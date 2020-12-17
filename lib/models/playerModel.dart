@@ -41,6 +41,7 @@ class PlayerDetailsModel {
       this.playerName,
       this.totalPlayedBalls = 0,
       this.madeRuns = 0,
+      this.overList,
       this.fours = 0,
       this.sixes = 0,
       this.overs,
@@ -52,16 +53,26 @@ class PlayerDetailsModel {
       this.singles = 0,
       this.doubles = 0,
       this.tripples = 0,
-      this.foursByBowler,
-      this.sixesByBowlers,
+      this.singleByBowler = 0,
+      this.doubleByBowlers = 0,
+      this.trippleByBowler = 0,
+      this.foursByBowler = 0,
+      this.extrasByBowlers = 0,
+      this.sixesByBowlers = 0,
       this.dotsBall = 0,
+      this.maxOverPerBowler = 0,
+      this.ballsByBowler = 0,
       this.facedBall = 0,
+      this.teamId = 0,
+      this.isPlaying = '',
       this.dotsBallByBowler = 0});
-
+  List<Over> overList = List<Over>();
   int playerId;
+  int teamId;
   String playerName;
   int totalPlayedBalls = 0;
   int madeRuns = 0;
+  int maxOverPerBowler = 0;
   int fours = 0;
   int sixes = 0;
   int overs;
@@ -73,27 +84,37 @@ class PlayerDetailsModel {
   int singles = 0;
   int doubles = 0;
   int tripples = 0;
-  int foursByBowler;
-  int sixesByBowlers;
+  int foursByBowler = 0;
+  int sixesByBowlers = 0;
+  int singleByBowler = 0;
+  int doubleByBowlers = 0;
+  int trippleByBowler = 0;
+  int extrasByBowlers = 0;
   int dotsBall = 0;
   int dotsBallByBowler = 0;
   int facedBall = 0;
-
+  int ballsByBowler = 0;
+  String isPlaying = '';
   factory PlayerDetailsModel.fromJson(Map<String, dynamic> json) =>
       PlayerDetailsModel(
         playerId: json["playerId"],
+        teamId: json['teamId'] ?? 0,
+        ballsByBowler: json['ballsByBowler'],
         dotsBallByBowler: json['dotsBallByBowler'] ?? 0,
         playerName: json["playerName"],
+        maxOverPerBowler: json['minOverPerBowler'] ?? 0,
         totalPlayedBalls: json["totalPlayedBalls"] ?? 0,
         madeRuns: json["madeRuns"] ?? 0,
         fours: json["fours"] ?? 0,
         sixes: json["sixes"] ?? 0,
         overs: json["overs"],
+        isPlaying: json["isPlaying"] ?? '',
         maiden: json["maiden"],
         runsByBowler: json["runsByBowler"] ?? 0,
         wickets: json["wickets"] ?? 0,
         caugth: json["caugth"],
         runout: json["runout"],
+        extrasByBowlers: json['extrasByBowlers'] ?? 0,
         singles: json["singles"] ?? 0,
         doubles: json["doubles"] ?? 0,
         tripples: json["tripples"] ?? 0,
@@ -101,6 +122,8 @@ class PlayerDetailsModel {
         sixesByBowlers: json["sixesByBowlers"],
         dotsBall: json["dotsBall"] ?? 0,
         facedBall: json["facedBall"] ?? 0,
+        overList:
+            List<Over>.from(json["overList"].map((x) => Over.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
@@ -109,16 +132,22 @@ class PlayerDetailsModel {
         "totalPlayedBalls": totalPlayedBalls,
         "madeRuns": madeRuns,
         "fours": fours,
+        "teamId": teamId,
         "sixes": sixes,
+        "isPlaying": isPlaying,
+        "ballsByBowler": ballsByBowler,
         "overs": overs,
         "maiden": maiden,
         "runsByBowler": runsByBowler,
         "wickets": wickets,
         "caugth": caugth,
         "runout": runout,
+        "extrasByBowlers": extrasByBowlers,
+        "minOverPerBowler": maxOverPerBowler,
         "singles": singles,
         "doubles": doubles,
         "tripples": tripples,
+        "overList": List<dynamic>.from(overList.map((x) => x.toJson())),
         "foursByBowler": foursByBowler,
         "sixesByBowlers": sixesByBowlers,
         "dotsBall": dotsBall,
@@ -148,29 +177,41 @@ class Over {
 
 class Bowl {
   Bowl(
-      {this.run = '',
+      {this.run = 0,
       this.totalRun = 0,
       this.wicket,
+      this.single = 0,
+      this.double = 0,
+      this.tripple = 0,
       this.wide = 0,
+      this.bowlerId = 0,
       this.noBall,
       this.helpingPlayerId,
       this.playerIdWhoFaced,
       this.runOut,
       this.playerIdWhoOut,
       this.four,
+      this.perBallRecord = '',
       this.sixdads,
+      this.facedBall = 0,
       this.six,
       this.bowled,
       this.dotBall = 0,
       this.caugth,
       this.stump,
+      this.extras = 0,
       this.lbw,
       this.isValid});
   bool isValid;
-  String run = '';
+  int run = 0;
+  int bowlerId = 0;
+  String perBallRecord = '';
   int totalRun = 0;
   int wicket;
   int wide = 0;
+  int single = 0;
+  int double = 0;
+  int tripple = 0;
   int noBall;
   int helpingPlayerId;
   int playerIdWhoFaced;
@@ -182,14 +223,19 @@ class Bowl {
   int bowled;
   int dotBall = 0;
   int caugth;
+  int facedBall = 0;
   int stump;
+  int extras = 0;
   int lbw;
 
   factory Bowl.fromJson(Map<String, dynamic> json) => Bowl(
-        run: json["run"] ?? '',
+        run: json["run"] ?? 0,
+        perBallRecord: json['perBallRecord'] ?? 0,
+        facedBall: json['facedBall'] ?? 0,
         totalRun: json['totalRun'] ?? 0,
         wicket: json["wicket"],
         wide: json["wide"] ?? 0,
+        bowlerId: json['bowlerId'] ?? 0,
         noBall: json["noBall"],
         helpingPlayerId: json["helpingPlayerId"],
         playerIdWhoFaced: json["playerIdWhoFaced"],
@@ -198,8 +244,12 @@ class Bowl {
         four: json["four"],
         sixdads: json["sixdads"],
         six: json["six"],
+        extras: json['extras'] ?? 0,
         bowled: json["bowled"],
         dotBall: json["dotBall"] ?? 0,
+        double: json['double'] ?? 0,
+        single: json['single'] ?? 0,
+        tripple: json['tripple'] ?? 0,
         caugth: json["caugth"],
         stump: json["stump"],
         lbw: json["LBW"],
@@ -207,16 +257,20 @@ class Bowl {
       );
 
   Map<String, dynamic> toJson() => {
-        "run": run = '',
+        "run": run = 0,
+        "perBallRecord": perBallRecord = '',
         "wicket": wicket,
         "totalRun": totalRun = 0,
         "wide": wide = 0,
         "noBall": noBall,
+        "extras": extras = 0,
+        "facedBall": facedBall = 0,
         "helpingPlayerId": helpingPlayerId,
         "playerIdWhoFaced": playerIdWhoFaced,
         "runOut": runOut,
         "playerIdWhoOut": playerIdWhoOut,
         "four": four,
+        "bowlerId": bowlerId = 0,
         "sixdads": sixdads,
         "six": six,
         "bowled": bowled,

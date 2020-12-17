@@ -1,9 +1,12 @@
+import 'dart:collection';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:froliccricketscore/blocs/sportsBloc.dart';
 import 'package:froliccricketscore/constants/config.dart';
 import 'package:froliccricketscore/models/MatchModel.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:froliccricketscore/models/player.dart';
 import 'package:froliccricketscore/modules/start_innings/start_Innings_Screen.dart';
 
 class TossScreen extends StatefulWidget {
@@ -124,32 +127,22 @@ class _TossScreenState extends State<TossScreen> {
       if (winningTossTeamID == widget.matchDataForApp.firstTeamId) {
         BATTING_TEAM_ID = widget.matchDataForApp.firstTeamId;
         BOWLING_TEAM_ID = widget.matchDataForApp.secondTeamId;
-//        print("11111111111");
-//        print("batting $BATTING_TEAM_ID");
-//        print("bowling $BOWLING_TEAM_ID");
+
         return;
       } else {
         BATTING_TEAM_ID = widget.matchDataForApp.secondTeamId;
         BOWLING_TEAM_ID = widget.matchDataForApp.firstTeamId;
-//        print("222222222222");
-//        print("batting $BATTING_TEAM_ID");
-//        print("bowling $BOWLING_TEAM_ID");
+
         return;
       }
     } else if (indexValue == 1) {
       if (winningTossTeamID == widget.matchDataForApp.firstTeamId) {
         BATTING_TEAM_ID = widget.matchDataForApp.secondTeamId;
         BOWLING_TEAM_ID = widget.matchDataForApp.firstTeamId;
-        print("3333333333");
-        print("batting $BATTING_TEAM_ID");
-        print("bowling $BOWLING_TEAM_ID");
         return;
       } else {
         BATTING_TEAM_ID = widget.matchDataForApp.firstTeamId;
         BOWLING_TEAM_ID = widget.matchDataForApp.secondTeamId;
-        print("444444444444");
-        print("batting $BATTING_TEAM_ID");
-        print("bowling $BOWLING_TEAM_ID");
         return;
       }
     }
@@ -166,15 +159,93 @@ class _TossScreenState extends State<TossScreen> {
           "https://www.iconninja.com/files/829/530/352/cricket-ball-sport-cr%C3%ADquete-magento-england-bowling-icon.png"
     },
   ];
+  var allPlayerList = List<Players>();
+  bool _isLoading = false;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-     }
+    getSquadTeamData();
+  }
+
+  Future<void> getSquadTeamData() async {
+    allPlayerList = await _getMatchPlayers();
+    if (allPlayerList.length > 0) {
+      setState(() {
+        _isLoading = true;
+      });
+      getPlayerDetailsList();
+    }
+  }
+
+  Future<List<Players>> _getMatchPlayers() async {
+    List<Players> playerList = List<Players>();
+
+    HashMap<int, Team> teamMap = context
+        .bloc<SportsDataBloc>()
+        .getTournamentData(widget.matchDataForApp.tournamentName)
+        .teamMap;
+
+    for (PlayerDetails playerDetails
+        in teamMap[widget.matchDataForApp.firstTeamId].playerMap.values) {
+      Players players = Players();
+      players.country = playerDetails.country;
+      players.point =
+          num.tryParse(playerDetails.credits.toString())?.toDouble();
+      players.firstName = playerDetails.name;
+      players.shortName = playerDetails.shortName;
+      players.picture = playerDetails.pictures;
+      players.pid = num.tryParse(playerDetails.playerId.toString())?.toInt();
+      players.fantasyPlayerRating =
+          num.tryParse(playerDetails.points.toString())?.toInt();
+      players.playingRole = playerDetails.skills;
+      players.teamId = teamMap[widget.matchDataForApp.firstTeamId].teamId;
+      players.teamName = teamMap[widget.matchDataForApp.firstTeamId].shortName;
+      players.playing11 = playerDetails.isPlaying.toString();
+      players.battingStyle = 'RHB';
+      players.bowlingStyle = 'RHB';
+      players.nationality = playerDetails.country;
+
+      playerList.add(players);
+    }
+
+    for (PlayerDetails playerDetails
+        in teamMap[widget.matchDataForApp.secondTeamId].playerMap.values) {
+      Players players = Players();
+      players.country = playerDetails.country;
+      players.point =
+          num.tryParse(playerDetails.credits.toString())?.toDouble();
+      players.firstName = playerDetails.name;
+      players.shortName = playerDetails.shortName;
+      players.picture = playerDetails.pictures;
+      players.pid = num.tryParse(playerDetails.playerId.toString())?.toInt();
+      players.fantasyPlayerRating =
+          num.tryParse(playerDetails.points.toString())?.toInt();
+      players.playingRole = playerDetails.skills;
+      players.teamId = teamMap[widget.matchDataForApp.secondTeamId].teamId;
+      players.teamName = teamMap[widget.matchDataForApp.secondTeamId].shortName;
+      players.playing11 = playerDetails.isPlaying.toString();
+      players.battingStyle = 'RHB';
+      players.bowlingStyle = 'RHB';
+      players.nationality = playerDetails.country;
+
+      playerList.add(players);
+    }
+
+    return playerList;
+  }
+
+  getPlayerDetailsList() {
+    context.bloc<SportsDataBloc>().getPlayerDetailList(allPlayerList);
+    setState(() {
+      _isLoading = true;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    PlayerDetails playerDetails;
+//    print(
+//        "length ----- ${context.bloc<SportsDataBloc>().state.playerDetailList[17].isPlaying}");
     return Scaffold(
         key: _scaffoldkey,
         appBar: AppBar(
@@ -281,6 +352,7 @@ class _TossScreenState extends State<TossScreen> {
                     builder: (context) => StartInningsScreen(
                           matchDataForApp: widget.matchDataForApp,
                           winningTossTeamId: winningTossTeamID,
+                          allPlayerList: allPlayerList,
                         )));
               },
               child: Container(

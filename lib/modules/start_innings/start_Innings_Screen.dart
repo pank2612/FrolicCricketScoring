@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:froliccricketscore/blocs/sportsBloc.dart';
 import 'package:froliccricketscore/constants/config.dart';
 import 'package:froliccricketscore/models/MatchModel.dart';
+import 'package:froliccricketscore/models/player.dart';
 import 'package:froliccricketscore/modules/start_innings/player_list.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -14,7 +15,9 @@ import 'package:froliccricketscore/constants/global_variables.dart' as global;
 class StartInningsScreen extends StatefulWidget {
   MatchDataForApp matchDataForApp;
   int winningTossTeamId;
-  StartInningsScreen({this.matchDataForApp, this.winningTossTeamId});
+  List<Players> allPlayerList;
+  StartInningsScreen(
+      {this.matchDataForApp, this.winningTossTeamId, this.allPlayerList});
   @override
   _StartInningsScreenState createState() => _StartInningsScreenState();
 }
@@ -319,6 +322,7 @@ class _StartInningsScreenState extends State<StartInningsScreen> {
               Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => LiveScoreScreen(
                         matchDataForApp: widget.matchDataForApp,
+                        allPlayerList: widget.allPlayerList,
                       )));
             },
             child: Container(

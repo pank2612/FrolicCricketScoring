@@ -75,25 +75,18 @@ class _RunOutScreenState extends State<RunOutScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           Container(
-            child: _image1 == null
-                ? InkWell(
-                    onTap: () {
-                      getImage1();
-                    },
-                    child: CircleAvatar(
-                      backgroundColor: Colors.white,
-                      maxRadius: 20,
-                      child: Image.network(
-                        url,
-                        fit: BoxFit.cover,
-                        width: MediaQuery.of(context).size.width * 0.1,
-                        height: MediaQuery.of(context).size.height * 0.1,
-                      ),
-                    ),
-                  )
-                : Image.file(_image1),
-            height: MediaQuery.of(context).size.height * 0.15,
-            width: MediaQuery.of(context).size.width * 0.25,
+            child: CircleAvatar(
+              backgroundColor: Colors.white,
+              maxRadius: 20,
+              child: Image.network(
+                url,
+                fit: BoxFit.cover,
+                width: MediaQuery.of(context).size.width * 0.08,
+                height: MediaQuery.of(context).size.height * 0.08,
+              ),
+            ),
+            height: MediaQuery.of(context).size.height * 0.1,
+            width: MediaQuery.of(context).size.width * 0.2,
           ),
           Text(
             name,
@@ -113,25 +106,18 @@ class _RunOutScreenState extends State<RunOutScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           Container(
-            child: _image3 == null
-                ? InkWell(
-                    onTap: () {
-                      getImage3();
-                    },
-                    child: CircleAvatar(
-                      backgroundColor: Colors.white,
-                      maxRadius: 20,
-                      child: Image.network(
-                        url,
-                        fit: BoxFit.cover,
-                        width: MediaQuery.of(context).size.width * 0.1,
-                        height: MediaQuery.of(context).size.height * 0.1,
-                      ),
-                    ),
-                  )
-                : Image.file(_image3),
-            height: MediaQuery.of(context).size.height * 0.15,
-            width: MediaQuery.of(context).size.width * 0.25,
+            child: CircleAvatar(
+              backgroundColor: Colors.white,
+              maxRadius: 20,
+              child: Image.network(
+                url,
+                fit: BoxFit.cover,
+                width: MediaQuery.of(context).size.width * 0.08,
+                height: MediaQuery.of(context).size.height * 0.08,
+              ),
+            ),
+            height: MediaQuery.of(context).size.height * 0.1,
+            width: MediaQuery.of(context).size.width * 0.2,
           ),
           Text(
             name,
@@ -151,25 +137,18 @@ class _RunOutScreenState extends State<RunOutScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           Container(
-            child: _image4 == null
-                ? InkWell(
-                    onTap: () {
-                      getImage4();
-                    },
-                    child: CircleAvatar(
-                      backgroundColor: Colors.white,
-                      maxRadius: 20,
-                      child: Image.network(
-                        url,
-                        fit: BoxFit.cover,
-                        width: MediaQuery.of(context).size.width * 0.1,
-                        height: MediaQuery.of(context).size.height * 0.1,
-                      ),
-                    ),
-                  )
-                : Image.file(_image4),
-            height: MediaQuery.of(context).size.height * 0.15,
-            width: MediaQuery.of(context).size.width * 0.25,
+            child: CircleAvatar(
+              backgroundColor: Colors.white,
+              maxRadius: 20,
+              child: Image.network(
+                url,
+                fit: BoxFit.cover,
+                width: MediaQuery.of(context).size.width * 0.08,
+                height: MediaQuery.of(context).size.height * 0.08,
+              ),
+            ),
+            height: MediaQuery.of(context).size.height * 0.1,
+            width: MediaQuery.of(context).size.width * 0.2,
           ),
           Text(
             name,
@@ -189,25 +168,18 @@ class _RunOutScreenState extends State<RunOutScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           Container(
-            child: _image2 == null
-                ? InkWell(
-                    onTap: () {
-                      getImage2();
-                    },
-                    child: CircleAvatar(
-                      backgroundColor: Colors.white,
-                      maxRadius: 20,
-                      child: Image.network(
-                        url,
-                        fit: BoxFit.cover,
-                        width: MediaQuery.of(context).size.width * 0.1,
-                        height: MediaQuery.of(context).size.height * 0.1,
-                      ),
-                    ),
-                  )
-                : Image.file(_image2),
-            height: MediaQuery.of(context).size.height * 0.15,
-            width: MediaQuery.of(context).size.width * 0.25,
+            child: CircleAvatar(
+              backgroundColor: Colors.white,
+              maxRadius: 20,
+              child: Image.network(
+                url,
+                fit: BoxFit.cover,
+                width: MediaQuery.of(context).size.width * 0.08,
+                height: MediaQuery.of(context).size.height * 0.08,
+              ),
+            ),
+            height: MediaQuery.of(context).size.height * 0.1,
+            width: MediaQuery.of(context).size.width * 0.2,
           ),
           Text(
             name,
@@ -246,43 +218,58 @@ class _RunOutScreenState extends State<RunOutScreen> {
                 ),
                 Row(
                   children: [
-                    chooseContainer1(
-                        name: "Avishek",
-                        url:
-                            "https://image.flaticon.com/icons/png/128/10/10552.png"),
+                    InkWell(
+                        splashColor: Colors.black,
+                        onTap: () {},
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: chooseContainer1(
+                              name: "Avishek",
+                              url:
+                                  "https://image.flaticon.com/icons/png/128/10/10552.png"),
+                        )),
                     SizedBox(
                       width: MediaQuery.of(context).size.width * 0.02,
                     ),
-                    chooseContainer2(
-                        name: "Avishek",
-                        url:
-                            "https://cdn0.iconfinder.com/data/icons/sports-and-games-3/512/140-128.png")
+                    InkWell(
+                      splashColor: Colors.black,
+                      onTap: () {},
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: chooseContainer2(
+                            name: "Avishek",
+                            url:
+                                "https://cdn0.iconfinder.com/data/icons/sports-and-games-3/512/140-128.png"),
+                      ),
+                    )
                   ],
-                ),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.02,
                 ),
                 normalText("Select Fielder"),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.02,
-                ),
                 Row(
                   children: [
-                    chooseContainer3(
-                        name: "Thrower",
-                        url:
-                            "https://cdn0.iconfinder.com/data/icons/sports-and-games-3/512/140-128.png"),
+                    InkWell(
+                        splashColor: Colors.black,
+                        onTap: () {},
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: chooseContainer3(
+                              name: "Thrower",
+                              url:
+                                  "https://cdn0.iconfinder.com/data/icons/sports-and-games-3/512/140-128.png"),
+                        )),
                     SizedBox(
                       width: MediaQuery.of(context).size.width * 0.02,
                     ),
-                    chooseContainer4(
-                        name: "Wicket",
-                        url:
-                            "https://cdn3.iconfinder.com/data/icons/sports-and-games-flat-outline/614/535_-_Cricket-128.png")
+                    InkWell(
+                        splashColor: Colors.black,
+                        onTap: () {},
+                        child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: chooseContainer4(
+                                name: "Wicket",
+                                url:
+                                    "https://cdn3.iconfinder.com/data/icons/sports-and-games-flat-outline/614/535_-_Cricket-128.png")))
                   ],
-                ),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.02,
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -352,23 +339,16 @@ class _RunOutScreenState extends State<RunOutScreen> {
               ],
             ),
           ),
-          InkWell(
-            onTap: () {},
-            child: Container(
-              width: MediaQuery.of(context).size.width,
-              child: Center(
-                child: Text(
-                  "OUT",
-                  style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w500),
-                ),
-              ),
-              color: Colors.teal.shade600,
-              height: MediaQuery.of(context).size.height * 0.08,
-            ),
-          )
+          RaisedButton(
+              onPressed: () {},
+              color: Colors.red,
+              child: Text(
+                "OUT",
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white),
+              ))
         ],
       ),
     );

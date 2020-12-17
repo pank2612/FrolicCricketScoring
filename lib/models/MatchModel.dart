@@ -297,7 +297,7 @@ class TournamentData {
       this.totalPoints = '',
       this.playerImageFolder = '',
       this.teamImageFolder = '',
-      this.inningsOver,
+      this.inningsOver = 0,
       this.matchDataMap = null,
       this.ruleMap = null,
       this.skillMap = null,

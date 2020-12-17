@@ -1,16 +1,22 @@
+import 'dart:async';
 import 'dart:collection';
+import 'dart:convert';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:froliccricketscore/blocs/sportsBloc.dart';
+import 'package:froliccricketscore/constants/config.dart';
 import 'package:froliccricketscore/models/MatchModel.dart';
 import 'package:froliccricketscore/models/player.dart';
 import 'package:froliccricketscore/models/playerModel.dart';
 import 'package:froliccricketscore/modules/out/outScreen.dart';
 import 'package:froliccricketscore/constants/global_variables.dart' as global;
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:froliccricketscore/modules/start_innings/player_list.dart';
 
 class LiveScoreScreen extends StatefulWidget {
   MatchDataForApp matchDataForApp;
-  LiveScoreScreen({this.matchDataForApp});
+  List<Players> allPlayerList;
+  LiveScoreScreen({this.matchDataForApp, this.allPlayerList});
   @override
   _LiveScoreScreenState createState() => _LiveScoreScreenState();
 }
@@ -18,83 +24,8 @@ class LiveScoreScreen extends StatefulWidget {
 class _LiveScoreScreenState extends State<LiveScoreScreen> {
   TextEditingController _nbController = TextEditingController();
   TextEditingController _byeController = TextEditingController();
-  var allPlayerList = List<Players>();
-  Bowl bowl = Bowl();
-  bool _isLoading = false;
-  Future<void> getSquadTeamData() async {
-    allPlayerList = await _getMatchPlayers();
-    if (allPlayerList.length > 0) {
-      setState(() {
-        _isLoading = true;
-      });
-      getPlayerDetailsList();
-    }
-  }
-
-  Future<List<Players>> _getMatchPlayers() async {
-    List<Players> playerList = List<Players>();
-
-    HashMap<int, Team> teamMap = context
-        .bloc<SportsDataBloc>()
-        .getTournamentData(widget.matchDataForApp.tournamentName)
-        .teamMap;
-
-    for (PlayerDetails playerDetails
-        in teamMap[widget.matchDataForApp.firstTeamId].playerMap.values) {
-      Players players = Players();
-      players.country = playerDetails.country;
-      players.point =
-          num.tryParse(playerDetails.credits.toString())?.toDouble();
-      players.firstName = playerDetails.name;
-      players.shortName = playerDetails.shortName;
-      players.picture = playerDetails.pictures;
-      players.pid = num.tryParse(playerDetails.playerId.toString())?.toInt();
-      players.fantasyPlayerRating =
-          num.tryParse(playerDetails.points.toString())?.toInt();
-      players.playingRole = playerDetails.skills;
-      players.teamId = teamMap[widget.matchDataForApp.firstTeamId].teamId;
-      players.teamName = teamMap[widget.matchDataForApp.firstTeamId].shortName;
-      players.playing11 = playerDetails.isPlaying.toString();
-      players.battingStyle = 'RHB';
-      players.bowlingStyle = 'RHB';
-      players.nationality = playerDetails.country;
-
-      playerList.add(players);
-    }
-
-    for (PlayerDetails playerDetails
-        in teamMap[widget.matchDataForApp.secondTeamId].playerMap.values) {
-      Players players = Players();
-      players.country = playerDetails.country;
-      players.point =
-          num.tryParse(playerDetails.credits.toString())?.toDouble();
-      players.firstName = playerDetails.name;
-      players.shortName = playerDetails.shortName;
-      players.picture = playerDetails.pictures;
-      players.pid = num.tryParse(playerDetails.playerId.toString())?.toInt();
-      players.fantasyPlayerRating =
-          num.tryParse(playerDetails.points.toString())?.toInt();
-      players.playingRole = playerDetails.skills;
-      players.teamId = teamMap[widget.matchDataForApp.secondTeamId].teamId;
-      players.teamName = teamMap[widget.matchDataForApp.secondTeamId].shortName;
-      players.playing11 = playerDetails.isPlaying.toString();
-      players.battingStyle = 'RHB';
-      players.bowlingStyle = 'RHB';
-      players.nationality = playerDetails.country;
-
-      playerList.add(players);
-    }
-
-//        });
-    return playerList;
-  }
-
-  getPlayerDetailsList() {
-    context.bloc<SportsDataBloc>().getPlayerDetailList(allPlayerList);
-    setState(() {
-      _isLoading = true;
-    });
-  }
+  TextEditingController _legByeController = TextEditingController();
+  TextEditingController _fiveSevenController = TextEditingController();
 
   List<Map<String, dynamic>> list1 = [
     {"name": "0"},
@@ -117,7 +48,6 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    getSquadTeamData();
   }
 
   @override
@@ -163,7 +93,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            "${state.bowl.totalRun ?? 0}/0",
+                            "${getScore(state.overList)}/0",
                             style: TextStyle(
                                 fontWeight: FontWeight.w500,
                                 color: Colors.white,
@@ -207,7 +137,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                                         0.01,
                                   ),
                                   Text(
-                                    stricker.firstName ?? "Striker",
+                                    state.stricker.firstName ?? "Striker",
                                     style: TextStyle(
                                         fontWeight: FontWeight.w500,
                                         color: Colors.white,
@@ -216,7 +146,8 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                                 ],
                               ),
                               Text(
-                                "${state.playerDetailsModel.madeRuns}(${state.playerDetailsModel.facedBall.toString() ?? "0"})",
+                                getStrikerData(state.stricker.pid) ?? "0(0)",
+                                // "${state.stricker.pid}(${state.playerDetailsModel.facedBall.toString() ?? "0"})",
                                 style: TextStyle(
                                     fontWeight: FontWeight.w300,
                                     color: Colors.white,
@@ -234,7 +165,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                                     child: Padding(
                                       padding: const EdgeInsets.all(2.0),
                                       child: Image.network(
-                                          "https://image.flaticon.com/icons/png/128/3439/3439653.png"),
+                                          "https://cdn.iconscout.com/icon/premium/png-256-thumb/running-batsman-2049546-1729209.png"),
                                     ),
                                   ),
                                   SizedBox(
@@ -242,7 +173,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                                         0.01,
                                   ),
                                   Text(
-                                    runner.firstName ?? "Runner",
+                                    state.runner.firstName ?? "Runner",
 //                                "Vivek",
                                     style: TextStyle(
                                         fontWeight: FontWeight.w500,
@@ -252,7 +183,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                                 ],
                               ),
                               Text(
-                                "0(0)",
+                                getStrikerData(state.runner.pid) ?? "0(0)",
                                 style: TextStyle(
                                     fontWeight: FontWeight.w300,
                                     color: Colors.white,
@@ -275,37 +206,64 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          CircleAvatar(
-                              maxRadius: 14,
-                              backgroundColor: Colors.transparent,
-                              child: Image.network(
-                                "https://www.iconninja.com/files/829/530/352/cricket-ball-sport-cr%C3%ADquete-magento-england-bowling-icon.png",
-                                fit: BoxFit.cover,
-                              )),
-                          SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.01,
-                          ),
-                          Text(
-                            bowler.firstName ?? "Bowler",
+                          Row(
+                            children: [
+                              CircleAvatar(
+                                  maxRadius: 14,
+                                  backgroundColor: Colors.transparent,
+                                  child: Image.network(
+                                    "https://www.iconninja.com/files/829/530/352/cricket-ball-sport-cr%C3%ADquete-magento-england-bowling-icon.png",
+                                    fit: BoxFit.cover,
+                                  )),
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.01,
+                              ),
+                              Text(
+                                state.bowler.firstName ?? "Bowler",
 //                        "Avishek",
-                            style: TextStyle(color: Colors.white, fontSize: 20),
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 20),
+                              ),
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.01,
+                              ),
+                              Text(
+                                getBowlerData(
+                                        state.bowler.pid, state.overList) ??
+                                    "(0-0)",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.white,
+                                    fontSize: 17),
+                              ),
+                            ],
                           ),
-                          SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.01,
-                          ),
-                          Text(
-                            "(${state.playerDetailsModel.runsByBowler ?? 0} - 0)",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w400,
-                                color: Colors.white,
-                                fontSize: 17),
-                          ),
+                          Row(
+                            children: [
+                              Text(
+                                "Extras -",
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 20),
+                              ),
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.01,
+                              ),
+                              Text(
+                                getExtraRuns(state.overList).toString(),
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.white,
+                                    fontSize: 17),
+                              ),
+                            ],
+                          )
                         ],
                       ),
                     ),
                     Container(
-                      height: 80,
+                      height: 90,
                       padding: const EdgeInsets.all(8.0),
                       child: ListView.builder(
                         shrinkWrap: true,
@@ -314,11 +272,11 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                           return CircleAvatar(
                             radius: 40,
                             child: Text(
-                              state.overList[state.overList.length].over[index]
-                                  .run
+                              state.overList[state.overList.length - 1]
+                                  .over[index].perBallRecord
                                   .toString(),
                               style: TextStyle(
-                                  fontSize: 40,
+                                  fontSize: 35,
                                   fontWeight: FontWeight.w700,
                                   color: Colors.black),
                             ),
@@ -327,7 +285,8 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                         },
                         itemCount: state.overList.isEmpty
                             ? 0
-                            : state.overList[state.overList.length].over.length,
+                            : state.overList[state.overList.length - 1].over
+                                .length,
                       ),
                     )
                   ],
@@ -416,17 +375,17 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
     if (indexValue == 0) {
       zero();
     } else if (indexValue == 1) {
-      //  single();
+      single();
     } else if (indexValue == 2) {
-      //double();
+      double();
     } else if (indexValue == 3) {
-      //triple();
+      triple();
     } else if (indexValue == 4) {
-      //four();
+      four();
     } else if (indexValue == 5) {
-      //six();
+      six();
     } else if (indexValue == 6) {
-      //wide();
+      wide();
     } else if (indexValue == 7) {
       _noBallDialogBox();
     } else if (indexValue == 8) {
@@ -440,141 +399,271 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
     } else if (indexValue == 1) {
       _57DialogBox();
     } else if (indexValue == 2) {
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (context) => OutScreen()));
+      Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => OutScreen(
+                matchDataForApp: widget.matchDataForApp,
+                allPlayerList: widget.allPlayerList,
+              )));
     } else if (indexValue == 3) {
       _legByeDialogBox();
     }
   }
 
-  String radioItem = '';
+  String _selectedNoBall;
   _noBallDialogBox() {
     return showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            'No Ball',
-            style: TextStyle(
-                color: Colors.red, fontSize: 20, fontWeight: FontWeight.w500),
-          ),
-          content: Container(
-            height: MediaQuery.of(context).size.height * 0.35,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      "NB + ",
-                      style:
-                          TextStyle(fontWeight: FontWeight.w500, fontSize: 17),
-                    ),
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.2,
-                      height: MediaQuery.of(context).size.height * 0.05,
-                      child: TextFormField(
-                        controller: _nbController,
-                        decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(6.0),
-                                borderSide: BorderSide(
-                                    color: Colors.black,
-                                    width: 4,
-                                    style: BorderStyle.solid))),
-                      ),
-                    ),
-                    Text(
-                      " = 2 Runs ",
-                      style:
-                          TextStyle(fontWeight: FontWeight.w500, fontSize: 17),
-                    ),
-                  ],
-                ),
-                Column(
+        return SingleChildScrollView(
+          child: Center(
+            child: AlertDialog(
+              title: Text(
+                'No Ball',
+                style: TextStyle(
+                    color: Colors.red,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w500),
+              ),
+              content: Container(
+                height: MediaQuery.of(context).size.height * 0.4,
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
-                        Radio(
-//                        autofocus: true,
-//                        activeColor: Colors.blue,
-                          value: "0",
-                          onChanged: (val) {
-                            setState(() {
-                              radioItem = val;
-                            });
-                          },
-                          groupValue: radioItem,
+                        Text(
+                          "NB + ",
+                          style: TextStyle(
+                              fontWeight: FontWeight.w500, fontSize: 17),
                         ),
-                        Text("From Bat"),
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.2,
+                          height: MediaQuery.of(context).size.height * 0.05,
+                          child: TextFormField(
+                            controller: _nbController,
+                            decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(6.0),
+                                    borderSide: BorderSide(
+                                        color: Colors.black,
+                                        width: 4,
+                                        style: BorderStyle.solid))),
+                          ),
+                        ),
+                        Text(
+                          _nbController.text.isEmpty
+                              ? " = 1 Runs"
+                              : " = ${int.parse(_nbController.text) + 1} Runs ",
+                          style: TextStyle(
+                              fontWeight: FontWeight.w500, fontSize: 17),
+                        ),
+                      ],
+                    ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ListTile(
+                          onTap: () {
+                            _selectedNoBall = "From Bat";
+                          },
+                          title: Text("From Bat"),
+                        ),
+                        ListTile(
+                          onTap: () {
+                            _selectedNoBall = "Bye";
+                          },
+                          title: Text("Bye"),
+                        ),
+                        ListTile(
+                          onTap: () {
+                            _selectedNoBall = "Leg Bye";
+                          },
+                          title: Text("Leg Bye"),
+                        )
                       ],
                     ),
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Radio(
-//                        autofocus: true,
-//                        activeColor: Colors.blue,
-                          value: "0",
-                          onChanged: (val) {
-                            setState(() {
-                              radioItem = val;
-                            });
+                        OutlineButton(
+                          //color: Colors.black,
+                          borderSide: BorderSide(color: Colors.black),
+                          child: Text(
+                            'Cancel',
+                            style: TextStyle(color: Colors.black, fontSize: 20),
+                          ),
+                          onPressed: () {
+                            Navigator.of(context).pop();
                           },
-                          groupValue: radioItem,
                         ),
-                        Text("Bye"),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Radio(
-//                        autofocus: true,
-//                        activeColor: Colors.blue,
-                          value: "0",
-                          onChanged: (val) {
-                            setState(() {
-                              radioItem = val;
-                            });
+                        FlatButton(
+                          child: Text(
+                            'Ok',
+                            style: TextStyle(color: Colors.white, fontSize: 20),
+                          ),
+                          color: Colors.teal.shade600,
+                          onPressed: () {
+                            noBall();
+                            Navigator.of(context).pop();
                           },
-                          groupValue: radioItem,
                         ),
-                        Text("Leg Bye"),
                       ],
                     )
                   ],
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    OutlineButton(
-                      //color: Colors.black,
-                      borderSide: BorderSide(color: Colors.black),
-                      child: Text(
-                        'Cancel',
-                        style: TextStyle(color: Colors.black, fontSize: 20),
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                    FlatButton(
-                      child: Text(
-                        'Ok',
-                        style: TextStyle(color: Colors.white, fontSize: 20),
-                      ),
-                      color: Colors.teal.shade600,
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                  ],
-                )
-              ],
+              ),
             ),
+          ),
+        );
+      },
+    );
+  }
+
+  _overFinishedDialogBox() {
+    return showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Center(
+          child: AlertDialog(
+            title: Text(
+              'Score after this over',
+              style: TextStyle(
+                  color: Colors.red, fontSize: 20, fontWeight: FontWeight.w500),
+            ),
+            content: Container(
+              height: MediaQuery.of(context).size.height * 0.15,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            "Total Score : ",
+                            style: TextStyle(color: Colors.black, fontSize: 20),
+                          ),
+                          Text(
+                            getScore(context
+                                            .bloc<SportsDataBloc>()
+                                            .state
+                                            .overList)
+                                        .toString() +
+                                    "/0" ??
+                                "0/0",
+                            style: TextStyle(color: Colors.black, fontSize: 20),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 2,
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            "${context.bloc<SportsDataBloc>().state.stricker.shortName} : " ??
+                                "Striker",
+                            style: TextStyle(color: Colors.black, fontSize: 20),
+                          ),
+                          Text(
+                            getStrikerData(context
+                                .bloc<SportsDataBloc>()
+                                .state
+                                .stricker
+                                .pid),
+                            style: TextStyle(color: Colors.black, fontSize: 20),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 2,
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            "${context.bloc<SportsDataBloc>().state.runner.shortName} : " ??
+                                "Runner",
+                            style: TextStyle(color: Colors.black, fontSize: 20),
+                          ),
+                          Text(
+                            getStrikerData(context
+                                .bloc<SportsDataBloc>()
+                                .state
+                                .runner
+                                .pid),
+                            style: TextStyle(color: Colors.black, fontSize: 20),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 2,
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            "${context.bloc<SportsDataBloc>().state.bowler.shortName} : " ??
+                                "Bowler",
+                            style: TextStyle(color: Colors.black, fontSize: 20),
+                          ),
+                          Text(
+                            getBowlerData(
+                                context.bloc<SportsDataBloc>().state.bowler.pid,
+                                context.bloc<SportsDataBloc>().state.overList),
+                            style: TextStyle(color: Colors.black, fontSize: 20),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  OutlineButton(
+                    //color: Colors.black,
+                    borderSide: BorderSide(color: Colors.black),
+                    child: Text(
+                      'Cancel',
+                      style: TextStyle(color: Colors.black, fontSize: 20),
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.3,
+                  ),
+                  FlatButton(
+                    child: Text(
+                      'Ok',
+                      style: TextStyle(color: Colors.white, fontSize: 20),
+                    ),
+                    color: Colors.teal.shade600,
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => PlayersList(
+                                    matchDataForApp: widget.matchDataForApp,
+                                    teamId: BOWLING_TEAM_ID,
+                                    select: "Bowler",
+                                  ))).then(goBack);
+                    },
+                  ),
+                ],
+              )
+            ],
           ),
         );
       },
@@ -614,9 +703,6 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                                     style: BorderStyle.solid))),
                       ),
                     ),
-//                    SizedBox(
-//                      height: MediaQuery.of(context).size.height * 0.02,
-//                    ),
                     Text(
                       " Runs ",
                       style:
@@ -624,9 +710,6 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                     ),
                   ],
                 ),
-//                SizedBox(
-//                  height: MediaQuery.of(context).size.height * 0.02,
-//                ),
                 Text(
                   "Current Keeper:",
                   style: TextStyle(fontWeight: FontWeight.w400, fontSize: 15),
@@ -652,6 +735,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                       ),
                       color: Colors.teal.shade600,
                       onPressed: () {
+                        bye();
                         Navigator.of(context).pop();
                       },
                     ),
@@ -688,7 +772,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                       width: MediaQuery.of(context).size.width * 0.2,
                       height: MediaQuery.of(context).size.height * 0.05,
                       child: TextFormField(
-                        controller: _byeController,
+                        controller: _legByeController,
                         decoration: InputDecoration(
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(6.0),
@@ -698,9 +782,6 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                                     style: BorderStyle.solid))),
                       ),
                     ),
-//                    SizedBox(
-//                      height: MediaQuery.of(context).size.height * 0.02,
-//                    ),
                     Text(
                       " Runs ",
                       style:
@@ -708,10 +789,6 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                     ),
                   ],
                 ),
-//                SizedBox(
-//                  height: MediaQuery.of(context).size.height * 0.02,
-//                ),
-
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -733,6 +810,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                       ),
                       color: Colors.teal.shade600,
                       onPressed: () {
+                        legBye();
                         Navigator.of(context).pop();
                       },
                     ),
@@ -769,7 +847,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                       width: MediaQuery.of(context).size.width * 0.2,
                       height: MediaQuery.of(context).size.height * 0.05,
                       child: TextFormField(
-                        controller: _byeController,
+                        controller: _fiveSevenController,
                         decoration: InputDecoration(
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(6.0),
@@ -779,9 +857,6 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                                     style: BorderStyle.solid))),
                       ),
                     ),
-//                    SizedBox(
-//                      height: MediaQuery.of(context).size.height * 0.02,
-//                    ),
                     Text(
                       " Runs ",
                       style:
@@ -789,9 +864,6 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                     ),
                   ],
                 ),
-//                SizedBox(
-//                  height: MediaQuery.of(context).size.height * 0.02,
-//                ),
                 Text(
                   "4 and 6 will not be considered boundaries",
                   style: TextStyle(fontWeight: FontWeight.w400, fontSize: 15),
@@ -817,6 +889,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                       ),
                       color: Colors.teal.shade600,
                       onPressed: () {
+                        fiveSeven();
                         Navigator.of(context).pop();
                       },
                     ),
@@ -897,58 +970,196 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         });
   }
 
-  // int count = 0;
   updateOver(Bowl bowl) {
     context.bloc<SportsDataBloc>().setOver(bowl);
   }
 
   updateStriker(Bowl bowl) {
-    context.bloc<SportsDataBloc>().state.playerDetailList.forEach((player) {
-      if (context.bloc<SportsDataBloc>().state.stricker.pid ==
-          player.playerId) {
-        PlayerDetailsModel _playerDetailsModel =
-            context.bloc<SportsDataBloc>().state.playerDetailsModel;
-        Bowl _bowl = context.bloc<SportsDataBloc>().state.bowl;
-        _playerDetailsModel.madeRuns += int.parse(bowl.run);
-        _playerDetailsModel.facedBall += bowl.dotBall;
-        // _playerDetailsModel.totalPlayedBalls += 1;
-        if (int.parse(bowl.run) == 1 ||
-            int.parse(bowl.run) == 3 ||
-            int.parse(bowl.run) == 5) {
-          // this.state.runner = player
-          context.bloc<SportsDataBloc>().state.stricker.pid =
-              context.bloc<SportsDataBloc>().state.runner.pid;
-        }
-
-        context.bloc<SportsDataBloc>().updatePlayerDetail(_playerDetailsModel);
+    PlayerDetailsModel _playerDetailsModel = PlayerDetailsModel();
+    context.bloc<SportsDataBloc>().state.playerDetailList.forEach((element) {
+      if (element.playerId ==
+          context.bloc<SportsDataBloc>().state.stricker.pid) {
+        _playerDetailsModel = element;
       }
     });
+//    _playerDetailsModel.overList.forEach((element) {
+//      element.over.add(bowl);
+//    });
+    _playerDetailsModel.sixes += bowl.six;
+    _playerDetailsModel.fours += bowl.four;
+    _playerDetailsModel.tripples += bowl.tripple;
+    //_playerDetailsModel.+=bowl.six;
+    _playerDetailsModel.madeRuns += bowl.run;
+    _playerDetailsModel.dotsBall += bowl.dotBall;
+    _playerDetailsModel.facedBall += bowl.facedBall;
+    _playerDetailsModel.doubles += bowl.double;
+    _playerDetailsModel.singles += bowl.single;
+    if (bowl.run == 1 || bowl.run == 3 || bowl.run == 5) {
+      context.bloc<SportsDataBloc>().setStricker(
+          context.bloc<SportsDataBloc>().state.runner.pid,
+          widget.allPlayerList);
+      context.bloc<SportsDataBloc>().setRunner(
+          context.bloc<SportsDataBloc>().state.stricker.pid,
+          widget.allPlayerList);
+    }
+
+    context.bloc<SportsDataBloc>().updatePlayerDetail(_playerDetailsModel);
   }
 
-  updateRunner() {}
+  updateRunner(Bowl bowl) {
+    PlayerDetailsModel _playerDetailsModel = PlayerDetailsModel();
+    _playerDetailsModel.madeRuns += bowl.run;
+    _playerDetailsModel.dotsBall += bowl.dotBall;
+    _playerDetailsModel.facedBall += bowl.facedBall;
+    context.bloc<SportsDataBloc>().updatePlayerDetail(_playerDetailsModel);
+  }
+
   updateBowler(Bowl bowl) {
-    context.bloc<SportsDataBloc>().state.playerDetailList.forEach((player) {
-      if (context.bloc<SportsDataBloc>().state.bowler.pid == player.playerId) {
-        PlayerDetailsModel _playerDetailsModel =
-            context.bloc<SportsDataBloc>().state.playerDetailsModel;
-        _playerDetailsModel.runsByBowler += int.parse(bowl.run);
-        if (bowl.isValid == true) {
-          _playerDetailsModel.dotsBallByBowler += bowl.dotBall;
-          if (bowl.wicket == 1) {
-            _playerDetailsModel.wickets += 1;
-          }
-        }
-        context.bloc<SportsDataBloc>().updatePlayerDetail(_playerDetailsModel);
+    PlayerDetailsModel _playerDetailsModel = PlayerDetailsModel();
+    context.bloc<SportsDataBloc>().state.playerDetailList.forEach((element) {
+      if (element.playerId == context.bloc<SportsDataBloc>().state.bowler.pid) {
+        _playerDetailsModel = element;
       }
     });
+    _playerDetailsModel.overList = setOver(bowl, _playerDetailsModel.overList);
+    _playerDetailsModel.runsByBowler += bowl.run;
+    _playerDetailsModel.extrasByBowlers += bowl.wide;
+    _playerDetailsModel.extrasByBowlers += bowl.extras;
+    _playerDetailsModel.sixesByBowlers += bowl.six;
+    _playerDetailsModel.foursByBowler += bowl.four;
+    _playerDetailsModel.trippleByBowler += bowl.tripple;
+    _playerDetailsModel.singleByBowler += bowl.single;
+    _playerDetailsModel.singleByBowler += bowl.wide;
+    _playerDetailsModel.doubleByBowlers += bowl.double;
+    _playerDetailsModel.foursByBowler += bowl.four;
+    _playerDetailsModel.dotsBallByBowler += bowl.dotBall;
+    if (bowl.isValid == true) {
+      _playerDetailsModel.ballsByBowler += 1;
+    }
+    if (bowl.wicket == 1) {
+      _playerDetailsModel.wickets += 1;
+    }
+
+    context.bloc<SportsDataBloc>().updatePlayerDetail(_playerDetailsModel);
+    if (bowl.isValid == true) {
+      int validBowl = 0;
+
+      _playerDetailsModel.overList[_playerDetailsModel.overList.length - 1].over
+          .forEach((singleBowl) {
+        if (singleBowl.isValid == true) {
+          validBowl += 1;
+        }
+      });
+      if (validBowl == 6) {
+        _playerDetailsModel.maxOverPerBowler += 1;
+        //print(element.over.length);
+        _overFinishedDialogBox();
+      }
+
+//      if (_playerDetailsModel.ballsByBowler == 6 ||
+//          _playerDetailsModel.ballsByBowler == 12 ||
+//          _playerDetailsModel.ballsByBowler == 18) {
+//        _playerDetailsModel.minOverPerBowler += 1;
+//        _overFinishedDialogBox();
+//      }
+    }
+//    _playerDetailsModel.overList.forEach((element) {
+//      if (element.over.length == 6) {
+//        print(element.over.length);
+//        _overFinishedDialogBox();
+//      }
+//    });
+  }
+
+  List<Over> setOver(Bowl bowl, List<Over> _overList) {
+//    print("over Ball------- $bowl");
+    if (_overList[0].over == null) {
+      //_overList.remove(_overList[0]);
+      List<Over> __overList = List<Over>();
+      Over overNext = Over();
+      List<Bowl> bowlList = List<Bowl>();
+      bowlList.add(bowl);
+      overNext.over = bowlList;
+      // print("over Next------- $overNext");
+      __overList.add(overNext);
+      _overList = __overList;
+    } else {
+      Over over = _overList[_overList.length - 1];
+//      print("---------------${_overList[_overList.length - 1].over.length}");
+      int bowlCount = 0;
+      if (over.over != null) {
+        over.over.forEach((element) {
+          if (element.isValid == true) {
+            bowlCount += 1;
+          }
+        });
+      }
+      if (bowlCount < 6) {
+        over.over.add(bowl);
+        _overList[_overList.length - 1] = over;
+      } else {
+        Over overNext = Over();
+        List<Bowl> bowlList = List<Bowl>();
+        bowlList.add(bowl);
+        overNext.over = bowlList;
+        _overList.add(overNext);
+      }
+    }
+    return _overList;
   }
 
   zero() {
-    Bowl _bowl = context.bloc<SportsDataBloc>().state.bowl;
     Bowl bowl = Bowl(
         dotBall: 1,
-        run: 0.toString(),
-        // totalRun: _bowl.totalRun + 0,
+        facedBall: 1,
+        run: 0,
+        bowlerId: context.bloc<SportsDataBloc>().state.bowler.pid,
+        playerIdWhoFaced: context.bloc<SportsDataBloc>().state.stricker.pid,
+        perBallRecord: 0.toString(),
+        totalRun: 0,
+        single: 0,
+        double: 0,
+        tripple: 0,
+        wide: 0,
+        bowled: 0,
+        caugth: 0,
+        four: 0,
+        extras: 0,
+        noBall: 0,
+        runOut: 0,
+        six: 0,
+        lbw: 0,
+        stump: 0,
+        wicket: 0,
+        isValid: true);
+    updateOver(bowl);
+    updateStriker(bowl);
+    updateBowler(bowl);
+  }
+
+  single() {
+    Bowl bowl = Bowl(
+        dotBall: 0,
+        bowlerId: context.bloc<SportsDataBloc>().state.bowler.pid,
+        playerIdWhoFaced: context.bloc<SportsDataBloc>().state.stricker.pid,
+        facedBall: 1,
+        run: 1,
+        perBallRecord: 1.toString(),
+        totalRun: 1,
+        single: 1,
+        double: 0,
+        tripple: 0,
+        wide: 0,
+        extras: 0,
+        bowled: 0,
+        caugth: 0,
+        four: 0,
+        noBall: 0,
+        runOut: 0,
+        six: 0,
+        lbw: 0,
+        stump: 0,
+        wicket: 0,
         isValid: true);
 
     updateOver(bowl);
@@ -956,238 +1167,310 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
     updateBowler(bowl);
   }
 
-//  zero1() {
-//    context.bloc<SportsDataBloc>().state.playerDetailList.forEach((player) {
-//      if (context.bloc<SportsDataBloc>().state.stricker.pid ==
-//          player.playerId) {
-//        PlayerDetailsModel _playerDetailsModel =
-//            context.bloc<SportsDataBloc>().state.playerDetailsModel;
-//        Bowl _bowl = context.bloc<SportsDataBloc>().state.bowl;
-//        PlayerDetailsModel playerDetailsModel = PlayerDetailsModel(
-//            dotsBall: _playerDetailsModel.dotsBall + 1,
-//            madeRuns: _playerDetailsModel.madeRuns + 0,
-//            totalPlayedBalls: _playerDetailsModel.totalPlayedBalls + 1);
-//        Bowl bowl = Bowl(
-//            dotBall: _bowl.dotBall + 1,
-//            run: 0.toString(),
-//            totalRun: _bowl.totalRun + 0,
-//            isValid: true);
-//        ball.add(bowl);
-//        if (getValidBall(ball) == 6) {
-//          setState(() {
-//            // count = 0;
-//          });
-//          return;
-//        }
-//        //   print("Count---------------${count}");
-//        print("---------------${getValidBall(ball)}");
-//        Over over = Over(over: ball);
-//        setState(() {
-//          context.bloc<SportsDataBloc>().getPlayerDetail(playerDetailsModel);
-//          context.bloc<SportsDataBloc>().getBowl(bowl);
-//          context.bloc<SportsDataBloc>().getOver(over);
-//        });
-//      }
-//    });
-//  }
-//
-//  wide() {
-//    context.bloc<SportsDataBloc>().state.playerDetailList.forEach((player) {
-//      if (context.bloc<SportsDataBloc>().state.stricker.pid ==
-//          player.playerId) {
-//        PlayerDetailsModel _playerDetailsModel =
-//            context.bloc<SportsDataBloc>().state.playerDetailsModel;
-//        Bowl _bowl = context.bloc<SportsDataBloc>().state.bowl;
-//        PlayerDetailsModel playerDetailsModel = PlayerDetailsModel(
-//            //dotsBall: _playerDetailsModel.dotsBall + 1,
-//            //madeRuns: _playerDetailsModel.madeRuns + 0,
-//            // totalPlayedBalls: _playerDetailsModel.totalPlayedBalls + 1
-//            );
-//        Bowl bowl = Bowl(
-//            dotBall: _bowl.dotBall + 1,
-//            wide: _bowl.wide + 1,
-//            run: "WD",
-//            totalRun: _bowl.totalRun + 1,
-//            isValid: true);
-//        ball.add(bowl);
-////        if (getValidBall(ball) == 6) {
-////          setState(() {
-////            count = 0;
-////          });
-////          return;
-////        }
-//        // print("Count---------------${count}");
-//        print("---------------${getValidBall(ball)}");
-//        Over over = Over(over: ball);
-//        setState(() {
-//          context.bloc<SportsDataBloc>().getPlayerDetail(playerDetailsModel);
-//          context.bloc<SportsDataBloc>().getBowl(bowl);
-//          context.bloc<SportsDataBloc>().getOver(over);
-//        });
-//      }
-//    });
-//  }
-//
-//  single() {
-//    context.bloc<SportsDataBloc>().state.playerDetailList.forEach((player) {
-//      if (context.bloc<SportsDataBloc>().state.stricker.pid ==
-//          player.playerId) {
-//        PlayerDetailsModel _playerDetailsModel =
-//            context.bloc<SportsDataBloc>().state.playerDetailsModel;
-//        Bowl _bowl = context.bloc<SportsDataBloc>().state.bowl;
-//        PlayerDetailsModel playerDetailsModel = PlayerDetailsModel(
-//            singles: _playerDetailsModel.singles + 1,
-//            madeRuns: _playerDetailsModel.madeRuns + 1,
-//            totalPlayedBalls: _playerDetailsModel.totalPlayedBalls + 1);
-//        Bowl bowl = Bowl(
-//            run: 1.toString(), totalRun: _bowl.totalRun + 1, isValid: true);
-//        ball.add(bowl);
-//        Over over = Over(over: ball);
-//        setState(() {
-//          context.bloc<SportsDataBloc>().getPlayerDetail(playerDetailsModel);
-//          context.bloc<SportsDataBloc>().getBowl(bowl);
-//          context.bloc<SportsDataBloc>().getOver(over);
-//        });
-//      }
-////      if (context.bloc<SportsDataBloc>().state.bowler.pid == player.playerId) {
-////        PlayerDetailsModel _playerDetailsModel =
-////            context.bloc<SportsDataBloc>().state.playerDetailsModel;
-////        Bowl _bowl = context.bloc<SportsDataBloc>().state.bowl;
-////        PlayerDetailsModel playerDetailsModel = PlayerDetailsModel(
-////          runsByBowler: _playerDetailsModel.runsByBowler + 1,
-////          // madeRuns: _playerDetailsModel.madeRuns + 0,
-////          //  totalPlayedBalls: _playerDetailsModel.totalPlayedBalls + 1
-////        );
-//////        Bowl bowl = Bowl(
-//////            //dotBall: count + 1,
-//////            //run: 0.toString(),
-//////            //totalRun: _bowl.totalRun + 0,
-//////            isValid: true);
-//////        ball.add(bowl);
-//////        if (getValidBall(ball) == 6) {
-//////          setState(() {
-//////            count = 0;
-//////          });
-//////          return;
-//////        }
-////        print("Count---------------${count}");
-////        print("---------------${getValidBall(ball)}");
-////        Over over = Over(over: ball);
-////        setState(() {
-////          context.bloc<SportsDataBloc>().getPlayerDetail(playerDetailsModel);
-//////          context.bloc<SportsDataBloc>().getBowl(bowl);
-//////          context.bloc<SportsDataBloc>().getOver(over);
-////        });
-////      }
-//    });
-//  }
-//
-//  double() {
-//    context.bloc<SportsDataBloc>().state.playerDetailList.forEach((player) {
-//      if (context.bloc<SportsDataBloc>().state.stricker.pid ==
-//          player.playerId) {
-//        PlayerDetailsModel _playerDetailsModel =
-//            context.bloc<SportsDataBloc>().state.playerDetailsModel;
-//        Bowl _bowl = context.bloc<SportsDataBloc>().state.bowl;
-//        PlayerDetailsModel playerDetailsModel = PlayerDetailsModel(
-//            doubles: _playerDetailsModel.doubles + 1,
-//            madeRuns: _playerDetailsModel.madeRuns + 2,
-//            totalPlayedBalls: _playerDetailsModel.totalPlayedBalls + 1);
-//        Bowl bowl = Bowl(
-//            run: 2.toString(), totalRun: _bowl.totalRun + 2, isValid: true);
-//        ball.add(bowl);
-//        Over over = Over(over: ball);
-//        setState(() {
-//          context.bloc<SportsDataBloc>().getPlayerDetail(playerDetailsModel);
-//          context.bloc<SportsDataBloc>().getBowl(bowl);
-//          context.bloc<SportsDataBloc>().getOver(over);
-//        });
-//      }
-//    });
-//  }
-//
-//  triple() {
-//    context.bloc<SportsDataBloc>().state.playerDetailList.forEach((player) {
-//      if (context.bloc<SportsDataBloc>().state.stricker.pid ==
-//          player.playerId) {
-//        PlayerDetailsModel _playerDetailsModel =
-//            context.bloc<SportsDataBloc>().state.playerDetailsModel;
-//        Bowl _bowl = context.bloc<SportsDataBloc>().state.bowl;
-//        PlayerDetailsModel playerDetailsModel = PlayerDetailsModel(
-//            tripples: _playerDetailsModel.tripples + 1,
-//            madeRuns: _playerDetailsModel.madeRuns + 3,
-//            totalPlayedBalls: _playerDetailsModel.totalPlayedBalls + 1);
-//        Bowl bowl = Bowl(
-//            run: 3.toString(), totalRun: _bowl.totalRun + 3, isValid: true);
-//        ball.add(bowl);
-//        Over over = Over(over: ball);
-//        setState(() {
-//          context.bloc<SportsDataBloc>().getPlayerDetail(playerDetailsModel);
-//          context.bloc<SportsDataBloc>().getBowl(bowl);
-//          context.bloc<SportsDataBloc>().getOver(over);
-//        });
-//      }
-//    });
-//  }
-//
-//  four() {
-//    context.bloc<SportsDataBloc>().state.playerDetailList.forEach((player) {
-//      if (context.bloc<SportsDataBloc>().state.stricker.pid ==
-//          player.playerId) {
-//        PlayerDetailsModel _playerDetailsModel =
-//            context.bloc<SportsDataBloc>().state.playerDetailsModel;
-//        Bowl _bowl = context.bloc<SportsDataBloc>().state.bowl;
-//        PlayerDetailsModel playerDetailsModel = PlayerDetailsModel(
-//            fours: _playerDetailsModel.fours + 1,
-//            madeRuns: _playerDetailsModel.madeRuns + 4,
-//            totalPlayedBalls: _playerDetailsModel.totalPlayedBalls + 1);
-//        Bowl bowl = Bowl(
-//            run: 4.toString(), totalRun: _bowl.totalRun + 4, isValid: true);
-//        ball.add(bowl);
-//        Over over = Over(over: ball);
-//        setState(() {
-//          context.bloc<SportsDataBloc>().getPlayerDetail(playerDetailsModel);
-//          context.bloc<SportsDataBloc>().getBowl(bowl);
-//          context.bloc<SportsDataBloc>().getOver(over);
-//        });
-//      }
-//    });
-//  }
-//
-//  six() {
-//    context.bloc<SportsDataBloc>().state.playerDetailList.forEach((player) {
-//      if (context.bloc<SportsDataBloc>().state.stricker.pid ==
-//          player.playerId) {
-//        Bowl _bowl = context.bloc<SportsDataBloc>().state.bowl;
-//        PlayerDetailsModel _playerDetailsModel =
-//            context.bloc<SportsDataBloc>().state.playerDetailsModel;
-//        PlayerDetailsModel playerDetailsModel = PlayerDetailsModel(
-//            sixes: _playerDetailsModel.sixes + 1,
-//            madeRuns: _playerDetailsModel.madeRuns + 6,
-//            totalPlayedBalls: _playerDetailsModel.totalPlayedBalls + 1);
-//        Bowl bowl = Bowl(
-//            run: 6.toString(), totalRun: _bowl.totalRun + 6, isValid: true);
-//        ball.add(bowl);
-//        Over over = Over(over: ball);
-//        setState(() {
-//          context.bloc<SportsDataBloc>().getPlayerDetail(playerDetailsModel);
-//          context.bloc<SportsDataBloc>().getBowl(bowl);
-//          context.bloc<SportsDataBloc>().getOver(over);
-//        });
-//      }
-//    });
-//  }
+  double() {
+    Bowl bowl = Bowl(
+        dotBall: 0,
+        facedBall: 1,
+        run: 2,
+        bowlerId: context.bloc<SportsDataBloc>().state.bowler.pid,
+        playerIdWhoFaced: context.bloc<SportsDataBloc>().state.stricker.pid,
+        perBallRecord: 2.toString(),
+        totalRun: 2,
+        single: 0,
+        double: 1,
+        tripple: 0,
+        wide: 0,
+        bowled: 0,
+        caugth: 0,
+        four: 0,
+        noBall: 0,
+        runOut: 0,
+        six: 0,
+        extras: 0,
+        lbw: 0,
+        stump: 0,
+        wicket: 0,
+        isValid: true);
+    updateOver(bowl);
+    updateStriker(bowl);
+    updateBowler(bowl);
+  }
 
-  int getValidBall(List<Bowl> bowlList) {
-    int length = 0;
-    bowlList.forEach((element) {
-      if (element.isValid == true) {
-        print("length is ${bowlList.length}");
-        length += 1;
-      }
-    });
-    return length;
-    //state.over.over.length
+  triple() {
+    Bowl bowl = Bowl(
+        dotBall: 0,
+        facedBall: 1,
+        run: 3,
+        perBallRecord: 3.toString(),
+        totalRun: 3,
+        bowlerId: context.bloc<SportsDataBloc>().state.bowler.pid,
+        playerIdWhoFaced: context.bloc<SportsDataBloc>().state.stricker.pid,
+        single: 0,
+        double: 0,
+        tripple: 1,
+        wide: 0,
+        bowled: 0,
+        caugth: 0,
+        four: 0,
+        noBall: 0,
+        runOut: 0,
+        extras: 0,
+        six: 0,
+        lbw: 0,
+        stump: 0,
+        wicket: 0,
+        isValid: true);
+    updateOver(bowl);
+    updateStriker(bowl);
+    updateBowler(bowl);
+  }
+
+  four() {
+    Bowl bowl = Bowl(
+        dotBall: 0,
+        bowlerId: context.bloc<SportsDataBloc>().state.bowler.pid,
+        playerIdWhoFaced: context.bloc<SportsDataBloc>().state.stricker.pid,
+        facedBall: 1,
+        run: 4,
+        perBallRecord: 4.toString(),
+        totalRun: 4,
+        single: 0,
+        double: 1,
+        tripple: 0,
+        wide: 0,
+        bowled: 0,
+        caugth: 0,
+        four: 1,
+        noBall: 0,
+        runOut: 0,
+        six: 0,
+        lbw: 0,
+        stump: 0,
+        extras: 0,
+        wicket: 0,
+        isValid: true);
+    updateOver(bowl);
+    updateStriker(bowl);
+    updateBowler(bowl);
+  }
+
+  six() {
+    Bowl bowl = Bowl(
+        dotBall: 0,
+        extras: 0,
+        bowlerId: context.bloc<SportsDataBloc>().state.bowler.pid,
+        playerIdWhoFaced: context.bloc<SportsDataBloc>().state.stricker.pid,
+        facedBall: 1,
+        run: 6,
+        perBallRecord: 6.toString(),
+        totalRun: 6,
+        single: 0,
+        double: 0,
+        tripple: 0,
+        wide: 0,
+        bowled: 0,
+        caugth: 0,
+        four: 0,
+        noBall: 0,
+        runOut: 0,
+        six: 6,
+        lbw: 0,
+        stump: 0,
+        wicket: 0,
+        isValid: true);
+    updateOver(bowl);
+    updateStriker(bowl);
+    updateBowler(bowl);
+  }
+
+  wide() {
+    Bowl bowl = Bowl(
+        dotBall: 0,
+        extras: 1,
+        facedBall: 0,
+        bowlerId: context.bloc<SportsDataBloc>().state.bowler.pid,
+        playerIdWhoFaced: context.bloc<SportsDataBloc>().state.stricker.pid,
+        run: 1,
+        perBallRecord: "WD",
+        totalRun: 1,
+        single: 0,
+        double: 0,
+        tripple: 0,
+        wide: 1,
+        bowled: 0,
+        caugth: 0,
+        four: 0,
+        noBall: 0,
+        runOut: 0,
+        six: 0,
+        lbw: 0,
+        stump: 0,
+        wicket: 0,
+        isValid: false);
+    updateOver(bowl);
+//    updateStriker(bowl);
+    updateBowler(bowl);
+  }
+
+  legBye() {
+    Bowl bowl = Bowl(
+        dotBall: 1,
+        bowlerId: context.bloc<SportsDataBloc>().state.bowler.pid,
+        playerIdWhoFaced: context.bloc<SportsDataBloc>().state.stricker.pid,
+        extras: int.parse(_legByeController.text) ?? 0,
+        facedBall: 1,
+        run: 0,
+        perBallRecord: _legByeController.text + "LB",
+        totalRun: int.parse(_legByeController.text) ?? 0,
+        single: 0,
+        double: 0,
+        tripple: 0,
+        wide: 0,
+        bowled: 0,
+        caugth: 0,
+        four: 0,
+        noBall: 0,
+        runOut: 0,
+        six: 0,
+        lbw: 0,
+        stump: 0,
+        wicket: 0,
+        isValid: true);
+    updateOver(bowl);
+    updateStriker(bowl);
+    updateBowler(bowl);
+  }
+
+  bye() {
+    Bowl bowl = Bowl(
+        dotBall: 1,
+        bowlerId: context.bloc<SportsDataBloc>().state.bowler.pid,
+        playerIdWhoFaced: context.bloc<SportsDataBloc>().state.stricker.pid,
+        extras: int.parse(_byeController.text) ?? 0,
+        facedBall: 1,
+        run: 0,
+        perBallRecord: _byeController.text + "B",
+        totalRun: int.parse(_byeController.text) ?? 0,
+        single: 0,
+        double: 0,
+        tripple: 0,
+        wide: 0,
+        bowled: 0,
+        caugth: 0,
+        four: 0,
+        noBall: 0,
+        runOut: 0,
+        six: 0,
+        lbw: 0,
+        stump: 0,
+        wicket: 0,
+        isValid: true);
+    updateOver(bowl);
+    updateStriker(bowl);
+    updateBowler(bowl);
+  }
+
+  fiveSeven() {
+    Bowl bowl = Bowl(
+        dotBall: 0,
+        bowlerId: context.bloc<SportsDataBloc>().state.bowler.pid,
+        playerIdWhoFaced: context.bloc<SportsDataBloc>().state.stricker.pid,
+        extras: int.parse(_fiveSevenController.text) ?? 0,
+        facedBall: 0,
+        run: int.parse(_fiveSevenController.text) ?? 0,
+        perBallRecord: _fiveSevenController.text ?? 0,
+        totalRun: int.parse(_fiveSevenController.text) ?? 0,
+        single: 0,
+        double: 0,
+        tripple: 0,
+        wide: 0,
+        bowled: 0,
+        caugth: 0,
+        four: 0,
+        noBall: 0,
+        runOut: 0,
+        six: 0,
+        lbw: 0,
+        stump: 0,
+        wicket: 0,
+        isValid: true);
+    updateOver(bowl);
+    //updateStriker(bowl);
+    updateBowler(bowl);
+  }
+
+  noBall() {
+    int run;
+    if (_selectedNoBall == "From Bat") {
+      run = int.parse(_nbController.text) ?? 0;
+    }
+    if (_selectedNoBall == "Bye" || _selectedNoBall == "Leg Bye") {
+      run = 0;
+    }
+    Bowl bowl = Bowl(
+        dotBall: 0,
+        bowlerId: context.bloc<SportsDataBloc>().state.bowler.pid,
+        playerIdWhoFaced: context.bloc<SportsDataBloc>().state.stricker.pid,
+        extras: int.parse(_nbController.text) + 1 ?? 0,
+        facedBall: 0,
+        run: run,
+        perBallRecord:
+            (int.parse(_nbController.text) + 1).toString() + "NB" ?? 0,
+        totalRun: int.parse(_nbController.text) + 1 ?? 0,
+        single: 0,
+        double: 0,
+        tripple: 0,
+        wide: 0,
+        bowled: 0,
+        caugth: 0,
+        four: 0,
+        noBall: 1,
+        runOut: 0,
+        six: 0,
+        lbw: 0,
+        stump: 0,
+        wicket: 0,
+        isValid: false);
+    updateOver(bowl);
+    updateStriker(bowl);
+    updateBowler(bowl);
+  }
+
+  out() {
+    int run;
+    if (_selectedNoBall == "From Bat") {
+      run = int.parse(_nbController.text) ?? 0;
+    }
+    if (_selectedNoBall == "Bye" || _selectedNoBall == "Leg Bye") {
+      run = 0;
+    }
+    Bowl bowl = Bowl(
+        dotBall: 0,
+        bowlerId: context.bloc<SportsDataBloc>().state.bowler.pid,
+        playerIdWhoFaced: context.bloc<SportsDataBloc>().state.stricker.pid,
+        extras: int.parse(_nbController.text) + 1 ?? 0,
+        facedBall: 0,
+        run: run,
+        perBallRecord:
+            (int.parse(_nbController.text) + 1).toString() + "NB" ?? 0,
+        totalRun: int.parse(_nbController.text) + 1 ?? 0,
+        single: 0,
+        double: 0,
+        tripple: 0,
+        wide: 0,
+        bowled: 0,
+        caugth: 0,
+        four: 0,
+        noBall: 1,
+        runOut: 0,
+        six: 0,
+        lbw: 0,
+        stump: 0,
+        wicket: 0,
+        isValid: true);
+    updateOver(bowl);
+    updateStriker(bowl);
+    updateBowler(bowl);
   }
 
   String getOverText(List<Over> overList) {
@@ -1196,7 +1479,8 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
       txt = "0.0";
       return txt;
     }
-    Over over = overList[overList.length];
+
+    Over over = overList[overList.length - 1];
     int bowlCount = 0;
     over.over.forEach((element) {
       if (element.isValid == true) {
@@ -1209,5 +1493,145 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
       txt = overList.length.toString() + ".0";
     }
     return txt;
+  }
+
+  String getCurrentBall(List<Over> overList) {
+    String txt = "";
+    if (overList.isEmpty) {
+      txt = "0.0";
+      return txt;
+    }
+
+    Over over = overList[overList.length - 1];
+    int bowlCount = 0;
+    over.over.forEach((element) {
+      if (element.isValid == true) {
+        bowlCount += 1;
+      }
+    });
+    if (bowlCount < 6) {
+      txt = (overList.length - 1).toString() + "." + bowlCount.toString();
+    } else {
+      txt = overList.length.toString() + ".0";
+    }
+    return txt;
+  }
+
+  int getScore(List<Over> overList) {
+    int scoreText = 0;
+    overList.forEach((element) {
+      element.over.forEach((element) {
+        scoreText += element.totalRun;
+      });
+    });
+    return scoreText;
+  }
+
+  int getExtraRuns(List<Over> overList) {
+    int extraRunText = 0;
+    overList.forEach((element) {
+      element.over.forEach((element) {
+        extraRunText += element.extras;
+      });
+    });
+    return extraRunText;
+  }
+
+  String getBowlerOverText(List<Over> overList) {
+    String txt = "";
+    if (overList == null) {
+      txt = "0.0";
+      return txt;
+    }
+
+    Over over = overList[overList.length - 1];
+    int bowlCount = 0;
+    if (over.over != null) {
+      over.over.forEach((element) {
+//      if (element.bowlerId ==
+//          context
+//              .bloc<SportsDataBloc>()
+//              .state
+//              .bowler
+//              .pid)
+        if (element.isValid == true) {
+          bowlCount += 1;
+        }
+      });
+    }
+    if (bowlCount < 6) {
+      txt = (overList.length - 1).toString() + "." + bowlCount.toString();
+    } else {
+      txt = overList.length.toString() + ".0";
+    }
+    return txt;
+//    String txt = "";
+//
+//    if (overList.isEmpty) {
+//      txt = "0.0";
+//      return txt;
+//    }
+//
+//    Over over = overList[overList.length - 1];
+//    int bowlCount = 0;
+//    over.over.forEach((element) {
+//      if (element.isValid == true) {
+//        bowlCount += 1;
+//      }
+//    });
+//    txt = (bowlCount ~/ 6).toString() + "." + (bowlCount % 6).toString();
+////    if (bowlCount % 6 == 0) {
+////      txt = overList.length.toString() + ".0";
+////    }
+////    else {
+////      txt = (overList.length - 1).toString() +
+////          "." +
+////          (bowlCount.remainder(6)).toString();
+////    }
+//    return txt;
+  }
+
+  String getStrikerData(int strikerPID) {
+    String text = '';
+    context.bloc<SportsDataBloc>().state.playerDetailList.forEach((element) {
+      if (element.playerId == strikerPID) {
+        text = element.madeRuns.toString() +
+            " (" +
+            (element.facedBall.toString()) +
+            ")";
+      }
+    });
+    return text;
+  }
+
+  String getRunnerData(int runnerPID) {
+    String text = '';
+    context.bloc<SportsDataBloc>().state.playerDetailList.forEach((element) {
+      if (element.playerId == runnerPID) {
+        text = element.madeRuns.toString() +
+            " (" +
+            (element.facedBall.toString()) +
+            ")";
+      }
+    });
+    return text;
+  }
+
+  String getBowlerData(int bowlerPID, List<Over> overList) {
+    String text = '';
+    context.bloc<SportsDataBloc>().state.playerDetailList.forEach((element) {
+      if (element.playerId == bowlerPID) {
+        text = "(" +
+            element.runsByBowler.toString() +
+            " - " +
+            (getBowlerOverText(element.overList)) +
+            ")";
+      }
+    });
+    return text;
+  }
+
+  FutureOr goBack(dynamic value) {
+    setState(() {});
   }
 }
