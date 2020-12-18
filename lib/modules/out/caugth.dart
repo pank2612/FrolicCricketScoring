@@ -290,79 +290,114 @@ class _CaugthScreenState extends State<CaugthScreen> {
         backgroundColor: Colors.red,
         centerTitle: true,
       ),
-      body: Container(
-        padding: EdgeInsets.symmetric(vertical: 13, horizontal: 10),
-        height: MediaQuery.of(context).size.height,
-        width: MediaQuery.of(context).size.width,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            normalText("Who?"),
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.02,
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 8),
-              child: chooseContainer1(
-                  name: context
-                      .bloc<SportsDataBloc>()
-                      .state
-                      .stricker
-                      .firstName
-                      .toString(),
-                  url: "https://image.flaticon.com/icons/png/128/10/10552.png"),
-            ),
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.02,
-            ),
-            normalText("Select Fielder"),
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.02,
-            ),
-            InkWell(
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => PlayersList(
-                              select: "Select Fielder",
-                              teamId: BOWLING_TEAM_ID,
-                              matchDataForApp: widget.matchDataForApp,
-                            ))).then(onGoBack);
-              },
-              splashColor: Colors.black,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: chooseContainer2(
-                    name: context
-                            .bloc<SportsDataBloc>()
-                            .state
-                            .selectFielder
-                            .firstName ??
-                        " Select Fielder",
-                    url:
-                        "https://cdn0.iconfinder.com/data/icons/sports-and-games-3/512/140-128.png"),
-              ),
-            ),
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.02,
-            ),
-            Center(
-              child: RaisedButton(
-                onPressed: () {
-                  _whoIsOnStrikeDialogBox();
-                },
-                child: Text(
-                  "OUT",
-                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 20),
+      body: ListView(
+        children: [
+          Container(
+            padding: EdgeInsets.symmetric(vertical: 13, horizontal: 10),
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                normalText("Who?"),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.02,
                 ),
-                splashColor: Colors.black,
-                color: Colors.teal,
-              ),
-            )
-          ],
-        ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        context.bloc<SportsDataBloc>().state.stricker.pid;
+                      },
+                      splashColor: Colors.black,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: chooseContainer1(
+                            name: context
+                                .bloc<SportsDataBloc>()
+                                .state
+                                .stricker
+                                .firstName
+                                .toString(),
+                            url:
+                                "https://image.flaticon.com/icons/png/128/10/10552.png"),
+                      ),
+                    ),
+                    InkWell(
+                      splashColor: Colors.black,
+                      onTap: () {
+                        context.bloc<SportsDataBloc>().state.stricker.pid;
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: chooseContainer1(
+                            name: context
+                                .bloc<SportsDataBloc>()
+                                .state
+                                .runner
+                                .firstName
+                                .toString(),
+                            url:
+                                "https://cdn.iconscout.com/icon/premium/png-256-thumb/running-batsman-2049546-1729209.png"),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.02,
+                ),
+                normalText("Select Fielder"),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.02,
+                ),
+                InkWell(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => PlayersList(
+                                  select: "Select Fielder",
+                                  teamId: BOWLING_TEAM_ID,
+                                  matchDataForApp: widget.matchDataForApp,
+                                ))).then(onGoBack);
+                  },
+                  splashColor: Colors.black,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: chooseContainer2(
+                        name: context
+                                .bloc<SportsDataBloc>()
+                                .state
+                                .selectFielder
+                                .firstName ??
+                            " Select Fielder",
+                        url:
+                            "https://cdn0.iconfinder.com/data/icons/sports-and-games-3/512/140-128.png"),
+                  ),
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.02,
+                ),
+                Center(
+                  child: RaisedButton(
+                    onPressed: () {
+                      _whoIsOnStrikeDialogBox();
+                    },
+                    child: Text(
+                      "OUT",
+                      style:
+                          TextStyle(fontWeight: FontWeight.w700, fontSize: 20),
+                    ),
+                    splashColor: Colors.black,
+                    color: Colors.teal,
+                  ),
+                )
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

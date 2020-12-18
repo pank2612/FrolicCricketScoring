@@ -71,7 +71,7 @@ class _PlayersListState extends State<PlayersList> {
         if (playerDetails.isPlaying == 1) {
           if (context.bloc<SportsDataBloc>().state.stricker != null) {
             if (playerDetails.playerId !=
-                context.bloc<SportsDataBloc>().state.stricker.pid) {
+                context.bloc<SportsDataBloc>().state.runner.pid) {
               getPlayerData();
             }
           } else {
@@ -83,7 +83,7 @@ class _PlayersListState extends State<PlayersList> {
         if (playerDetails.isPlaying == 1) {
           if (context.bloc<SportsDataBloc>().state.runner != null) {
             if (playerDetails.playerId !=
-                context.bloc<SportsDataBloc>().state.runner.pid) {
+                context.bloc<SportsDataBloc>().state.stricker.pid) {
               getPlayerData();
             }
           } else {

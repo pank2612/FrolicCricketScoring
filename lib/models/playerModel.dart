@@ -44,8 +44,8 @@ class PlayerDetailsModel {
       this.overList,
       this.fours = 0,
       this.sixes = 0,
-      this.overs,
-      this.maiden,
+      this.overs = 0,
+      this.maiden = 0,
       this.runsByBowler = 0,
       this.wickets = 0,
       this.caugth,
@@ -64,19 +64,21 @@ class PlayerDetailsModel {
       this.ballsByBowler = 0,
       this.facedBall = 0,
       this.teamId = 0,
+      this.shortName = '',
       this.isPlaying = '',
       this.dotsBallByBowler = 0});
   List<Over> overList = List<Over>();
   int playerId;
   int teamId;
+  String shortName;
   String playerName;
   int totalPlayedBalls = 0;
   int madeRuns = 0;
   int maxOverPerBowler = 0;
   int fours = 0;
   int sixes = 0;
-  int overs;
-  int maiden;
+  int overs = 0;
+  int maiden = 0;
   int runsByBowler = 0;
   int wickets = 0;
   int caugth;
@@ -107,9 +109,10 @@ class PlayerDetailsModel {
         madeRuns: json["madeRuns"] ?? 0,
         fours: json["fours"] ?? 0,
         sixes: json["sixes"] ?? 0,
-        overs: json["overs"],
+        overs: json["overs"] ?? 0,
+        shortName: json["shortName"] ?? "",
         isPlaying: json["isPlaying"] ?? '',
-        maiden: json["maiden"],
+        maiden: json["maiden"] ?? 0,
         runsByBowler: json["runsByBowler"] ?? 0,
         wickets: json["wickets"] ?? 0,
         caugth: json["caugth"],
@@ -129,6 +132,7 @@ class PlayerDetailsModel {
   Map<String, dynamic> toJson() => {
         "playerId": playerId,
         "playerName": playerName,
+        "shortName": shortName,
         "totalPlayedBalls": totalPlayedBalls,
         "madeRuns": madeRuns,
         "fours": fours,

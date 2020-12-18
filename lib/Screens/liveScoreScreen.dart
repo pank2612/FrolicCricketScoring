@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'dart:convert';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:froliccricketscore/Screens/scoreCardScreen.dart';
 import 'package:froliccricketscore/blocs/sportsBloc.dart';
 import 'package:froliccricketscore/constants/config.dart';
 import 'package:froliccricketscore/models/MatchModel.dart';
@@ -15,7 +16,7 @@ import 'package:froliccricketscore/modules/start_innings/player_list.dart';
 
 class LiveScoreScreen extends StatefulWidget {
   MatchDataForApp matchDataForApp;
-  List<Players> allPlayerList;
+  List<Players> allPlayerList = List<Players>();
   LiveScoreScreen({this.matchDataForApp, this.allPlayerList});
   @override
   _LiveScoreScreenState createState() => _LiveScoreScreenState();
@@ -52,9 +53,6 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Players bowler = context.bloc<SportsDataBloc>().state.bowler;
-    Players stricker = context.bloc<SportsDataBloc>().state.stricker;
-    Players runner = context.bloc<SportsDataBloc>().state.runner;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.red,
@@ -87,32 +85,60 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "${getScore(state.overList)}/0",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                color: Colors.white,
-                                fontSize: 40),
+                    Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 1),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "${getScore(state.overList)}/0",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.white,
+                                    fontSize: 40),
+                              ),
+                              Text(
+                                "(${getOverText(state.overList)})",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w300,
+                                    color: Colors.white,
+                                    fontSize: 18),
+                              ),
+                            ],
                           ),
-                          Text(
-                            getOverText(state.overList),
-                            //"0/2",
-                            // "(0.${state.over.over == null ? "0" : getValidBall(state.over.over)}/${state.over.overCounter ?? "0"})",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w300,
-                                color: Colors.white,
-                                fontSize: 18),
+                        ),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => ScoreCardScreen(
+                                            matchDataForApp:
+                                                widget.matchDataForApp,
+                                            score: score,
+                                            extraRuns: extraRuns,
+                                            totalOver: totalOver,
+                                          )));
+                            },
+                            child: Text(
+                              "Score Card",
+                              style: TextStyle(
+                                  color: Colors.blue.shade800,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w400),
+//                        textAlign: TextAlign.left,
+                            ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                     Divider(
                       color: Colors.grey.shade50,
+                      thickness: 1,
                     ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -363,7 +389,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                         flex: 1,
                       )
                     ],
-                  ))
+                  )),
             ],
           );
         },
@@ -522,8 +548,15 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
     );
   }
 
-  _overFinishedDialogBox() {
-    return showDialog(
+  overFinishedDialogBox() {
+    if (context.bloc<SportsDataBloc>().overFinished == true) {
+      overFinished();
+      context.bloc<SportsDataBloc>().resetOverFinished();
+    }
+  }
+
+  overFinished() {
+    showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
@@ -970,144 +1003,6 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         });
   }
 
-  updateOver(Bowl bowl) {
-    context.bloc<SportsDataBloc>().setOver(bowl);
-  }
-
-  updateStriker(Bowl bowl) {
-    PlayerDetailsModel _playerDetailsModel = PlayerDetailsModel();
-    context.bloc<SportsDataBloc>().state.playerDetailList.forEach((element) {
-      if (element.playerId ==
-          context.bloc<SportsDataBloc>().state.stricker.pid) {
-        _playerDetailsModel = element;
-      }
-    });
-//    _playerDetailsModel.overList.forEach((element) {
-//      element.over.add(bowl);
-//    });
-    _playerDetailsModel.sixes += bowl.six;
-    _playerDetailsModel.fours += bowl.four;
-    _playerDetailsModel.tripples += bowl.tripple;
-    //_playerDetailsModel.+=bowl.six;
-    _playerDetailsModel.madeRuns += bowl.run;
-    _playerDetailsModel.dotsBall += bowl.dotBall;
-    _playerDetailsModel.facedBall += bowl.facedBall;
-    _playerDetailsModel.doubles += bowl.double;
-    _playerDetailsModel.singles += bowl.single;
-    if (bowl.run == 1 || bowl.run == 3 || bowl.run == 5) {
-      context.bloc<SportsDataBloc>().setStricker(
-          context.bloc<SportsDataBloc>().state.runner.pid,
-          widget.allPlayerList);
-      context.bloc<SportsDataBloc>().setRunner(
-          context.bloc<SportsDataBloc>().state.stricker.pid,
-          widget.allPlayerList);
-    }
-
-    context.bloc<SportsDataBloc>().updatePlayerDetail(_playerDetailsModel);
-  }
-
-  updateRunner(Bowl bowl) {
-    PlayerDetailsModel _playerDetailsModel = PlayerDetailsModel();
-    _playerDetailsModel.madeRuns += bowl.run;
-    _playerDetailsModel.dotsBall += bowl.dotBall;
-    _playerDetailsModel.facedBall += bowl.facedBall;
-    context.bloc<SportsDataBloc>().updatePlayerDetail(_playerDetailsModel);
-  }
-
-  updateBowler(Bowl bowl) {
-    PlayerDetailsModel _playerDetailsModel = PlayerDetailsModel();
-    context.bloc<SportsDataBloc>().state.playerDetailList.forEach((element) {
-      if (element.playerId == context.bloc<SportsDataBloc>().state.bowler.pid) {
-        _playerDetailsModel = element;
-      }
-    });
-    _playerDetailsModel.overList = setOver(bowl, _playerDetailsModel.overList);
-    _playerDetailsModel.runsByBowler += bowl.run;
-    _playerDetailsModel.extrasByBowlers += bowl.wide;
-    _playerDetailsModel.extrasByBowlers += bowl.extras;
-    _playerDetailsModel.sixesByBowlers += bowl.six;
-    _playerDetailsModel.foursByBowler += bowl.four;
-    _playerDetailsModel.trippleByBowler += bowl.tripple;
-    _playerDetailsModel.singleByBowler += bowl.single;
-    _playerDetailsModel.singleByBowler += bowl.wide;
-    _playerDetailsModel.doubleByBowlers += bowl.double;
-    _playerDetailsModel.foursByBowler += bowl.four;
-    _playerDetailsModel.dotsBallByBowler += bowl.dotBall;
-    if (bowl.isValid == true) {
-      _playerDetailsModel.ballsByBowler += 1;
-    }
-    if (bowl.wicket == 1) {
-      _playerDetailsModel.wickets += 1;
-    }
-
-    context.bloc<SportsDataBloc>().updatePlayerDetail(_playerDetailsModel);
-    if (bowl.isValid == true) {
-      int validBowl = 0;
-
-      _playerDetailsModel.overList[_playerDetailsModel.overList.length - 1].over
-          .forEach((singleBowl) {
-        if (singleBowl.isValid == true) {
-          validBowl += 1;
-        }
-      });
-      if (validBowl == 6) {
-        _playerDetailsModel.maxOverPerBowler += 1;
-        //print(element.over.length);
-        _overFinishedDialogBox();
-      }
-
-//      if (_playerDetailsModel.ballsByBowler == 6 ||
-//          _playerDetailsModel.ballsByBowler == 12 ||
-//          _playerDetailsModel.ballsByBowler == 18) {
-//        _playerDetailsModel.minOverPerBowler += 1;
-//        _overFinishedDialogBox();
-//      }
-    }
-//    _playerDetailsModel.overList.forEach((element) {
-//      if (element.over.length == 6) {
-//        print(element.over.length);
-//        _overFinishedDialogBox();
-//      }
-//    });
-  }
-
-  List<Over> setOver(Bowl bowl, List<Over> _overList) {
-//    print("over Ball------- $bowl");
-    if (_overList[0].over == null) {
-      //_overList.remove(_overList[0]);
-      List<Over> __overList = List<Over>();
-      Over overNext = Over();
-      List<Bowl> bowlList = List<Bowl>();
-      bowlList.add(bowl);
-      overNext.over = bowlList;
-      // print("over Next------- $overNext");
-      __overList.add(overNext);
-      _overList = __overList;
-    } else {
-      Over over = _overList[_overList.length - 1];
-//      print("---------------${_overList[_overList.length - 1].over.length}");
-      int bowlCount = 0;
-      if (over.over != null) {
-        over.over.forEach((element) {
-          if (element.isValid == true) {
-            bowlCount += 1;
-          }
-        });
-      }
-      if (bowlCount < 6) {
-        over.over.add(bowl);
-        _overList[_overList.length - 1] = over;
-      } else {
-        Over overNext = Over();
-        List<Bowl> bowlList = List<Bowl>();
-        bowlList.add(bowl);
-        overNext.over = bowlList;
-        _overList.add(overNext);
-      }
-    }
-    return _overList;
-  }
-
   zero() {
     Bowl bowl = Bowl(
         dotBall: 1,
@@ -1132,9 +1027,10 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         stump: 0,
         wicket: 0,
         isValid: true);
-    updateOver(bowl);
-    updateStriker(bowl);
-    updateBowler(bowl);
+    context.bloc<SportsDataBloc>().updateOver(bowl);
+    context.bloc<SportsDataBloc>().updateStriker(bowl, widget.allPlayerList);
+    context.bloc<SportsDataBloc>().updateBowler(bowl);
+    overFinishedDialogBox();
   }
 
   single() {
@@ -1162,9 +1058,12 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         wicket: 0,
         isValid: true);
 
-    updateOver(bowl);
-    updateStriker(bowl);
-    updateBowler(bowl);
+    context.bloc<SportsDataBloc>().updateOver(bowl);
+    context.bloc<SportsDataBloc>().updateStriker(bowl, widget.allPlayerList);
+    context.bloc<SportsDataBloc>().updateBowler(
+          bowl,
+        );
+    overFinishedDialogBox();
   }
 
   double() {
@@ -1191,9 +1090,12 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         stump: 0,
         wicket: 0,
         isValid: true);
-    updateOver(bowl);
-    updateStriker(bowl);
-    updateBowler(bowl);
+    context.bloc<SportsDataBloc>().updateOver(bowl);
+    context.bloc<SportsDataBloc>().updateStriker(bowl, widget.allPlayerList);
+    context.bloc<SportsDataBloc>().updateBowler(
+          bowl,
+        );
+    overFinishedDialogBox();
   }
 
   triple() {
@@ -1220,9 +1122,12 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         stump: 0,
         wicket: 0,
         isValid: true);
-    updateOver(bowl);
-    updateStriker(bowl);
-    updateBowler(bowl);
+    context.bloc<SportsDataBloc>().updateOver(bowl);
+    context.bloc<SportsDataBloc>().updateStriker(bowl, widget.allPlayerList);
+    context.bloc<SportsDataBloc>().updateBowler(
+          bowl,
+        );
+    overFinishedDialogBox();
   }
 
   four() {
@@ -1249,9 +1154,12 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         extras: 0,
         wicket: 0,
         isValid: true);
-    updateOver(bowl);
-    updateStriker(bowl);
-    updateBowler(bowl);
+    context.bloc<SportsDataBloc>().updateOver(bowl);
+    context.bloc<SportsDataBloc>().updateStriker(bowl, widget.allPlayerList);
+    context.bloc<SportsDataBloc>().updateBowler(
+          bowl,
+        );
+    overFinishedDialogBox();
   }
 
   six() {
@@ -1273,14 +1181,15 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         four: 0,
         noBall: 0,
         runOut: 0,
-        six: 6,
+        six: 1,
         lbw: 0,
         stump: 0,
         wicket: 0,
         isValid: true);
-    updateOver(bowl);
-    updateStriker(bowl);
-    updateBowler(bowl);
+    context.bloc<SportsDataBloc>().updateOver(bowl);
+    context.bloc<SportsDataBloc>().updateStriker(bowl, widget.allPlayerList);
+    context.bloc<SportsDataBloc>().updateBowler(bowl);
+    overFinishedDialogBox();
   }
 
   wide() {
@@ -1307,9 +1216,12 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         stump: 0,
         wicket: 0,
         isValid: false);
-    updateOver(bowl);
-//    updateStriker(bowl);
-    updateBowler(bowl);
+    context.bloc<SportsDataBloc>().updateOver(bowl);
+//    context.bloc<SportsDataBloc>().updateStriker(bowl,widget.allPlayerList);
+    context.bloc<SportsDataBloc>().updateBowler(
+          bowl,
+        );
+    overFinishedDialogBox();
   }
 
   legBye() {
@@ -1336,9 +1248,12 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         stump: 0,
         wicket: 0,
         isValid: true);
-    updateOver(bowl);
-    updateStriker(bowl);
-    updateBowler(bowl);
+    context.bloc<SportsDataBloc>().updateOver(bowl);
+    context.bloc<SportsDataBloc>().updateStriker(bowl, widget.allPlayerList);
+    context.bloc<SportsDataBloc>().updateBowler(
+          bowl,
+        );
+    overFinishedDialogBox();
   }
 
   bye() {
@@ -1365,9 +1280,12 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         stump: 0,
         wicket: 0,
         isValid: true);
-    updateOver(bowl);
-    updateStriker(bowl);
-    updateBowler(bowl);
+    context.bloc<SportsDataBloc>().updateOver(bowl);
+    context.bloc<SportsDataBloc>().updateStriker(bowl, widget.allPlayerList);
+    context.bloc<SportsDataBloc>().updateBowler(
+          bowl,
+        );
+    overFinishedDialogBox();
   }
 
   fiveSeven() {
@@ -1394,9 +1312,12 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         stump: 0,
         wicket: 0,
         isValid: true);
-    updateOver(bowl);
-    //updateStriker(bowl);
-    updateBowler(bowl);
+    context.bloc<SportsDataBloc>().updateOver(bowl);
+//    context.bloc<SportsDataBloc>().updateStriker(bowl,widget.allPlayerList);
+    context.bloc<SportsDataBloc>().updateBowler(
+          bowl,
+        );
+    overFinishedDialogBox();
   }
 
   noBall() {
@@ -1431,9 +1352,12 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         stump: 0,
         wicket: 0,
         isValid: false);
-    updateOver(bowl);
-    updateStriker(bowl);
-    updateBowler(bowl);
+    context.bloc<SportsDataBloc>().updateOver(bowl);
+    context.bloc<SportsDataBloc>().updateStriker(bowl, widget.allPlayerList);
+    context.bloc<SportsDataBloc>().updateBowler(
+          bowl,
+        );
+    overFinishedDialogBox();
   }
 
   out() {
@@ -1468,11 +1392,15 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         stump: 0,
         wicket: 0,
         isValid: true);
-    updateOver(bowl);
-    updateStriker(bowl);
-    updateBowler(bowl);
+    context.bloc<SportsDataBloc>().updateOver(bowl);
+    context.bloc<SportsDataBloc>().updateStriker(bowl, widget.allPlayerList);
+    context.bloc<SportsDataBloc>().updateBowler(
+          bowl,
+        );
+    overFinishedDialogBox();
   }
 
+  String totalOver = '';
   String getOverText(List<Over> overList) {
     String txt = "";
     if (overList.isEmpty) {
@@ -1492,6 +1420,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
     } else {
       txt = overList.length.toString() + ".0";
     }
+    totalOver = txt;
     return txt;
   }
 
@@ -1517,6 +1446,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
     return txt;
   }
 
+  int score = 0;
   int getScore(List<Over> overList) {
     int scoreText = 0;
     overList.forEach((element) {
@@ -1524,9 +1454,11 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         scoreText += element.totalRun;
       });
     });
+    score = scoreText;
     return scoreText;
   }
 
+  int extraRuns = 0;
   int getExtraRuns(List<Over> overList) {
     int extraRunText = 0;
     overList.forEach((element) {
@@ -1534,6 +1466,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         extraRunText += element.extras;
       });
     });
+    extraRuns = extraRunText;
     return extraRunText;
   }
 
@@ -1548,12 +1481,6 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
     int bowlCount = 0;
     if (over.over != null) {
       over.over.forEach((element) {
-//      if (element.bowlerId ==
-//          context
-//              .bloc<SportsDataBloc>()
-//              .state
-//              .bowler
-//              .pid)
         if (element.isValid == true) {
           bowlCount += 1;
         }
@@ -1565,30 +1492,6 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
       txt = overList.length.toString() + ".0";
     }
     return txt;
-//    String txt = "";
-//
-//    if (overList.isEmpty) {
-//      txt = "0.0";
-//      return txt;
-//    }
-//
-//    Over over = overList[overList.length - 1];
-//    int bowlCount = 0;
-//    over.over.forEach((element) {
-//      if (element.isValid == true) {
-//        bowlCount += 1;
-//      }
-//    });
-//    txt = (bowlCount ~/ 6).toString() + "." + (bowlCount % 6).toString();
-////    if (bowlCount % 6 == 0) {
-////      txt = overList.length.toString() + ".0";
-////    }
-////    else {
-////      txt = (overList.length - 1).toString() +
-////          "." +
-////          (bowlCount.remainder(6)).toString();
-////    }
-//    return txt;
   }
 
   String getStrikerData(int strikerPID) {
