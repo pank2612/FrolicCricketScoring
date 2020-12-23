@@ -127,12 +127,10 @@ class _TossScreenState extends State<TossScreen> {
       if (winningTossTeamID == widget.matchDataForApp.firstTeamId) {
         BATTING_TEAM_ID = widget.matchDataForApp.firstTeamId;
         BOWLING_TEAM_ID = widget.matchDataForApp.secondTeamId;
-
         return;
       } else {
         BATTING_TEAM_ID = widget.matchDataForApp.secondTeamId;
         BOWLING_TEAM_ID = widget.matchDataForApp.firstTeamId;
-
         return;
       }
     } else if (indexValue == 1) {
@@ -244,8 +242,6 @@ class _TossScreenState extends State<TossScreen> {
 
   @override
   Widget build(BuildContext context) {
-//    print(
-//        "length ----- ${context.bloc<SportsDataBloc>().state.playerDetailList[17].isPlaying}");
     return Scaffold(
         key: _scaffoldkey,
         appBar: AppBar(
@@ -351,7 +347,6 @@ class _TossScreenState extends State<TossScreen> {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => StartInningsScreen(
                           matchDataForApp: widget.matchDataForApp,
-                          winningTossTeamId: winningTossTeamID,
                           allPlayerList: allPlayerList,
                         )));
               },

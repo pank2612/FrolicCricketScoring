@@ -243,6 +243,8 @@ class SportsData {
 class MatchDataForApp {
   String sportsName;
   var firstTeamId;
+  var inningsOver;
+  var maxOverPerPlayer;
   String firstTeamShortName;
   String firstTeamLogo;
   var matchUniqueId;
@@ -261,6 +263,8 @@ class MatchDataForApp {
       this.firstTeamShortName = '',
       this.firstTeamLogo = '',
       this.matchUniqueId = '',
+      this.inningsOver = '',
+      this.maxOverPerPlayer = '',
       this.secondTeamId = '',
       this.secondTeamShortName = '',
       this.secondTeamLogo = '',
@@ -280,7 +284,8 @@ class TournamentData {
   var totalPoints;
   var playerImageFolder;
   var teamImageFolder;
-  int inningsOver;
+  var inningsOver;
+  var maxOverPerPlayer;
 
   HashMap<int, MatchData> matchDataMap;
   HashMap<int, Rule> ruleMap;
@@ -295,9 +300,10 @@ class TournamentData {
       this.name = '',
       this.playersCount = '',
       this.totalPoints = '',
+      this.inningsOver = '',
+      this.maxOverPerPlayer = '',
       this.playerImageFolder = '',
       this.teamImageFolder = '',
-      this.inningsOver = 0,
       this.matchDataMap = null,
       this.ruleMap = null,
       this.skillMap = null,
@@ -310,6 +316,8 @@ class TournamentData {
     deadlineSeconds = json['deadlineSeconds'] ?? '';
     maxPlayerFromSingleTeam = json['maxPlr'] ?? '';
     name = json['name'] ?? '';
+    maxOverPerPlayer = json['maxOverPerPlayer'] ?? '';
+    inningsOver = json['inningsOver'] ?? '';
     playersCount = json['plr'] ?? '';
     totalPoints = json['pts'] ?? '';
     playerImageFolder = json['playerFolder'] ?? '';

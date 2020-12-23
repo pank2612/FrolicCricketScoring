@@ -14,10 +14,9 @@ import 'package:froliccricketscore/constants/global_variables.dart' as global;
 
 class StartInningsScreen extends StatefulWidget {
   MatchDataForApp matchDataForApp;
-  int winningTossTeamId;
+
   List<Players> allPlayerList;
-  StartInningsScreen(
-      {this.matchDataForApp, this.winningTossTeamId, this.allPlayerList});
+  StartInningsScreen({this.matchDataForApp, this.allPlayerList});
   @override
   _StartInningsScreenState createState() => _StartInningsScreenState();
 }
@@ -128,10 +127,6 @@ class _StartInningsScreenState extends State<StartInningsScreen> {
                         builder: (context) => PlayersList(
                             matchDataForApp: widget.matchDataForApp,
                             teamId: BATTING_TEAM_ID,
-//                            teamName: widget.tossModel.choose == "BAT"
-//                                ? widget.tossModel.wonTossTeamName
-//                                : looseTossTeamName,
-//                            teamId: widget.tossModel.teamId,
                             select: "Runner"))).then(onGoBack);
               },
               child: CircleAvatar(
@@ -201,10 +196,47 @@ class _StartInningsScreenState extends State<StartInningsScreen> {
     );
   }
 
+  Widget chooseKeeperContainer({String name, String url}) {
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.4,
+      height: MediaQuery.of(context).size.height * 0.3,
+      color: Colors.grey,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          Container(
+            child:
+//            _image3 == null
+//                ?
+                CircleAvatar(
+              backgroundColor: Colors.white,
+              maxRadius: 45,
+              child: Image.network(
+                url,
+                fit: BoxFit.cover,
+              ),
+            ),
+            //  : Image.file(_image3),
+            height: MediaQuery.of(context).size.height * 0.2,
+            width: MediaQuery.of(context).size.width * 0.3,
+          ),
+          Text(
+            name,
+            style: TextStyle(fontSize: 20),
+          )
+        ],
+      ),
+    );
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    context.bloc<SportsDataBloc>().state.stricker.firstName = null;
+    context.bloc<SportsDataBloc>().state.runner.firstName = null;
+    context.bloc<SportsDataBloc>().state.bowler.firstName = null;
+    context.bloc<SportsDataBloc>().state.keeper.firstName = null;
   }
 
   @override
@@ -269,15 +301,9 @@ class _StartInningsScreenState extends State<StartInningsScreen> {
                             "https://cdn.iconscout.com/icon/premium/png-256-thumb/running-batsman-2049546-1729209.png"),
                   ],
                 ),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.01,
-                ),
                 Text(
                   "Bowling- ${getBowlingTeamName()}",
                   style: TextStyle(fontWeight: FontWeight.w500, fontSize: 20),
-                ),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.01,
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -297,6 +323,30 @@ class _StartInningsScreenState extends State<StartInningsScreen> {
                                 .firstName,
                         url:
                             "https://cdn.iconscout.com/icon/premium/png-128-thumb/bowler-6-870764.png"),
+                    InkWell(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            CupertinoPageRoute(
+                                builder: (context) => PlayersList(
+                                    matchDataForApp: widget.matchDataForApp,
+                                    teamId: BOWLING_TEAM_ID,
+                                    select: "Keeper"))).then(onGoBack);
+                      },
+                      splashColor: Colors.black,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: chooseKeeperContainer(
+                            name: context
+                                    .bloc<SportsDataBloc>()
+                                    .state
+                                    .keeper
+                                    .firstName ??
+                                "Wicket Keeper",
+                            url:
+                                "http://images.clipartpanda.com/keeper-clipart-cricket_wicket_keeper.jpg"),
+                      ),
+                    )
                   ],
                 ),
               ],

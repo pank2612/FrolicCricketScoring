@@ -13,6 +13,7 @@ import 'package:froliccricketscore/modules/out/outScreen.dart';
 import 'package:froliccricketscore/constants/global_variables.dart' as global;
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:froliccricketscore/modules/start_innings/player_list.dart';
+import 'package:froliccricketscore/modules/start_innings/start_Innings_Screen.dart';
 
 class LiveScoreScreen extends StatefulWidget {
   MatchDataForApp matchDataForApp;
@@ -58,7 +59,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         backgroundColor: Colors.red,
         centerTitle: true,
         title: Text(
-          "Team Avishek",
+          "Live Score",
           style: TextStyle(
               color: Colors.white, fontSize: 22, fontWeight: FontWeight.w500),
         ),
@@ -78,150 +79,175 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         builder: (_, state) {
           return ListView(
             children: [
-              Container(
-                color: Colors.grey.shade500,
-                height: MediaQuery.of(context).size.height * 0.25,
-                width: MediaQuery.of(context).size.width,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Column(
+              Stack(
+                children: [
+//                  Container(
+//                    decoration: BoxDecoration(
+//                      color: Colors.red.withOpacity(0.8),
+//                    ),
+//                    width: MediaQuery.of(context).size.width,
+//                    height: MediaQuery.of(context).size.height * 0.25,
+//                    child: Image.asset(
+//                      "images/score_bg_Image.jpg",
+//                      fit: BoxFit.cover,
+//                      // color: Color.,
+//                    ),
+//                  ),
+                  Container(
+                    color: Colors.grey.shade700,
+                    height: MediaQuery.of(context).size.height * 0.25,
+                    width: MediaQuery.of(context).size.width,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 1),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "${getScore(state.overList)}/0",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.white,
-                                    fontSize: 40),
+                        Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 1),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "${getTotalScore(state.overList) + "/" + getTotalWickets(state.overList)}",
+                                    //   "${getScore(state.overList)}",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.white,
+                                        fontSize: 40),
+                                  ),
+                                  Text(
+                                    "(${getOverText(state.overList)})",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w300,
+                                        color: Colors.white,
+                                        fontSize: 18),
+                                  ),
+                                ],
                               ),
-                              Text(
-                                "(${getOverText(state.overList)})",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w300,
-                                    color: Colors.white,
-                                    fontSize: 18),
+                            ),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => ScoreCardScreen(
+                                                wickets: totalwickets,
+                                                matchDataForApp:
+                                                    widget.matchDataForApp,
+                                                score: totalScore,
+                                                extraRuns: extraRuns,
+                                                totalOver: totalOver,
+                                              )));
+                                },
+                                child: Text(
+                                  "Score Card",
+                                  style: TextStyle(
+                                      decoration: TextDecoration.underline,
+                                      decorationStyle:
+                                          TextDecorationStyle.solid,
+                                      //decorationColor: Colors.white,
+                                      color: Colors.white,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w400),
+//                        textAlign: TextAlign.left,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        Divider(
+                          color: Colors.grey.shade50,
+                          thickness: 1,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      CircleAvatar(
+                                        backgroundColor: Colors.white,
+                                        maxRadius: 17,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(2.0),
+                                          child: Image.network(
+                                              "https://image.flaticon.com/icons/png/128/3439/3439653.png"),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.01,
+                                      ),
+                                      Text(
+                                        state.stricker.firstName ?? "Striker",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w500,
+                                            color: Colors.white,
+                                            fontSize: 18),
+                                      ),
+                                    ],
+                                  ),
+                                  Text(
+                                    getStrikerData(state.stricker.pid) ??
+                                        "0(0)",
+                                    // "${state.stricker.pid}(${state.playerDetailsModel.facedBall.toString() ?? "0"})",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w300,
+                                        color: Colors.white,
+                                        fontSize: 17),
+                                  ),
+                                ],
+                              ),
+                              Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      CircleAvatar(
+                                        backgroundColor: Colors.white,
+                                        maxRadius: 17,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(2.0),
+                                          child: Image.network(
+                                              "https://cdn.iconscout.com/icon/premium/png-256-thumb/running-batsman-2049546-1729209.png"),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.01,
+                                      ),
+                                      Text(
+                                        state.runner.firstName ?? "Runner",
+//                                "Vivek",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w500,
+                                            color: Colors.white,
+                                            fontSize: 18),
+                                      ),
+                                    ],
+                                  ),
+                                  Text(
+                                    getStrikerData(state.runner.pid) ?? "0(0)",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w300,
+                                        color: Colors.white,
+                                        fontSize: 17),
+                                  ),
+                                ],
                               ),
                             ],
-                          ),
-                        ),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => ScoreCardScreen(
-                                            matchDataForApp:
-                                                widget.matchDataForApp,
-                                            score: score,
-                                            extraRuns: extraRuns,
-                                            totalOver: totalOver,
-                                          )));
-                            },
-                            child: Text(
-                              "Score Card",
-                              style: TextStyle(
-                                  color: Colors.blue.shade800,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w400),
-//                        textAlign: TextAlign.left,
-                            ),
                           ),
                         ),
                       ],
                     ),
-                    Divider(
-                      color: Colors.grey.shade50,
-                      thickness: 1,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            children: [
-                              Row(
-                                children: [
-                                  CircleAvatar(
-                                    backgroundColor: Colors.white,
-                                    maxRadius: 17,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(2.0),
-                                      child: Image.network(
-                                          "https://image.flaticon.com/icons/png/128/3439/3439653.png"),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.01,
-                                  ),
-                                  Text(
-                                    state.stricker.firstName ?? "Striker",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        color: Colors.white,
-                                        fontSize: 18),
-                                  ),
-                                ],
-                              ),
-                              Text(
-                                getStrikerData(state.stricker.pid) ?? "0(0)",
-                                // "${state.stricker.pid}(${state.playerDetailsModel.facedBall.toString() ?? "0"})",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w300,
-                                    color: Colors.white,
-                                    fontSize: 17),
-                              ),
-                            ],
-                          ),
-                          Column(
-                            children: [
-                              Row(
-                                children: [
-                                  CircleAvatar(
-                                    backgroundColor: Colors.white,
-                                    maxRadius: 17,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(2.0),
-                                      child: Image.network(
-                                          "https://cdn.iconscout.com/icon/premium/png-256-thumb/running-batsman-2049546-1729209.png"),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.01,
-                                  ),
-                                  Text(
-                                    state.runner.firstName ?? "Runner",
-//                                "Vivek",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        color: Colors.white,
-                                        fontSize: 18),
-                                  ),
-                                ],
-                              ),
-                              Text(
-                                getStrikerData(state.runner.pid) ?? "0(0)",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w300,
-                                    color: Colors.white,
-                                    fontSize: 17),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
               Container(
                 width: MediaQuery.of(context).size.width,
@@ -399,6 +425,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
 
   Widget _grid1Navigation(int indexValue) {
     if (indexValue == 0) {
+//      inningComplete();
       zero();
     } else if (indexValue == 1) {
       single();
@@ -419,20 +446,27 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
     }
   }
 
-  Widget _grid2Navigation(int indexValue) {
+  Future _grid2Navigation(int indexValue) async {
     if (indexValue == 0) {
       _undoDialogBox();
     } else if (indexValue == 1) {
       _57DialogBox();
     } else if (indexValue == 2) {
-      Navigator.of(context).push(MaterialPageRoute(
+      await Navigator.of(context).push(MaterialPageRoute(
           builder: (context) => OutScreen(
                 matchDataForApp: widget.matchDataForApp,
                 allPlayerList: widget.allPlayerList,
               )));
+      overFinishedDialogBox();
     } else if (indexValue == 3) {
       _legByeDialogBox();
     }
+  }
+
+  FutureOr onGoBack(dynamic value) {
+    setState(() {
+      overFinishedDialogBox();
+    });
   }
 
   String _selectedNoBall;
@@ -548,8 +582,14 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
     );
   }
 
+  int overLength = 0;
   overFinishedDialogBox() {
     if (context.bloc<SportsDataBloc>().overFinished == true) {
+      overLength += 1;
+      if (overLength == widget.matchDataForApp.inningsOver) {
+        inningComplete();
+        return;
+      }
       overFinished();
       context.bloc<SportsDataBloc>().resetOverFinished();
     }
@@ -568,7 +608,8 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                   color: Colors.red, fontSize: 20, fontWeight: FontWeight.w500),
             ),
             content: Container(
-              height: MediaQuery.of(context).size.height * 0.15,
+              height: MediaQuery.of(context).size.height * 0.35,
+              width: MediaQuery.of(context).size.width * 0.9,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -584,12 +625,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                             style: TextStyle(color: Colors.black, fontSize: 20),
                           ),
                           Text(
-                            getScore(context
-                                            .bloc<SportsDataBloc>()
-                                            .state
-                                            .overList)
-                                        .toString() +
-                                    "/0" ??
+                            "${getTotalScore(context.bloc<SportsDataBloc>().state.overList).toString() + "/" + getTotalWickets(context.bloc<SportsDataBloc>().state.overList).toString()}" ??
                                 "0/0",
                             style: TextStyle(color: Colors.black, fontSize: 20),
                           ),
@@ -653,6 +689,55 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                           ),
                         ],
                       ),
+                      Text(
+                        "Change Wicket-Keeper :",
+                        style: TextStyle(color: Colors.grey, fontSize: 14),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 3, bottom: 3),
+                        child: FlatButton(
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => PlayersList(
+                                          matchDataForApp:
+                                              widget.matchDataForApp,
+                                          teamId: BOWLING_TEAM_ID,
+                                          select: "Keeper",
+                                        ))).then(goBackKeeper);
+                          },
+                          child: ListTile(title:
+                              BlocBuilder<SportsDataBloc, SportsDataBlocState>(
+                            builder: (_, state) {
+                              return Center(
+                                child: Text(
+                                  state.keeper.firstName ?? "Change Keeper",
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 20),
+                                ),
+                              );
+                            },
+                          )),
+                          color: Colors.teal,
+                        ),
+                      ),
+                      FlatButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          inningComplete();
+                        },
+                        child: ListTile(
+                          title: Center(
+                            child: Text(
+                              "Declare team",
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 20),
+                            ),
+                          ),
+                        ),
+                        color: Colors.teal,
+                      )
                     ],
                   ),
                 ],
@@ -697,6 +782,163 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                 ],
               )
             ],
+          ),
+        );
+      },
+    );
+  }
+
+  inningComplete() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Center(
+          child: AlertDialog(
+            title: Text(
+              'Innings complete',
+              style: TextStyle(
+                  color: Colors.red, fontSize: 22, fontWeight: FontWeight.w500),
+            ),
+            content: Container(
+              height: MediaQuery.of(context).size.height * 0.3,
+              width: MediaQuery.of(context).size.width * 0.9,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 5),
+                    child: Text(
+                      "End of innings team ${BATTING_TEAM_ID == widget.matchDataForApp.firstTeamId ? widget.matchDataForApp.firstTeamShortName : widget.matchDataForApp.secondTeamShortName} ",
+                      style: TextStyle(
+                          color: Colors.grey.shade700,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    color: Colors.grey.shade600,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.15,
+                          padding: EdgeInsets.all(5),
+                          child: Text(
+                            "Runs",
+                            style: TextStyle(fontSize: 18, color: Colors.white),
+                          ),
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.18,
+                          child: Text(
+                            "Wickets",
+                            style: TextStyle(fontSize: 18, color: Colors.white),
+                          ),
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.18,
+                          child: Text(
+                            "Extras",
+                            style: TextStyle(fontSize: 18, color: Colors.white),
+                          ),
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.15,
+                          child: Text(
+                            "Overs",
+                            style: TextStyle(fontSize: 18, color: Colors.white),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    color: Colors.grey.shade300,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.15,
+                          padding: EdgeInsets.all(5),
+                          child: Text(
+                            totalScore.toString() ?? 0,
+                            style: TextStyle(fontSize: 18, color: Colors.black),
+                          ),
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.18,
+                          child: Text(
+                            totalwickets.toString() ?? "0",
+                            style: TextStyle(fontSize: 18, color: Colors.black),
+                          ),
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.18,
+                          child: Text(
+                            extraRuns.toString(),
+                            style: TextStyle(fontSize: 18, color: Colors.black),
+                          ),
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.15,
+                          child: Text(
+                            totalOver == '' ? "0" : totalOver,
+                            style: TextStyle(fontSize: 18, color: Colors.black),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.03,
+                  ),
+                  FlatButton(
+                      onPressed: () {
+                        changeInnings();
+                        context
+                            .bloc<SportsDataBloc>()
+                            .inningsFlag("2nd innings");
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => StartInningsScreen(
+                                      matchDataForApp: widget.matchDataForApp,
+                                      allPlayerList: widget.allPlayerList,
+                                    )));
+                      },
+                      color: Colors.teal,
+                      child: ListTile(
+                        title: Center(
+                          child: Text(
+                            "Start next inning",
+                            style: TextStyle(color: Colors.white, fontSize: 18),
+                          ),
+                        ),
+                      )),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.01,
+                  ),
+                  InkWell(
+                    onTap: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Center(
+                      child: Text(
+                        "CONTINUE THIS OVER",
+                        style: TextStyle(
+                            color: Colors.red,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         );
       },
@@ -1140,7 +1382,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         perBallRecord: 4.toString(),
         totalRun: 4,
         single: 0,
-        double: 1,
+        double: 0,
         tripple: 0,
         wide: 0,
         bowled: 0,
@@ -1199,7 +1441,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         facedBall: 0,
         bowlerId: context.bloc<SportsDataBloc>().state.bowler.pid,
         playerIdWhoFaced: context.bloc<SportsDataBloc>().state.stricker.pid,
-        run: 1,
+        run: 0,
         perBallRecord: "WD",
         totalRun: 1,
         single: 0,
@@ -1446,16 +1688,42 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
     return txt;
   }
 
-  int score = 0;
-  int getScore(List<Over> overList) {
-    int scoreText = 0;
+  String totalScore = "";
+  String totalwickets = "";
+  String getTotalWickets(List<Over> overList) {
+    String totalWicket = '';
+//    print("wicket---- ${totalwickets}");
+    int wickets = 0;
+    if (overList.isEmpty) {
+      totalWicket = "0";
+    }
     overList.forEach((element) {
       element.over.forEach((element) {
-        scoreText += element.totalRun;
+        wickets += element.wicket;
+        totalWicket = wickets.toString();
       });
     });
-    score = scoreText;
-    return scoreText;
+    if (int.parse(totalWicket) == 10) {
+      inningComplete();
+    }
+    totalwickets = totalWicket;
+    return totalWicket;
+  }
+
+  String getTotalScore(List<Over> overList) {
+    String totalscore = '';
+    int score = 0;
+    if (overList.isEmpty) {
+      totalscore = "0";
+    }
+    overList.forEach((element) {
+      element.over.forEach((element) {
+        score += element.totalRun;
+        totalscore = score.toString();
+      });
+    });
+    totalScore = totalscore;
+    return totalscore;
   }
 
   int extraRuns = 0;
@@ -1526,6 +1794,8 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
       if (element.playerId == bowlerPID) {
         text = "(" +
             element.runsByBowler.toString() +
+            "/" +
+            element.wickets.toString() +
             " - " +
             (getBowlerOverText(element.overList)) +
             ")";
@@ -1536,5 +1806,18 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
 
   FutureOr goBack(dynamic value) {
     setState(() {});
+  }
+
+  FutureOr goBackKeeper(dynamic value) {
+    setState(() {
+      context.bloc<SportsDataBloc>().state.keeper.firstName;
+    });
+  }
+
+  changeInnings() {
+    int battingTeamId = BATTING_TEAM_ID;
+    int bowlingTeamId = BOWLING_TEAM_ID;
+    BATTING_TEAM_ID = bowlingTeamId;
+    BOWLING_TEAM_ID = battingTeamId;
   }
 }

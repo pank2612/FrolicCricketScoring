@@ -72,42 +72,34 @@ class _CaugthScreenState extends State<CaugthScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                FlatButton(
-                  child: Text(
-                    'Select next batsman',
-                    style: TextStyle(color: Colors.white, fontSize: 20),
-                  ),
-                  color: Colors.teal.shade600,
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => PlayersList(
-                                  select: "Select next batsman",
-                                  teamId: BATTING_TEAM_ID,
-                                  matchDataForApp: widget.matchDataForApp,
-                                ))).then(onGoBack1);
-                    //Navigator.of(context).pop();
-                  },
-                ),
                 Row(
                   children: [
                     InkWell(
                       splashColor: Colors.black,
-                      onTap: () {
-                        context.bloc<SportsDataBloc>().setStricker(
-                            context.bloc<SportsDataBloc>().state.stricker.pid,
-                            widget.playerList);
-                      },
+                      onTap: () {},
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: chooseStrikerContainer(
-                            name: context
-                                    .bloc<SportsDataBloc>()
-                                    .state
-                                    .stricker
-                                    .firstName ??
-                                "Striker",
+                            name:
+//                            playerIdWhoIsOut !=
+//                                    context
+//                                        .bloc<SportsDataBloc>()
+//                                        .state
+//                                        .stricker
+//                                        .pid
+//                                ? context
+//                                        .bloc<SportsDataBloc>()
+//                                        .state
+//                                        .stricker
+//                                        .firstName ??
+//                                    "Striker"
+//                                :
+                                context
+                                        .bloc<SportsDataBloc>()
+                                        .state
+                                        .stricker
+                                        .firstName ??
+                                    "Striker",
                             url:
                                 "https://image.flaticon.com/icons/png/128/10/10552.png"),
                       ),
@@ -115,19 +107,31 @@ class _CaugthScreenState extends State<CaugthScreen> {
                     InkWell(
                         splashColor: Colors.black,
                         onTap: () {
-                          context.bloc<SportsDataBloc>().setStricker(
-                              context.bloc<SportsDataBloc>().state.runner.pid,
-                              widget.playerList);
+                          context.bloc<SportsDataBloc>().rotateStrike();
                         },
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: chooseStrikerContainer(
-                              name: context
-                                      .bloc<SportsDataBloc>()
-                                      .state
-                                      .runner
-                                      .firstName ??
-                                  "Runner",
+                              name:
+//                              playerIdWhoIsOut !=
+//                                      context
+//                                          .bloc<SportsDataBloc>()
+//                                          .state
+//                                          .runner
+//                                          .pid
+//                                  ? context
+//                                          .bloc<SportsDataBloc>()
+//                                          .state
+//                                          .runner
+//                                          .firstName ??
+//                                      "Runner"
+//                                  :
+                                  context
+                                          .bloc<SportsDataBloc>()
+                                          .state
+                                          .runner
+                                          .firstName ??
+                                      "Runner",
                               url:
                                   "https://image.flaticon.com/icons/png/128/10/10552.png"),
                         ))
@@ -149,6 +153,7 @@ class _CaugthScreenState extends State<CaugthScreen> {
                   ),
                   onPressed: () {
                     Navigator.of(context).pop();
+                    return false;
                   },
                 ),
                 SizedBox(
@@ -163,12 +168,15 @@ class _CaugthScreenState extends State<CaugthScreen> {
                   onPressed: () {
                     //  legBye();
                     Navigator.of(context).pop();
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => LiveScoreScreen(
-                                  matchDataForApp: widget.matchDataForApp,
-                                )));
+                    return true;
+                    ;
+//                    Navigator.push(
+//                        context,
+//                        MaterialPageRoute(
+//                            builder: (context) => LiveScoreScreen(
+//                                  matchDataForApp: widget.matchDataForApp,
+//                                  allPlayerList: widget.playerList,
+//                                )));
                   },
                 ),
               ],
@@ -179,7 +187,7 @@ class _CaugthScreenState extends State<CaugthScreen> {
     );
   }
 
-  Widget chooseContainer1({String name, String url}) {
+  Widget whoIsOutContainer({String name, String url}) {
     return Container(
       width: MediaQuery.of(context).size.width * 0.4,
       height: MediaQuery.of(context).size.height * 0.3,
@@ -232,16 +240,18 @@ class _CaugthScreenState extends State<CaugthScreen> {
             height: MediaQuery.of(context).size.height * 0.1,
             width: MediaQuery.of(context).size.width * 0.2,
           ),
-          Text(
-            name,
-            style: TextStyle(fontSize: 20),
+          Center(
+            child: Text(
+              name,
+              style: TextStyle(fontSize: 20),
+            ),
           )
         ],
       ),
     );
   }
 
-  Widget chooseContainer2({String name, String url}) {
+  Widget selectFielderContainer({String name, String url}) {
     return Container(
       width: MediaQuery.of(context).size.width * 0.4,
       height: MediaQuery.of(context).size.height * 0.3,
@@ -276,6 +286,7 @@ class _CaugthScreenState extends State<CaugthScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
+//    print("length is ${widget.playerList.length}");
   }
 
   @override
@@ -307,42 +318,40 @@ class _CaugthScreenState extends State<CaugthScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    InkWell(
-                      onTap: () {
-                        context.bloc<SportsDataBloc>().state.stricker.pid;
-                      },
-                      splashColor: Colors.black,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: chooseContainer1(
-                            name: context
-                                .bloc<SportsDataBloc>()
-                                .state
-                                .stricker
-                                .firstName
-                                .toString(),
-                            url:
-                                "https://image.flaticon.com/icons/png/128/10/10552.png"),
-                      ),
+                    Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: whoIsOutContainer(
+                          name: context
+                              .bloc<SportsDataBloc>()
+                              .state
+                              .stricker
+                              .firstName
+                              .toString(),
+                          url:
+                              "https://image.flaticon.com/icons/png/128/10/10552.png"),
                     ),
-                    InkWell(
-                      splashColor: Colors.black,
-                      onTap: () {
-                        context.bloc<SportsDataBloc>().state.stricker.pid;
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: chooseContainer1(
-                            name: context
-                                .bloc<SportsDataBloc>()
-                                .state
-                                .runner
-                                .firstName
-                                .toString(),
-                            url:
-                                "https://cdn.iconscout.com/icon/premium/png-256-thumb/running-batsman-2049546-1729209.png"),
-                      ),
-                    ),
+//                    InkWell(
+//                      splashColor: Colors.black,
+//                      onTap: () {
+//                        playerIdWhoIsOut =
+//                            context.bloc<SportsDataBloc>().state.runner.pid;
+////                        context.bloc<SportsDataBloc>().setRunner(
+////                            context.bloc<SportsDataBloc>().state.stricker.pid,
+////                            widget.playerList);
+//                      },
+//                      child: Padding(
+//                        padding: const EdgeInsets.all(8),
+//                        child: whoIsOutContainer(
+//                            name: context
+//                                .bloc<SportsDataBloc>()
+//                                .state
+//                                .runner
+//                                .firstName
+//                                .toString(),
+//                            url:
+//                                "https://cdn.iconscout.com/icon/premium/png-256-thumb/running-batsman-2049546-1729209.png"),
+//                      ),
+//                    ),
                   ],
                 ),
                 SizedBox(
@@ -366,7 +375,7 @@ class _CaugthScreenState extends State<CaugthScreen> {
                   splashColor: Colors.black,
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: chooseContainer2(
+                    child: selectFielderContainer(
                         name: context
                                 .bloc<SportsDataBloc>()
                                 .state
@@ -383,7 +392,16 @@ class _CaugthScreenState extends State<CaugthScreen> {
                 Center(
                   child: RaisedButton(
                     onPressed: () {
-                      _whoIsOnStrikeDialogBox();
+                      out();
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => PlayersList(
+                                    select: "Select next batsman",
+                                    teamId: BATTING_TEAM_ID,
+                                    matchDataForApp: widget.matchDataForApp,
+                                  ))).then(onGoBack1);
+                      //_whoIsOnStrikeDialogBox();
                     },
                     child: Text(
                       "OUT",
@@ -406,44 +424,47 @@ class _CaugthScreenState extends State<CaugthScreen> {
     setState(() {});
   }
 
-  FutureOr onGoBack1(dynamic value) {
-    setState(() {});
+  FutureOr onGoBack1(dynamic value) async {
+    bool returnValue = await _whoIsOnStrikeDialogBox();
+    if (returnValue == true) {
+      Navigator.of(context).pop();
+    }
   }
 
-  LiveScoreScreen liveScoreScreen = LiveScoreScreen();
-//  out() {
-//    int run;
-////    if (_selectedNoBall == "From Bat") {
-////      run = int.parse(_nbController.text) ?? 0;
-////    }
-////    if (_selectedNoBall == "Bye" || _selectedNoBall == "Leg Bye") {
-////      run = 0;
-////    }
-//    Bowl bowl = Bowl(
-//        dotBall: 0,
-//        extras: int.parse(_nbController.text) + 1 ?? 0,
-//        facedBall: 0,
-//        run: run,
-//        perBallRecord:
-//            (int.parse(_nbController.text) + 1).toString() + "NB" ?? 0,
-//        totalRun: int.parse(_nbController.text) + 1 ?? 0,
-//        single: 0,
-//        double: 0,
-//        tripple: 0,
-//        wide: 0,
-//        bowled: 0,
-//        caugth: 0,
-//        four: 0,
-//        noBall: 1,
-//        runOut: 0,
-//        six: 0,
-//        lbw: 0,
-//        stump: 0,
-//        wicket: 0,
-//        isValid: true);
-//
-//    updateOver(bowl);
-//    updateStriker(bowl);
-//    updateBowler(bowl);
-//  }
+  out() {
+//    print(
+//        "selected fielder${context.bloc<SportsDataBloc>().state.selectFielder.pid}");
+    Bowl bowl = Bowl(
+        playerIdWhoIsOut: context.bloc<SportsDataBloc>().state.stricker.pid,
+        dotBall: 1,
+        bowlerId: context.bloc<SportsDataBloc>().state.bowler.pid,
+        playerIdWhoFaced: context.bloc<SportsDataBloc>().state.stricker.pid,
+        facedBall: 1,
+        helpingPlayerId: context.bloc<SportsDataBloc>().state.selectFielder.pid,
+        run: 0,
+        typeOfOut: "caugth",
+        perBallRecord: "W".toString(),
+        totalRun: 0,
+        single: 0,
+        double: 0,
+        tripple: 0,
+        wide: 0,
+        bowled: 0,
+        caugth: 1,
+        four: 0,
+        noBall: 0,
+        runOut: 0,
+        six: 0,
+        lbw: 0,
+        stump: 0,
+        extras: 0,
+        wicket: 1,
+        isValid: true);
+    context.bloc<SportsDataBloc>().updateOver(bowl);
+    context.bloc<SportsDataBloc>().updateStriker(bowl, widget.playerList);
+    context.bloc<SportsDataBloc>().updateBowler(
+          bowl,
+        );
+    // overFinishedDialogBox();
+  }
 }

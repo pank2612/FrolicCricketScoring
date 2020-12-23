@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:froliccricketscore/blocs/sportsBloc.dart';
@@ -7,6 +8,7 @@ import 'package:froliccricketscore/constants/global_variables.dart' as global;
 import 'package:froliccricketscore/models/MatchModel.dart';
 import 'package:froliccricketscore/models/player.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:froliccricketscore/models/playerModel.dart';
 
 class PlayersList extends StatefulWidget {
   int teamId;
@@ -95,16 +97,15 @@ class _PlayersListState extends State<PlayersList> {
         if (playerDetails.isPlaying == 1) {
           if (context.bloc<SportsDataBloc>().state.bowler != null) {
             if (playerDetails.playerId !=
-                context.bloc<SportsDataBloc>().state.bowler.pid) {
-//            print(
-//                "length ---- ${context.bloc<SportsDataBloc>().state.playerDetailList.length}");
+                context.bloc<SportsDataBloc>().state.keeper.pid) {
               context
                   .bloc<SportsDataBloc>()
                   .state
                   .playerDetailList
                   .forEach((element) {
                 if (element.playerId == playerDetails.playerId) {
-                  if (element.maxOverPerBowler < 2) {
+                  if (element.maxOverPerBowler <
+                      widget.matchDataForApp.maxOverPerPlayer) {
                     getPlayerData();
                   }
                 }
@@ -115,28 +116,23 @@ class _PlayersListState extends State<PlayersList> {
           }
         }
       }
+      if (widget.select == 'Keeper') {
+        if (playerDetails.isPlaying == 1) {
+          if (context.bloc<SportsDataBloc>().state.keeper != null) {
+            if (playerDetails.playerId !=
+                context.bloc<SportsDataBloc>().state.bowler.pid) {
+              getPlayerData();
+            }
+          } else {
+            getPlayerData();
+          }
+        }
+      }
       if (widget.select == 'Select Fielder') {
-//          if (context.bloc<SportsDataBloc>().state.bowler != null) {
-//            if (playerDetails.playerId !=
-//                context.bloc<SportsDataBloc>().state.bowler.pid) {
-////            print(
-////                "length ---- ${context.bloc<SportsDataBloc>().state.playerDetailList.length}");
-//              context
-//                  .bloc<SportsDataBloc>()
-//                  .state
-//                  .playerDetailList
-//                  .forEach((element) {
-//                if (element.playerId == playerDetails.playerId) {
-//                  if (element.maxOverPerBowler < 2) {
-//                    getPlayerData();
-//                  }
-//                }
-//              });
-//            }
-//          } else {
-        getPlayerData();
-//          }
-
+        if (context.bloc<SportsDataBloc>().state.keeper.pid !=
+            playerDetails.playerId) {
+          getPlayerData();
+        }
       }
       if (widget.select == 'Select next batsman') {
         // isPlaying check
@@ -146,7 +142,19 @@ class _PlayersListState extends State<PlayersList> {
                     context.bloc<SportsDataBloc>().state.stricker.pid &&
                 playerDetails.playerId !=
                     context.bloc<SportsDataBloc>().state.runner.pid) {
-              getPlayerData();
+              PlayerDetailsModel playerDetailsModel = PlayerDetailsModel();
+              context
+                  .bloc<SportsDataBloc>()
+                  .state
+                  .playerDetailList
+                  .forEach((element) {
+                if (playerDetails.playerId == element.playerId) {
+                  playerDetailsModel = element;
+                }
+              });
+              if (playerDetailsModel.batsmanOut == 0) {
+                getPlayerData();
+              }
             }
           } else {
             getPlayerData();
@@ -162,7 +170,9 @@ class _PlayersListState extends State<PlayersList> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "Players List",
+          widget.select == "Select next batsman"
+              ? "Select next batsman"
+              : "Players List",
           style: TextStyle(
               color: Colors.white, fontWeight: FontWeight.w600, fontSize: 22),
         ),
@@ -212,10 +222,29 @@ class _PlayersListState extends State<PlayersList> {
                             .setRunner(allPlayerList[index].pid, allPlayerList);
                         //global.runner = allPlayerList[index];
                         return;
-                      } else if (widget.select == "Bowler") {
+                      } else if (widget.select == "Keeper") {
+                        if (context.bloc<SportsDataBloc>().state.bowler !=
+                            null) {
+                          if (context.bloc<SportsDataBloc>().state.bowler.pid ==
+                              allPlayerList[index].pid) {
+                            context.bloc<SportsDataBloc>().state.bowler = null;
+                          }
+                        }
                         context
                             .bloc<SportsDataBloc>()
-                            .setBowler(allPlayerList[index]);
+                            .setKeeper(allPlayerList[index].pid, allPlayerList);
+                        return;
+                      } else if (widget.select == "Bowler") {
+                        if (context.bloc<SportsDataBloc>().state.keeper !=
+                            null) {
+                          if (context.bloc<SportsDataBloc>().state.keeper.pid ==
+                              allPlayerList[index].pid) {
+                            context.bloc<SportsDataBloc>().state.bowler = null;
+                          }
+                        }
+                        context
+                            .bloc<SportsDataBloc>()
+                            .setBowler(allPlayerList[index].pid, allPlayerList);
                         return;
                       } else if (widget.select == "Select Fielder") {
                         context
@@ -231,8 +260,25 @@ class _PlayersListState extends State<PlayersList> {
                                 null;
                           }
                         }
-                        context.bloc<SportsDataBloc>().setStricker(
-                            allPlayerList[index].pid, allPlayerList);
+                        if (context
+                                .bloc<SportsDataBloc>()
+                                .state
+                                .strikerNrunner ==
+                            "striker") {
+                          context.bloc<SportsDataBloc>().setStricker(
+                              allPlayerList[index].pid, allPlayerList);
+                        } else if (context
+                                .bloc<SportsDataBloc>()
+                                .state
+                                .strikerNrunner ==
+                            "runner") {
+                          context.bloc<SportsDataBloc>().setRunner(
+                              allPlayerList[index].pid, allPlayerList);
+                        } else {
+                          context.bloc<SportsDataBloc>().setStricker(
+                              allPlayerList[index].pid, allPlayerList);
+                        }
+
                         return;
                       }
                     },

@@ -1,22 +1,37 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:froliccricketscore/blocs/sportsBloc.dart';
 import 'package:froliccricketscore/constants/config.dart';
 import 'package:froliccricketscore/models/MatchModel.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:froliccricketscore/models/playerModel.dart';
+import 'package:froliccricketscore/modules/start_innings/player_list.dart';
 
 class ScoreCardScreen extends StatefulWidget {
   MatchDataForApp matchDataForApp;
-  int score;
+  String score;
+  String wickets;
   int extraRuns;
   String totalOver;
   ScoreCardScreen(
-      {this.matchDataForApp, this.extraRuns, this.totalOver, this.score});
+      {this.matchDataForApp,
+      this.wickets,
+      this.extraRuns,
+      this.totalOver,
+      this.score});
   @override
   _ScoreCardScreenState createState() => _ScoreCardScreenState();
 }
 
 class _ScoreCardScreenState extends State<ScoreCardScreen> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    print("score is ${widget.score + "/" + widget.wickets}");
+  }
+
   @override
   Widget build(BuildContext context) {
     List<PlayerDetailsModel> battingPlayerdetailList =
@@ -114,7 +129,9 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
                     Row(
                       children: [
                         Text(
-                          "(${widget.totalOver ?? "0.0"} ov)",
+                          BATTING_TEAM_ID == widget.matchDataForApp.firstTeamId
+                              ? "(${widget.totalOver ?? "0.0"} ov)"
+                              : "",
                           style: TextStyle(
                               color: Colors.grey,
                               fontSize: 16,
@@ -123,7 +140,7 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
                         ),
                         Text(
                           BATTING_TEAM_ID == widget.matchDataForApp.firstTeamId
-                              ? "${widget.score.toString()}/0"
+                              ? "${widget.score + "/" + widget.wickets}"
                               : "0/0",
                           style: TextStyle(
                               color: Colors.black,
@@ -165,21 +182,23 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
                     ),
                     Row(
                       children: [
-//                        Text(
-//                          "(${widget.totalOver ?? "0.0"} ov)",
-//                          style: TextStyle(
-//                              color: Colors.grey,
-//                              fontSize: 16,
-//                              fontWeight: FontWeight.w500),
-//                          textAlign: TextAlign.left,
-//                        ),
+                        Text(
+                          BATTING_TEAM_ID == widget.matchDataForApp.secondTeamId
+                              ? "(${widget.totalOver ?? "0.0"} ov)"
+                              : "",
+                          style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500),
+                          textAlign: TextAlign.left,
+                        ),
                         Padding(
                           padding: const EdgeInsets.only(left: 8),
                           child: Text(
-                            BOWLING_TEAM_ID ==
+                            BATTING_TEAM_ID ==
                                     widget.matchDataForApp.secondTeamId
-                                ? '0/0'
-                                : "28/4",
+                                ? "${widget.score + "/" + widget.wickets}"
+                                : "0/0",
                             style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 28,
@@ -210,7 +229,9 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
           ),
           ExpansionTile(
             title: Text(
-              "${widget.matchDataForApp.firstTeamShortName} innings",
+              BATTING_TEAM_ID == widget.matchDataForApp.firstTeamId
+                  ? "${widget.matchDataForApp.firstTeamShortName} innings"
+                  : "${widget.matchDataForApp.secondTeamShortName} innings",
               style: TextStyle(
                   color: Colors.black,
                   fontWeight: FontWeight.w600,
@@ -362,7 +383,9 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
                             height: MediaQuery.of(context).size.height * 0.01,
                           ),
                           Text(
-                            "lbw b Bumrah",
+                            "${getOutText(battingPlayerdetailList[index])}",
+                            //"${bowlingPlayerdetailList[index].typeOfOut.toString()} ${getHelpingFielderName(bowlingPlayerdetailList[index].playerId)}",
+                            //"lbw b Bumrah",
                             style: TextStyle(
                                 color: Colors.black,
                                 fontWeight: FontWeight.w500,
@@ -519,16 +542,16 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
                               ),
                             ],
                           ),
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.01,
-                          ),
-                          Text(
-                            "lbw b Bumrah",
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 16),
-                          ),
+//                          SizedBox(
+//                            height: MediaQuery.of(context).size.height * 0.01,
+//                          ),
+//                          Text(
+//                            "lbw b Bumrah",
+//                            style: TextStyle(
+//                                color: Colors.black,
+//                                fontWeight: FontWeight.w500,
+//                                fontSize: 16),
+//                          ),
                           Divider(
                             thickness: 1.5,
                           )
@@ -547,7 +570,9 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
           ),
           ExpansionTile(
             title: Text(
-              "${widget.matchDataForApp.secondTeamShortName} innings",
+              BOWLING_TEAM_ID == widget.matchDataForApp.secondTeamId
+                  ? "${widget.matchDataForApp.secondTeamShortName} innings"
+                  : "${widget.matchDataForApp.firstTeamShortName} innings",
               style: TextStyle(
                   color: Colors.black,
                   fontWeight: FontWeight.w600,
@@ -689,7 +714,8 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
                             height: MediaQuery.of(context).size.height * 0.01,
                           ),
                           Text(
-                            "lbw b Bumrah",
+                            bowlingPlayerdetailList[index].typeOfOut.toString(),
+//                            "lbw b Bumrah",
                             style: TextStyle(
                                 color: Colors.black,
                                 fontWeight: FontWeight.w500,
@@ -859,6 +885,49 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
                 ),
               )
             ],
+          ),
+          Divider(
+            thickness: 1.5,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 10, right: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "To change wicket-keeper :",
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 20,
+                  ),
+                ),
+                FlatButton(
+                  child: BlocBuilder<SportsDataBloc, SportsDataBlocState>(
+                    builder: (_, state) {
+                      return Text(
+                        state.keeper.shortName ?? "Change Keeper",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                      );
+                    },
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => PlayersList(
+                                  matchDataForApp: widget.matchDataForApp,
+                                  teamId: BOWLING_TEAM_ID,
+                                  select: "Keeper",
+                                ))).then(goBackKeeper);
+                  },
+                  color: Colors.teal,
+                  splashColor: Colors.grey,
+                )
+              ],
+            ),
           )
         ],
       ),
@@ -887,5 +956,83 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
       txt = overList.length.toString() + ".0";
     }
     return txt;
+  }
+
+  String getOutText(PlayerDetailsModel playerDetailsModel) {
+    switch (playerDetailsModel.typeOfOut) {
+      case 'runout':
+        return "r.o. " +
+            getHelpingFielderName(playerDetailsModel.helpingPlayerId) +
+            " b " +
+            getBowlerName(playerDetailsModel.batsmanOutThroughBowlerId);
+      case 'caugth':
+        return "c " +
+            getHelpingFielderName(playerDetailsModel.helpingPlayerId) +
+            " b " +
+            getBowlerName(playerDetailsModel.batsmanOutThroughBowlerId);
+      case 'caugth behind':
+        return "cb " +
+            getHelpingFielderName(playerDetailsModel.helpingPlayerId) +
+            " b " +
+            getBowlerName(playerDetailsModel.batsmanOutThroughBowlerId);
+      case 'lbw':
+        return "lbw " +
+            " b " +
+            getBowlerName(playerDetailsModel.batsmanOutThroughBowlerId);
+      case 'caugth & bowled':
+        return "c & b " +
+            getBowlerName(playerDetailsModel.batsmanOutThroughBowlerId);
+      case 'stump':
+        return "s " +
+            getHelpingFielderName(playerDetailsModel.helpingPlayerId) +
+            " b " +
+            getBowlerName(playerDetailsModel.batsmanOutThroughBowlerId);
+      case 'hit-wicket':
+        return "hit-wicket " +
+            " b " +
+            getBowlerName(playerDetailsModel.batsmanOutThroughBowlerId);
+      case 'hit the ball twice':
+        return "hit the ball twice " +
+            " b " +
+            getBowlerName(playerDetailsModel.batsmanOutThroughBowlerId);
+      case 'timed out':
+        return "timed out " +
+            " b " +
+            getBowlerName(playerDetailsModel.batsmanOutThroughBowlerId);
+      case 'obstructing the field':
+        return "obstructing the field " +
+            " b " +
+            getBowlerName(playerDetailsModel.batsmanOutThroughBowlerId);
+      case 'bowled':
+        return "b " +
+            " b " +
+            getBowlerName(playerDetailsModel.batsmanOutThroughBowlerId);
+      default:
+        return "Not Out";
+    }
+  }
+
+  String getHelpingFielderName(int pId) {
+    String txt = '';
+    context.bloc<SportsDataBloc>().state.playerDetailList.forEach((element) {
+      if (element.playerId == pId) {
+        txt = element.shortName;
+      }
+    });
+    return txt;
+  }
+
+  String getBowlerName(int pId) {
+    String txt = '';
+    context.bloc<SportsDataBloc>().state.playerDetailList.forEach((element) {
+      if (element.playerId == pId) {
+        txt = element.shortName;
+      }
+    });
+    return txt;
+  }
+
+  FutureOr goBackKeeper(dynamic value) {
+    setState(() {});
   }
 }
