@@ -2,6 +2,7 @@
 //
 //     final playerModel = playerModelFromJson(jsonString);
 
+import 'dart:collection';
 import 'dart:convert';
 
 PlayerModel playerModelFromJson(String str) =>
@@ -318,4 +319,15 @@ class Bowl {
         "LBW": lbw,
         "isValid": isValid
       };
+}
+
+class ScoreModel {
+  HashMap<int, PlayerDetailsModel> teamPlayerModelMap =
+      HashMap<int, PlayerDetailsModel>();
+  int extraRuns;
+  ScoreModel({this.teamPlayerModelMap = null, this.extraRuns = 0});
+  ScoreModel.fromJson(Map<String, dynamic> json) {
+    extraRuns = json['extrasRuns'] ?? 0;
+    teamPlayerModelMap = json['teamPlayerModelMap'] ?? '';
+  }
 }

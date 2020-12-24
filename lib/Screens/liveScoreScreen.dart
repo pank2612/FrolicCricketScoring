@@ -1270,8 +1270,8 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         wicket: 0,
         isValid: true);
     context.bloc<SportsDataBloc>().updateOver(bowl);
-    context.bloc<SportsDataBloc>().updateStriker(bowl, widget.allPlayerList);
-    context.bloc<SportsDataBloc>().updateBowler(bowl);
+    context.bloc<SportsDataBloc>().updateStriker(bowl, BATTING_TEAM_ID);
+    context.bloc<SportsDataBloc>().updateBowler(bowl, BOWLING_TEAM_ID);
     overFinishedDialogBox();
   }
 
@@ -1301,10 +1301,8 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         isValid: true);
 
     context.bloc<SportsDataBloc>().updateOver(bowl);
-    context.bloc<SportsDataBloc>().updateStriker(bowl, widget.allPlayerList);
-    context.bloc<SportsDataBloc>().updateBowler(
-          bowl,
-        );
+    context.bloc<SportsDataBloc>().updateStriker(bowl, BATTING_TEAM_ID);
+    context.bloc<SportsDataBloc>().updateBowler(bowl, BOWLING_TEAM_ID);
     overFinishedDialogBox();
   }
 
@@ -1333,10 +1331,8 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         wicket: 0,
         isValid: true);
     context.bloc<SportsDataBloc>().updateOver(bowl);
-    context.bloc<SportsDataBloc>().updateStriker(bowl, widget.allPlayerList);
-    context.bloc<SportsDataBloc>().updateBowler(
-          bowl,
-        );
+    context.bloc<SportsDataBloc>().updateStriker(bowl, BATTING_TEAM_ID);
+    context.bloc<SportsDataBloc>().updateBowler(bowl, BOWLING_TEAM_ID);
     overFinishedDialogBox();
   }
 
@@ -1365,10 +1361,8 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         wicket: 0,
         isValid: true);
     context.bloc<SportsDataBloc>().updateOver(bowl);
-    context.bloc<SportsDataBloc>().updateStriker(bowl, widget.allPlayerList);
-    context.bloc<SportsDataBloc>().updateBowler(
-          bowl,
-        );
+    context.bloc<SportsDataBloc>().updateStriker(bowl, BATTING_TEAM_ID);
+    context.bloc<SportsDataBloc>().updateBowler(bowl, BOWLING_TEAM_ID);
     overFinishedDialogBox();
   }
 
@@ -1397,10 +1391,8 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         wicket: 0,
         isValid: true);
     context.bloc<SportsDataBloc>().updateOver(bowl);
-    context.bloc<SportsDataBloc>().updateStriker(bowl, widget.allPlayerList);
-    context.bloc<SportsDataBloc>().updateBowler(
-          bowl,
-        );
+    context.bloc<SportsDataBloc>().updateStriker(bowl, BATTING_TEAM_ID);
+    context.bloc<SportsDataBloc>().updateBowler(bowl, BOWLING_TEAM_ID);
     overFinishedDialogBox();
   }
 
@@ -1429,8 +1421,8 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         wicket: 0,
         isValid: true);
     context.bloc<SportsDataBloc>().updateOver(bowl);
-    context.bloc<SportsDataBloc>().updateStriker(bowl, widget.allPlayerList);
-    context.bloc<SportsDataBloc>().updateBowler(bowl);
+    context.bloc<SportsDataBloc>().updateStriker(bowl, BATTING_TEAM_ID);
+    context.bloc<SportsDataBloc>().updateBowler(bowl, BOWLING_TEAM_ID);
     overFinishedDialogBox();
   }
 
@@ -1460,9 +1452,8 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         isValid: false);
     context.bloc<SportsDataBloc>().updateOver(bowl);
 //    context.bloc<SportsDataBloc>().updateStriker(bowl,widget.allPlayerList);
-    context.bloc<SportsDataBloc>().updateBowler(
-          bowl,
-        );
+    //context.bloc<SportsDataBloc>().updateStriker(bowl, BATTING_TEAM_ID);
+    context.bloc<SportsDataBloc>().updateBowler(bowl, BOWLING_TEAM_ID);
     overFinishedDialogBox();
   }
 
@@ -1491,10 +1482,8 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         wicket: 0,
         isValid: true);
     context.bloc<SportsDataBloc>().updateOver(bowl);
-    context.bloc<SportsDataBloc>().updateStriker(bowl, widget.allPlayerList);
-    context.bloc<SportsDataBloc>().updateBowler(
-          bowl,
-        );
+    context.bloc<SportsDataBloc>().updateStriker(bowl, BATTING_TEAM_ID);
+    context.bloc<SportsDataBloc>().updateBowler(bowl, BOWLING_TEAM_ID);
     overFinishedDialogBox();
   }
 
@@ -1523,10 +1512,8 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         wicket: 0,
         isValid: true);
     context.bloc<SportsDataBloc>().updateOver(bowl);
-    context.bloc<SportsDataBloc>().updateStriker(bowl, widget.allPlayerList);
-    context.bloc<SportsDataBloc>().updateBowler(
-          bowl,
-        );
+    context.bloc<SportsDataBloc>().updateStriker(bowl, BATTING_TEAM_ID);
+    context.bloc<SportsDataBloc>().updateBowler(bowl, BOWLING_TEAM_ID);
     overFinishedDialogBox();
   }
 
@@ -1556,9 +1543,8 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         isValid: true);
     context.bloc<SportsDataBloc>().updateOver(bowl);
 //    context.bloc<SportsDataBloc>().updateStriker(bowl,widget.allPlayerList);
-    context.bloc<SportsDataBloc>().updateBowler(
-          bowl,
-        );
+//    context.bloc<SportsDataBloc>().updateStriker(bowl, BATTING_TEAM_ID);
+    context.bloc<SportsDataBloc>().updateBowler(bowl, BOWLING_TEAM_ID);
     overFinishedDialogBox();
   }
 
@@ -1595,10 +1581,8 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         wicket: 0,
         isValid: false);
     context.bloc<SportsDataBloc>().updateOver(bowl);
-    context.bloc<SportsDataBloc>().updateStriker(bowl, widget.allPlayerList);
-    context.bloc<SportsDataBloc>().updateBowler(
-          bowl,
-        );
+    context.bloc<SportsDataBloc>().updateStriker(bowl, BATTING_TEAM_ID);
+    context.bloc<SportsDataBloc>().updateBowler(bowl, BOWLING_TEAM_ID);
     overFinishedDialogBox();
   }
 
@@ -1635,10 +1619,8 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         wicket: 0,
         isValid: true);
     context.bloc<SportsDataBloc>().updateOver(bowl);
-    context.bloc<SportsDataBloc>().updateStriker(bowl, widget.allPlayerList);
-    context.bloc<SportsDataBloc>().updateBowler(
-          bowl,
-        );
+    context.bloc<SportsDataBloc>().updateStriker(bowl, BATTING_TEAM_ID);
+    context.bloc<SportsDataBloc>().updateBowler(bowl, BOWLING_TEAM_ID);
     overFinishedDialogBox();
   }
 

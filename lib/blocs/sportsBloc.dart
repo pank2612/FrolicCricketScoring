@@ -17,9 +17,10 @@ class SportsDataBloc extends Bloc<SportsDataBlocEvent, SportsDataBlocState> {
   List<Over> _overList = List<Over>();
 
   final _firestore = Firestore.instance;
-  List<PlayerDetailsModel> _playerDetailList = List<PlayerDetailsModel>();
-  List<Players> _selectedPlayers = List<Players>();
+  //List<PlayerDetailsModel> _playerDetailList = List<PlayerDetailsModel>();
+  //List<Players> _selectedPlayers = List<Players>();
   Players _stricker = Players();
+  HashMap<int, ScoreModel> _teamPlayerScoring = HashMap<int, ScoreModel>();
   String _strikerNrunner = '';
   String _inningsFlag = '';
   Players _selectFielder = Players();
@@ -49,13 +50,12 @@ class SportsDataBloc extends Bloc<SportsDataBlocEvent, SportsDataBlocState> {
     setOver(bowl);
   }
 
-  updateStriker(Bowl bowl, List<Players> allPlayerList) {
+  updateStriker(Bowl bowl, int teamId) {
+//    print("team id ${teamId}");
     PlayerDetailsModel _playerDetailsModel = PlayerDetailsModel();
-    _playerDetailList.forEach((element) {
-      if (element.playerId == _stricker.pid) {
-        _playerDetailsModel = element;
-      }
-    });
+    _playerDetailsModel =
+        _teamPlayerScoring[teamId].teamPlayerModelMap[_stricker.pid];
+
     _playerDetailsModel.sixes += bowl.six;
     _playerDetailsModel.fours += bowl.four;
     _playerDetailsModel.tripples += bowl.tripple;
@@ -65,10 +65,6 @@ class SportsDataBloc extends Bloc<SportsDataBlocEvent, SportsDataBlocState> {
     _playerDetailsModel.facedBall += bowl.facedBall;
     _playerDetailsModel.doubles += bowl.double;
     _playerDetailsModel.singles += bowl.single;
-
-//    _playerDetailsModel.runout = bowl.runOut;
-//    _playerDetailsModel.bowled = bowl.bowled;
-    //_playerDetailsModel. = bowl.caugth;
     if (bowl.wicket == 1) {
       _playerDetailsModel.typeOfOut = bowl.typeOfOut;
       _playerDetailsModel.batsmanOutThroughBowlerId = bowl.bowlerId;
@@ -79,7 +75,9 @@ class SportsDataBloc extends Bloc<SportsDataBlocEvent, SportsDataBlocState> {
     if (bowl.run == 1 || bowl.run == 3 || bowl.run == 5) {
       rotateStrike();
     }
-    updatePlayerDetail(_playerDetailsModel);
+    _teamPlayerScoring[teamId].teamPlayerModelMap[_stricker.pid] =
+        _playerDetailsModel;
+    add(SportsDataBlocEvent.setUpdate);
   }
 
 //  updateRunner(Bowl bowl) {
@@ -97,13 +95,10 @@ class SportsDataBloc extends Bloc<SportsDataBlocEvent, SportsDataBlocState> {
 //  }
 //  }
 
-  updateBowler(Bowl bowl) {
+  updateBowler(Bowl bowl, int teamId) {
     PlayerDetailsModel _playerDetailsModel = PlayerDetailsModel();
-    _playerDetailList.forEach((element) {
-      if (element.playerId == _bowler.pid) {
-        _playerDetailsModel = element;
-      }
-    });
+    _playerDetailsModel =
+        _teamPlayerScoring[teamId].teamPlayerModelMap[_stricker.pid];
     _playerDetailsModel.overList =
         setOverList(bowl, _playerDetailsModel.overList);
     _playerDetailsModel.runsByBowler += bowl.run;
@@ -132,7 +127,8 @@ class SportsDataBloc extends Bloc<SportsDataBlocEvent, SportsDataBlocState> {
       }
     }
 
-    updatePlayerDetail(_playerDetailsModel);
+    _teamPlayerScoring[teamId].teamPlayerModelMap[_stricker.pid] =
+        _playerDetailsModel;
     if (bowl.isValid == true) {
       int validBowl = 0;
 //      print("----${_playerDetailsModel.overList[0].over.length}");
@@ -312,18 +308,18 @@ class SportsDataBloc extends Bloc<SportsDataBlocEvent, SportsDataBlocState> {
 //    return state.bowler;
 //  }
 
-  void updatePlayerDetail(PlayerDetailsModel players) {
-    PlayerDetailsModel playerDetailsModel = PlayerDetailsModel();
-    _playerDetailList.forEach((element) {
-      if (element.playerId == players.playerId) {
-        playerDetailsModel = element;
-      }
-    });
-    _playerDetailList.remove(playerDetailsModel);
-    _playerDetailList.add(players);
-
-    add(SportsDataBlocEvent.setUpdate);
-  }
+//  void updatePlayerDetail(PlayerDetailsModel players) {
+//    PlayerDetailsModel playerDetailsModel = PlayerDetailsModel();
+//    _playerDetailList.forEach((element) {
+//      if (element.playerId == players.playerId) {
+//        playerDetailsModel = element;
+//      }
+//    });
+//    _playerDetailList.remove(playerDetailsModel);
+//    _playerDetailList.add(players);
+//
+//    add(SportsDataBlocEvent.setUpdate);
+//  }
 
   void setOver(Bowl bowl) {
 //    print("over Ball------- $bowl");
@@ -357,22 +353,41 @@ class SportsDataBloc extends Bloc<SportsDataBlocEvent, SportsDataBlocState> {
     add(SportsDataBlocEvent.setUpdate);
   }
 
-  void getPlayerDetailList(List<Players> allPlayerList) {
-    List<PlayerDetailsModel> playerDetailList = List<PlayerDetailsModel>();
-    allPlayerList.forEach((player) {
-      Over over = Over();
-      List<Over> __overList = List<Over>();
-      __overList.add(over);
-      PlayerDetailsModel playerDetailsModel = PlayerDetailsModel(
-          playerName: player.firstName,
-          isPlaying: player.playing11,
-          shortName: player.shortName,
-          teamId: player.teamId,
-          playerId: player.pid,
-          overList: __overList);
-      playerDetailList.add(playerDetailsModel);
-    });
-    _playerDetailList = playerDetailList;
+//  void getPlayerDetailList(List<Players> allPlayerList) {
+//    List<PlayerDetailsModel> playerDetailList = List<PlayerDetailsModel>();
+//    allPlayerList.forEach((player) {
+//      Over over = Over();
+//      List<Over> __overList = List<Over>();
+//      __overList.add(over);
+//      PlayerDetailsModel playerDetailsModel = PlayerDetailsModel(
+//          playerName: player.firstName,
+//          isPlaying: player.playing11,
+//          shortName: player.shortName,
+//          teamId: player.teamId,
+//          playerId: player.pid,
+//          overList: __overList);
+//      playerDetailList.add(playerDetailsModel);
+//    });
+//    _playerDetailList = playerDetailList;
+//    add(SportsDataBlocEvent.setUpdate);
+//  }
+
+  PlayerDetailsModel getPlayerModel(int teamId, PlayerDetails playerDetails) {
+    Over over = Over();
+    List<Over> __overList = List<Over>();
+    __overList.add(over);
+    PlayerDetailsModel playerDetailsModel = PlayerDetailsModel(
+        playerName: playerDetails.name,
+        isPlaying: playerDetails.isPlaying.toString(),
+        shortName: playerDetails.shortName,
+        teamId: teamId,
+        playerId: playerDetails.playerId,
+        overList: __overList);
+    return playerDetailsModel;
+  }
+
+  setTeamsScoring(HashMap<int, ScoreModel> teamPlayerScoring) {
+    _teamPlayerScoring = teamPlayerScoring;
     add(SportsDataBlocEvent.setUpdate);
   }
 
@@ -380,15 +395,15 @@ class SportsDataBloc extends Bloc<SportsDataBlocEvent, SportsDataBlocState> {
     return state.playerDetailList;
   }
 
-  void addNewPlayer(Players player) {
-    _selectedPlayers.add(player);
-    add(SportsDataBlocEvent.setUpdate);
-  }
+//  void addNewPlayer(Players player) {
+//    _selectedPlayers.add(player);
+//    add(SportsDataBlocEvent.setUpdate);
+//  }
 
-  void removePlayer(Players player) {
-    _selectedPlayers.remove(player);
-    add(SportsDataBlocEvent.setUpdate);
-  }
+//  void removePlayer(Players player) {
+//    _selectedPlayers.remove(player);
+//    add(SportsDataBlocEvent.setUpdate);
+//  }
 
   @override
   Stream<SportsDataBlocState> mapEventToState(
@@ -403,12 +418,13 @@ class SportsDataBloc extends Bloc<SportsDataBlocEvent, SportsDataBlocState> {
             strikerNrunner: _strikerNrunner,
             overList: _overList,
             runner: _runner,
+            teamPlayerScoring: _teamPlayerScoring,
             overFinished: overFinished,
             bowler: _bowler,
             selectFielder: _selectFielder,
-            selectedPlayer: _selectedPlayers,
+//            selectedPlayer: _selectedPlayers,
             tournamentDataMap: _tournamentDataMap,
-            playerDetailList: _playerDetailList,
+//            playerDetailList: _playerDetailList,
             sportsDataFetched: _sportsDataFetched);
         break;
     }
@@ -651,6 +667,7 @@ enum SportsDataBlocEvent { setUpdate }
 class SportsDataBlocState {
   String strikerNrunner = '';
   String inningsFlag = '';
+  HashMap<int, ScoreModel> teamPlayerScoring = HashMap<int, ScoreModel>();
   Players selectFielder = Players();
   List<PlayerDetailsModel> playerDetailList = List<PlayerDetailsModel>();
   List<Over> overList = List<Over>();
@@ -673,6 +690,7 @@ class SportsDataBlocState {
       this.playerDetailList,
       this.stricker,
       this.keeper,
+      this.teamPlayerScoring,
       this.inningsFlag,
       this.tournamentDataMap,
       this.sportsDataFetched,
@@ -692,6 +710,7 @@ class SportsDataBlocState {
         selectedPlayer: List<Players>(),
         runner: Players(),
         strikerNrunner: '',
+        teamPlayerScoring: HashMap<int, ScoreModel>(),
         inningsFlag: '',
         bowler: Players(),
         keeper: Players(),
@@ -707,6 +726,7 @@ class SportsDataBlocState {
     Players stricker,
     Players runner,
     Players bowler,
+    HashMap<int, ScoreModel> teamPlayerScoring,
     String strikerNrunner,
     Players keeper,
     String inningsFlag,
@@ -723,6 +743,7 @@ class SportsDataBlocState {
         bowler: bowler ?? this.bowler,
         runner: runner ?? this.runner,
         keeper: keeper ?? this.keeper,
+        teamPlayerScoring: teamPlayerScoring ?? this.teamPlayerScoring,
         inningsFlag: inningsFlag ?? this.inningsFlag,
         strikerNrunner: strikerNrunner ?? this.strikerNrunner,
         overFinished: overFinished ?? this.overFinished,

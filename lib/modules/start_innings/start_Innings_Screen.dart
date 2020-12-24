@@ -233,10 +233,10 @@ class _StartInningsScreenState extends State<StartInningsScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    context.bloc<SportsDataBloc>().state.stricker.firstName = null;
-    context.bloc<SportsDataBloc>().state.runner.firstName = null;
-    context.bloc<SportsDataBloc>().state.bowler.firstName = null;
-    context.bloc<SportsDataBloc>().state.keeper.firstName = null;
+//    context.bloc<SportsDataBloc>().state.stricker.firstName = null;
+//    context.bloc<SportsDataBloc>().state.runner.firstName = null;
+//    context.bloc<SportsDataBloc>().state.bowler.firstName = null;
+//    context.bloc<SportsDataBloc>().state.keeper.firstName = null;
   }
 
   @override

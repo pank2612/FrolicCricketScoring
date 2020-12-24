@@ -606,10 +606,8 @@ class _RunOutScreenState extends State<RunOutScreen> {
         wicket: 1,
         isValid: true);
     context.bloc<SportsDataBloc>().updateOver(bowl);
-    context.bloc<SportsDataBloc>().updateStriker(bowl, widget.playerList);
-    context.bloc<SportsDataBloc>().updateBowler(
-          bowl,
-        );
+    context.bloc<SportsDataBloc>().updateStriker(bowl, BATTING_TEAM_ID);
+    context.bloc<SportsDataBloc>().updateBowler(bowl, BOWLING_TEAM_ID);
     // overFinishedDialogBox();
   }
 }

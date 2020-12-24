@@ -5,6 +5,7 @@ import 'package:froliccricketscore/blocs/sportsBloc.dart';
 import 'package:froliccricketscore/constants/config.dart';
 import 'package:froliccricketscore/models/MatchModel.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../constants/global_variables.dart' as globals;
 import 'package:froliccricketscore/modules/start_innings/start_Innings_Screen.dart';
 
 class MatchScreen extends StatefulWidget {
@@ -14,7 +15,7 @@ class MatchScreen extends StatefulWidget {
 
 class _MatchScreenState extends State<MatchScreen> {
   final _scaffoldkey = GlobalKey<ScaffoldState>();
-  Widget tossContainer({String name, String url}) {
+  Widget matchContainer({String name, String url}) {
     return Padding(
       padding: EdgeInsets.all(0),
       child: Container(
@@ -76,94 +77,61 @@ class _MatchScreenState extends State<MatchScreen> {
         centerTitle: true,
         backgroundColor: Colors.red,
       ),
-      body: isLoading == true
-          ? Center(
-              child: CircularProgressIndicator(),
-            )
-          : BlocBuilder<SportsDataBloc, SportsDataBlocState>(
-              builder: (_, sportsState) {
-                return sportsState.sportsMap["Cricket"].length == null
-                    ? Center(
-                        child: CircularProgressIndicator(),
-                      )
-                    : ListView(
+      body: BlocBuilder<SportsDataBloc, SportsDataBlocState>(
+        builder: (_, sportsState) {
+          if (sportsState.sportsMap[globals.defaultSports] != null) {
+            return listItems(sportsState);
+          } else {
+            return Center(child: CircularProgressIndicator());
+          }
+        },
+      ),
+    );
+  }
+
+  Widget listItems(SportsDataBlocState state) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        children: state.sportsMap[globals.defaultSports]
+            .map((matchDataForApp) => Column(
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => TossScreen(
+                                      matchDataForApp: matchDataForApp,
+                                    )));
+                      },
+                      splashColor: Colors.black,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Container(
-                            height: MediaQuery.of(context).size.height * 0.79,
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 8, horizontal: 8),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  sportsState
-                                      .sportsMap['Cricket'][1].tournamentName
-                                      .toString(),
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 20),
-                                ),
-                                SizedBox(
-                                  height: 5,
-                                ),
-                                ListView(
-                                  shrinkWrap: true,
-                                  children: sportsState.sportsMap['Cricket']
-                                      .map((matchData) => Column(
-                                            //  shrinkWrap: true,
-                                            children: [
-                                              InkWell(
-                                                onTap: () {
-                                                  Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              TossScreen(
-                                                                matchDataForApp:
-                                                                    matchData,
-                                                              )));
-                                                },
-                                                splashColor: Colors.black,
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    tossContainer(
-                                                        name: matchData
-                                                            .firstTeamShortName,
-                                                        url:
-                                                            "https://image.flaticon.com/icons/png/128/3439/3439653.png"),
-                                                    Text(
-                                                      "VS",
-                                                      style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          fontSize: 25),
-                                                    ),
-                                                    tossContainer(
-                                                        name: matchData
-                                                            .secondTeamShortName,
-                                                        url:
-                                                            "https://image.flaticon.com/icons/png/128/3439/3439653.png"),
-                                                  ],
-                                                ),
-                                              ),
-                                              Divider(
-                                                thickness: 2,
-                                              )
-                                            ],
-                                          ))
-                                      .toList(),
-                                ),
-                              ],
-                            ),
+                          matchContainer(
+                              name: matchDataForApp.firstTeamShortName,
+                              url:
+                                  "https://image.flaticon.com/icons/png/128/3439/3439653.png"),
+                          Text(
+                            "VS",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 25),
                           ),
+                          matchContainer(
+                              name: matchDataForApp.secondTeamShortName,
+                              url:
+                                  "https://image.flaticon.com/icons/png/128/3439/3439653.png"),
                         ],
-                      );
-              },
-            ),
+                      ),
+                    ),
+                    Divider(
+                      thickness: 2,
+                    )
+                  ],
+                ))
+            .toList(),
+      ),
     );
   }
 
