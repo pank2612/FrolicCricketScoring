@@ -322,8 +322,7 @@ class Bowl {
 }
 
 class ScoreModel {
-  HashMap<int, PlayerDetailsModel> teamPlayerModelMap =
-      HashMap<int, PlayerDetailsModel>();
+  HashMap<int, PlayerDetailsModel> teamPlayerModelMap;
   int extraRuns;
   ScoreModel({this.teamPlayerModelMap = null, this.extraRuns = 0});
   ScoreModel.fromJson(Map<String, dynamic> json) {

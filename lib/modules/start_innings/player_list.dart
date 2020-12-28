@@ -26,7 +26,23 @@ class _PlayersListState extends State<PlayersList> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    getSquadTeamData();
+
+    getTeamData();
+  }
+
+  List<PlayerDetailsModel> playerDetailModelList = List<PlayerDetailsModel>();
+
+  getTeamData() {
+    context
+        .bloc<SportsDataBloc>()
+        .state
+        .teamPlayerScoring[widget.teamId]
+        .teamPlayerModelMap
+        .values
+        .forEach((element) {
+      playerDetailModelList.add(element);
+    });
+    print('----- ${playerDetailModelList.length}');
   }
 
   Future<void> getSquadTeamData() async {
@@ -179,128 +195,226 @@ class _PlayersListState extends State<PlayersList> {
         backgroundColor: Colors.red,
         centerTitle: true,
       ),
-      body: _isLoading == false
-          ? Center(
-              child: CircularProgressIndicator(),
-            )
-          : Container(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height,
-              padding: EdgeInsets.all(12),
-              child: ListView.builder(
-                itemBuilder: (context, index) {
-                  return InkWell(
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      if (widget.select == "Striker") {
-                        if (context.bloc<SportsDataBloc>().state.runner !=
-                            null) {
-                          if (context.bloc<SportsDataBloc>().state.runner.pid ==
-                              allPlayerList[index].pid) {
-                            context.bloc<SportsDataBloc>().state.stricker =
-                                null;
-                          }
-                        }
-                        context.bloc<SportsDataBloc>().setStricker(
-                            allPlayerList[index].pid, allPlayerList);
-                        return;
-                      } else if (widget.select == "Runner") {
-                        if (context.bloc<SportsDataBloc>().state.stricker !=
-                            null) {
-                          if (context
-                                  .bloc<SportsDataBloc>()
-                                  .state
-                                  .stricker
-                                  .pid ==
-                              allPlayerList[index].pid) {
-                            context.bloc<SportsDataBloc>().state.stricker =
-                                null;
-                          }
-                        }
-                        context
-                            .bloc<SportsDataBloc>()
-                            .setRunner(allPlayerList[index].pid, allPlayerList);
-                        //global.runner = allPlayerList[index];
-                        return;
-                      } else if (widget.select == "Keeper") {
-                        if (context.bloc<SportsDataBloc>().state.bowler !=
-                            null) {
-                          if (context.bloc<SportsDataBloc>().state.bowler.pid ==
-                              allPlayerList[index].pid) {
-                            context.bloc<SportsDataBloc>().state.bowler = null;
-                          }
-                        }
-                        context
-                            .bloc<SportsDataBloc>()
-                            .setKeeper(allPlayerList[index].pid, allPlayerList);
-                        return;
-                      } else if (widget.select == "Bowler") {
-                        if (context.bloc<SportsDataBloc>().state.keeper !=
-                            null) {
-                          if (context.bloc<SportsDataBloc>().state.keeper.pid ==
-                              allPlayerList[index].pid) {
-                            context.bloc<SportsDataBloc>().state.bowler = null;
-                          }
-                        }
-                        context
-                            .bloc<SportsDataBloc>()
-                            .setBowler(allPlayerList[index].pid, allPlayerList);
-                        return;
-                      } else if (widget.select == "Select Fielder") {
-                        context
-                            .bloc<SportsDataBloc>()
-                            .selectFielder(allPlayerList[index]);
-                        return;
-                      } else if (widget.select == "Select next batsman") {
-                        if (context.bloc<SportsDataBloc>().state.runner !=
-                            null) {
-                          if (context.bloc<SportsDataBloc>().state.runner.pid ==
-                              allPlayerList[index].pid) {
-                            context.bloc<SportsDataBloc>().state.stricker =
-                                null;
-                          }
-                        }
-                        if (context
-                                .bloc<SportsDataBloc>()
-                                .state
-                                .strikerNrunner ==
-                            "striker") {
-                          context.bloc<SportsDataBloc>().setStricker(
-                              allPlayerList[index].pid, allPlayerList);
-                        } else if (context
-                                .bloc<SportsDataBloc>()
-                                .state
-                                .strikerNrunner ==
-                            "runner") {
-                          context.bloc<SportsDataBloc>().setRunner(
-                              allPlayerList[index].pid, allPlayerList);
-                        } else {
-                          context.bloc<SportsDataBloc>().setStricker(
-                              allPlayerList[index].pid, allPlayerList);
-                        }
-
-                        return;
+      body: Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          padding: EdgeInsets.all(12),
+          child: ListView.builder(
+            itemBuilder: (context, index) {
+              PlayerDetailsModel key = context
+                  .bloc<SportsDataBloc>()
+                  .state
+                  .teamPlayerScoring[widget.teamId]
+                  .teamPlayerModelMap
+                  .values
+                  .elementAt(index);
+              return InkWell(
+                onTap: () {
+                  Navigator.of(context).pop();
+                  if (widget.select == "Striker") {
+                    if (context.bloc<SportsDataBloc>().state.runner != null) {
+                      if (context.bloc<SportsDataBloc>().state.runner.pid ==
+                          key.playerId) {
+                        context.bloc<SportsDataBloc>().state.stricker = null;
                       }
-                    },
-                    highlightColor: Colors.black,
-                    child: Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          allPlayerList[index].firstName.toString(),
-                          //snapShot.data['Players'][index].toString(),
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 25,
-                              fontWeight: FontWeight.w500),
-                        ),
-                      ),
-                      elevation: 5,
-                    ),
-                  );
+                    }
+//                    context.bloc<SportsDataBloc>().setStricker(
+//                        key.playerId,
+//                        context
+//                            .bloc<SportsDataBloc>()
+//                            .state
+//                            .teamPlayerScoring[widget.teamId]
+//                            .teamPlayerModelMap
+//                            .values);
+                    return;
+                  } else if (widget.select == "Runner") {
+                    if (context.bloc<SportsDataBloc>().state.stricker != null) {
+                      if (context.bloc<SportsDataBloc>().state.stricker.pid ==
+                          allPlayerList[index].pid) {
+                        context.bloc<SportsDataBloc>().state.stricker = null;
+                      }
+                    }
+                    context
+                        .bloc<SportsDataBloc>()
+                        .setRunner(allPlayerList[index].pid, allPlayerList);
+//global.runner = allPlayerList[index];
+                    return;
+                  } else if (widget.select == "Keeper") {
+                    if (context.bloc<SportsDataBloc>().state.bowler != null) {
+                      if (context.bloc<SportsDataBloc>().state.bowler.pid ==
+                          allPlayerList[index].pid) {
+                        context.bloc<SportsDataBloc>().state.bowler = null;
+                      }
+                    }
+                    context
+                        .bloc<SportsDataBloc>()
+                        .setKeeper(allPlayerList[index].pid, allPlayerList);
+                    return;
+                  } else if (widget.select == "Bowler") {
+                    if (context.bloc<SportsDataBloc>().state.keeper != null) {
+                      if (context.bloc<SportsDataBloc>().state.keeper.pid ==
+                          allPlayerList[index].pid) {
+                        context.bloc<SportsDataBloc>().state.bowler = null;
+                      }
+                    }
+                    context
+                        .bloc<SportsDataBloc>()
+                        .setBowler(allPlayerList[index].pid, allPlayerList);
+                    return;
+                  } else if (widget.select == "Select Fielder") {
+                    context
+                        .bloc<SportsDataBloc>()
+                        .selectFielder(allPlayerList[index]);
+                    return;
+                  } else if (widget.select == "Select next batsman") {
+                    if (context.bloc<SportsDataBloc>().state.runner != null) {
+                      if (context.bloc<SportsDataBloc>().state.runner.pid ==
+                          allPlayerList[index].pid) {
+                        context.bloc<SportsDataBloc>().state.stricker = null;
+                      }
+                    }
+                    if (context.bloc<SportsDataBloc>().state.strikerNrunner ==
+                        "striker") {
+                      context
+                          .bloc<SportsDataBloc>()
+                          .setStricker(allPlayerList[index].pid, allPlayerList);
+                    } else if (context
+                            .bloc<SportsDataBloc>()
+                            .state
+                            .strikerNrunner ==
+                        "runner") {
+                      context
+                          .bloc<SportsDataBloc>()
+                          .setRunner(allPlayerList[index].pid, allPlayerList);
+                    } else {
+                      context
+                          .bloc<SportsDataBloc>()
+                          .setStricker(allPlayerList[index].pid, allPlayerList);
+                    }
+
+                    return;
+                  }
                 },
-                itemCount: allPlayerList.length,
-              )),
+                highlightColor: Colors.black,
+                child: Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      key.playerName.toString(),
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 25,
+                          fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                  elevation: 5,
+                ),
+              );
+            },
+            itemCount: context
+                .bloc<SportsDataBloc>()
+                .state
+                .teamPlayerScoring[widget.teamId]
+                .teamPlayerModelMap
+                .length,
+          )),
     );
   }
 }
+//InkWell(
+//onTap: () {
+//Navigator.of(context).pop();
+//if (widget.select == "Striker") {
+//if (context.bloc<SportsDataBloc>().state.runner != null) {
+//if (context.bloc<SportsDataBloc>().state.runner.pid ==
+//allPlayerList[index].pid) {
+//context.bloc<SportsDataBloc>().state.stricker = null;
+//}
+//}
+//context
+//    .bloc<SportsDataBloc>()
+//    .setStricker(allPlayerList[index].pid, allPlayerList);
+//return;
+//} else if (widget.select == "Runner") {
+//if (context.bloc<SportsDataBloc>().state.stricker != null) {
+//if (context.bloc<SportsDataBloc>().state.stricker.pid ==
+//allPlayerList[index].pid) {
+//context.bloc<SportsDataBloc>().state.stricker = null;
+//}
+//}
+//context
+//    .bloc<SportsDataBloc>()
+//    .setRunner(allPlayerList[index].pid, allPlayerList);
+////global.runner = allPlayerList[index];
+//return;
+//} else if (widget.select == "Keeper") {
+//if (context.bloc<SportsDataBloc>().state.bowler != null) {
+//if (context.bloc<SportsDataBloc>().state.bowler.pid ==
+//allPlayerList[index].pid) {
+//context.bloc<SportsDataBloc>().state.bowler = null;
+//}
+//}
+//context
+//    .bloc<SportsDataBloc>()
+//    .setKeeper(allPlayerList[index].pid, allPlayerList);
+//return;
+//} else if (widget.select == "Bowler") {
+//if (context.bloc<SportsDataBloc>().state.keeper != null) {
+//if (context.bloc<SportsDataBloc>().state.keeper.pid ==
+//allPlayerList[index].pid) {
+//context.bloc<SportsDataBloc>().state.bowler = null;
+//}
+//}
+//context
+//    .bloc<SportsDataBloc>()
+//    .setBowler(allPlayerList[index].pid, allPlayerList);
+//return;
+//} else if (widget.select == "Select Fielder") {
+//context
+//    .bloc<SportsDataBloc>()
+//    .selectFielder(allPlayerList[index]);
+//return;
+//} else if (widget.select == "Select next batsman") {
+//if (context.bloc<SportsDataBloc>().state.runner != null) {
+//if (context.bloc<SportsDataBloc>().state.runner.pid ==
+//allPlayerList[index].pid) {
+//context.bloc<SportsDataBloc>().state.stricker = null;
+//}
+//}
+//if (context.bloc<SportsDataBloc>().state.strikerNrunner ==
+//"striker") {
+//context
+//    .bloc<SportsDataBloc>()
+//    .setStricker(allPlayerList[index].pid, allPlayerList);
+//} else if (context
+//    .bloc<SportsDataBloc>()
+//    .state
+//    .strikerNrunner ==
+//"runner") {
+//context
+//    .bloc<SportsDataBloc>()
+//    .setRunner(allPlayerList[index].pid, allPlayerList);
+//} else {
+//context
+//    .bloc<SportsDataBloc>()
+//    .setStricker(allPlayerList[index].pid, allPlayerList);
+//}
+//
+//return;
+//}
+//},
+//highlightColor: Colors.black,
+//child: Card(
+//child: Padding(
+//padding: const EdgeInsets.all(8.0),
+//child: Text(
+//teamData[index].playerName.toString(),
+//style: TextStyle(
+//color: Colors.black,
+//fontSize: 25,
+//fontWeight: FontWeight.w500),
+//),
+//),
+//elevation: 5,
+//),
+//);

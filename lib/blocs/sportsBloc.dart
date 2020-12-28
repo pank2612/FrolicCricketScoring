@@ -373,6 +373,7 @@ class SportsDataBloc extends Bloc<SportsDataBlocEvent, SportsDataBlocState> {
 //  }
 
   PlayerDetailsModel getPlayerModel(int teamId, PlayerDetails playerDetails) {
+//    print("data is ${playerDetails.name}");
     Over over = Over();
     List<Over> __overList = List<Over>();
     __overList.add(over);

@@ -55,7 +55,7 @@ class _TossScreenState extends State<TossScreen> {
     );
   }
 
-  Widget tossContainer1({String name, String url}) {
+  Widget FirstTeamContainer({String name, String url}) {
     return Padding(
       padding: EdgeInsets.all(8),
       child: Container(
@@ -89,7 +89,7 @@ class _TossScreenState extends State<TossScreen> {
     );
   }
 
-  Widget tossContainer2({String name, String url}) {
+  Widget SecondTeamContainer({String name, String url}) {
     return Padding(
       padding: EdgeInsets.all(8),
       child: Container(
@@ -164,33 +164,14 @@ class _TossScreenState extends State<TossScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-//    getSquadTeamData();
     getTeamData();
   }
 
   getTeamData() {
-    print("tourId ${widget.matchDataForApp.tournamentId}");
-    print("teamId ${widget.matchDataForApp.firstTeamId}");
-    Map<int, HashMap<int, PlayerDetails>> teamData =
-        Map<int, HashMap<int, PlayerDetails>>();
-    print(
-        "teamMap ${context.bloc<SportsDataBloc>().state.tournamentDataMap[widget.matchDataForApp.tournamentName].teamMap.length}");
-    teamData[widget.matchDataForApp.firstTeamId] = context
-        .bloc<SportsDataBloc>()
-        .state
-        .tournamentDataMap[widget.matchDataForApp.tournamentName]
-        .teamMap[widget.matchDataForApp.firstTeamId]
-        .playerMap;
-
-    teamData[widget.matchDataForApp.secondTeamId] = context
-        .bloc<SportsDataBloc>()
-        .state
-        .tournamentDataMap[widget.matchDataForApp.tournamentName]
-        .teamMap[widget.matchDataForApp.secondTeamId]
-        .playerMap;
-
     HashMap<int, ScoreModel> teamPlayerScoring = HashMap<int, ScoreModel>();
     HashMap<int, PlayerDetailsModel> playerDetailsModelMap =
+        HashMap<int, PlayerDetailsModel>();
+    HashMap<int, PlayerDetailsModel> playerDetailsModelMap1 =
         HashMap<int, PlayerDetailsModel>();
     context
         .bloc<SportsDataBloc>()
@@ -203,14 +184,13 @@ class _TossScreenState extends State<TossScreen> {
           .bloc<SportsDataBloc>()
           .getPlayerModel(widget.matchDataForApp.firstTeamId, playerDetail);
     });
+    for (var value in playerDetailsModelMap.values) {
+//      print("player data------ ${value.playerName}");
+    }
     ScoreModel scoreModel =
         ScoreModel(extraRuns: 0, teamPlayerModelMap: playerDetailsModelMap);
 
     teamPlayerScoring[widget.matchDataForApp.firstTeamId] = scoreModel;
-
-    playerDetailsModelMap.clear();
-
-    ///second team scoring model
     context
         .bloc<SportsDataBloc>()
         .state
@@ -218,90 +198,32 @@ class _TossScreenState extends State<TossScreen> {
         .teamMap[widget.matchDataForApp.secondTeamId]
         .playerMap
         .forEach((playerID, playerDetail) {
-      playerDetailsModelMap[playerID] = context
+      playerDetailsModelMap1[playerID] = context
           .bloc<SportsDataBloc>()
           .getPlayerModel(widget.matchDataForApp.secondTeamId, playerDetail);
     });
+    for (var value in playerDetailsModelMap1.values) {
+//      print("player data ${value.playerName}");
+    }
 
     scoreModel =
-        ScoreModel(extraRuns: 0, teamPlayerModelMap: playerDetailsModelMap);
+        ScoreModel(extraRuns: 0, teamPlayerModelMap: playerDetailsModelMap1);
+
     teamPlayerScoring[widget.matchDataForApp.secondTeamId] = scoreModel;
+    context.bloc<SportsDataBloc>().setTeamsScoring(teamPlayerScoring);
+//    print("teamID is ${widget.matchDataForApp.firstTeamId}");
+//    for (var value in teamPlayerScoring[widget.matchDataForApp.firstTeamId]
+//        .teamPlayerModelMap
+//        .values) {
+//      print("player data ${value.playerName}");
+//    }
+//    print("teamID is ${widget.matchDataForApp.secondTeamId}");
+//    for (var value in teamPlayerScoring[widget.matchDataForApp.secondTeamId]
+//        .teamPlayerModelMap
+//        .values) {
+//      print("player data ${value.playerName}");
+//    }
   }
-
-//  Future<void> getSquadTeamData() async {
-//    allPlayerList = await _getMatchPlayers();
-//    if (allPlayerList.length > 0) {
-//      setState(() {
-//        _isLoading = true;
-//      });
-//      getPlayerDetailsList();
-//    }
-//  }
-
-//  Future<List<Players>> _getMatchPlayers() async {
-//    List<Players> playerList = List<Players>();
-//
-//    HashMap<int, Team> teamMap = context
-//        .bloc<SportsDataBloc>()
-//        .getTournamentData(widget.matchDataForApp.tournamentName)
-//        .teamMap;
-//    for (PlayerDetails playerDetails
-//        in teamMap[widget.matchDataForApp.firstTeamId].playerMap.values) {
-//      Players players = Players();
-//      players.country = playerDetails.country;
-//      players.point =
-//          num.tryParse(playerDetails.credits.toString())?.toDouble();
-//      players.firstName = playerDetails.name;
-//      players.shortName = playerDetails.shortName;
-//      players.picture = playerDetails.pictures;
-//      players.pid = num.tryParse(playerDetails.playerId.toString())?.toInt();
-//      players.fantasyPlayerRating =
-//          num.tryParse(playerDetails.points.toString())?.toInt();
-//      players.playingRole = playerDetails.skills;
-//      players.teamId = teamMap[widget.matchDataForApp.firstTeamId].teamId;
-//      players.teamName = teamMap[widget.matchDataForApp.firstTeamId].shortName;
-//      players.playing11 = playerDetails.isPlaying.toString();
-//      players.battingStyle = 'RHB';
-//      players.bowlingStyle = 'RHB';
-//      players.nationality = playerDetails.country;
-//
-//      playerList.add(players);
-////      playerListOfFirstTeam.add(players);
-//    }
-//
-//    for (PlayerDetails playerDetails
-//        in teamMap[widget.matchDataForApp.secondTeamId].playerMap.values) {
-//      Players players = Players();
-//      players.country = playerDetails.country;
-//      players.point =
-//          num.tryParse(playerDetails.credits.toString())?.toDouble();
-//      players.firstName = playerDetails.name;
-//      players.shortName = playerDetails.shortName;
-//      players.picture = playerDetails.pictures;
-//      players.pid = num.tryParse(playerDetails.playerId.toString())?.toInt();
-//      players.fantasyPlayerRating =
-//          num.tryParse(playerDetails.points.toString())?.toInt();
-//      players.playingRole = playerDetails.skills;
-//      players.teamId = teamMap[widget.matchDataForApp.secondTeamId].teamId;
-//      players.teamName = teamMap[widget.matchDataForApp.secondTeamId].shortName;
-//      players.playing11 = playerDetails.isPlaying.toString();
-//      players.battingStyle = 'RHB';
-//      players.bowlingStyle = 'RHB';
-//      players.nationality = playerDetails.country;
-//
-//      playerList.add(players);
-////      playerListOfSecondTeam.add(players);
-//    }
-//
-//    return playerList;
-//  }
-
-//  getPlayerDetailsList() {
-//    context.bloc<SportsDataBloc>().getPlayerDetailList(allPlayerList);
-//    setState(() {
-//      _isLoading = true;
-//    });
-//  }
 
   @override
   Widget build(BuildContext context) {
@@ -342,7 +264,7 @@ class _TossScreenState extends State<TossScreen> {
                                 winningTossTeamID =
                                     widget.matchDataForApp.firstTeamId;
                               },
-                              child: tossContainer1(
+                              child: FirstTeamContainer(
                                   name:
                                       widget.matchDataForApp.firstTeamShortName,
                                   url:
@@ -354,7 +276,7 @@ class _TossScreenState extends State<TossScreen> {
                                 winningTossTeamID =
                                     widget.matchDataForApp.secondTeamId;
                               },
-                              child: tossContainer2(
+                              child: SecondTeamContainer(
                                   name: widget
                                       .matchDataForApp.secondTeamShortName,
                                   url:
