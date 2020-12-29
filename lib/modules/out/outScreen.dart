@@ -109,7 +109,7 @@ class _OutScreenState extends State<OutScreen> {
                                     .bloc<SportsDataBloc>()
                                     .state
                                     .stricker
-                                    .firstName ??
+                                    .playerName ??
                                 "Striker",
                             url:
                                 "https://image.flaticon.com/icons/png/128/10/10552.png"),
@@ -127,7 +127,7 @@ class _OutScreenState extends State<OutScreen> {
                                       .bloc<SportsDataBloc>()
                                       .state
                                       .runner
-                                      .firstName ??
+                                      .playerName ??
                                   "Runner",
                               url:
                                   "https://image.flaticon.com/icons/png/128/10/10552.png"),
@@ -342,10 +342,12 @@ class _OutScreenState extends State<OutScreen> {
   ];
   bowled() {
     Bowl bowl = Bowl(
-        playerIdWhoIsOut: context.bloc<SportsDataBloc>().state.stricker.pid,
+        playerIdWhoIsOut:
+            context.bloc<SportsDataBloc>().state.stricker.playerId,
         dotBall: 1,
-        bowlerId: context.bloc<SportsDataBloc>().state.bowler.pid,
-        playerIdWhoFaced: context.bloc<SportsDataBloc>().state.stricker.pid,
+        bowlerId: context.bloc<SportsDataBloc>().state.bowler.playerId,
+        playerIdWhoFaced:
+            context.bloc<SportsDataBloc>().state.stricker.playerId,
         facedBall: 1,
         run: 0,
         perBallRecord: "W".toString(),
@@ -374,13 +376,15 @@ class _OutScreenState extends State<OutScreen> {
 
   caugthBehind() {
     Bowl bowl = Bowl(
-        playerIdWhoIsOut: context.bloc<SportsDataBloc>().state.stricker.pid,
+        playerIdWhoIsOut:
+            context.bloc<SportsDataBloc>().state.stricker.playerId,
         dotBall: 1,
-        bowlerId: context.bloc<SportsDataBloc>().state.bowler.pid,
-        playerIdWhoFaced: context.bloc<SportsDataBloc>().state.stricker.pid,
+        bowlerId: context.bloc<SportsDataBloc>().state.bowler.playerId,
+        playerIdWhoFaced:
+            context.bloc<SportsDataBloc>().state.stricker.playerId,
         facedBall: 1,
         run: 0,
-        helpingPlayerId: context.bloc<SportsDataBloc>().state.keeper.pid,
+        helpingPlayerId: context.bloc<SportsDataBloc>().state.keeper.playerId,
         perBallRecord: "W".toString(),
         totalRun: 0,
         single: 0,
@@ -407,17 +411,19 @@ class _OutScreenState extends State<OutScreen> {
 
   stump() {
     Bowl bowl = Bowl(
-        playerIdWhoIsOut: context.bloc<SportsDataBloc>().state.stricker.pid,
+        playerIdWhoIsOut:
+            context.bloc<SportsDataBloc>().state.stricker.playerId,
         dotBall: 1,
-        bowlerId: context.bloc<SportsDataBloc>().state.bowler.pid,
-        playerIdWhoFaced: context.bloc<SportsDataBloc>().state.stricker.pid,
+        bowlerId: context.bloc<SportsDataBloc>().state.bowler.playerId,
+        playerIdWhoFaced:
+            context.bloc<SportsDataBloc>().state.stricker.playerId,
         facedBall: 1,
         run: 0,
         perBallRecord: "W".toString(),
         totalRun: 0,
         single: 0,
         typeOfOut: "stump",
-        helpingPlayerId: context.bloc<SportsDataBloc>().state.keeper.pid,
+        helpingPlayerId: context.bloc<SportsDataBloc>().state.keeper.playerId,
         double: 0,
         tripple: 0,
         wide: 0,
@@ -440,17 +446,19 @@ class _OutScreenState extends State<OutScreen> {
 
   caugthNbowled() {
     Bowl bowl = Bowl(
-        playerIdWhoIsOut: context.bloc<SportsDataBloc>().state.stricker.pid,
+        playerIdWhoIsOut:
+            context.bloc<SportsDataBloc>().state.stricker.playerId,
         dotBall: 1,
-        bowlerId: context.bloc<SportsDataBloc>().state.bowler.pid,
-        playerIdWhoFaced: context.bloc<SportsDataBloc>().state.stricker.pid,
+        bowlerId: context.bloc<SportsDataBloc>().state.bowler.playerId,
+        playerIdWhoFaced:
+            context.bloc<SportsDataBloc>().state.stricker.playerId,
         facedBall: 1,
         run: 0,
         perBallRecord: "W".toString(),
         totalRun: 0,
         single: 0,
         typeOfOut: "caugth & bowled",
-        helpingPlayerId: context.bloc<SportsDataBloc>().state.bowler.pid,
+        helpingPlayerId: context.bloc<SportsDataBloc>().state.bowler.playerId,
         double: 0,
         tripple: 0,
         wide: 0,
@@ -473,10 +481,12 @@ class _OutScreenState extends State<OutScreen> {
 
   lbw() {
     Bowl bowl = Bowl(
-        playerIdWhoIsOut: context.bloc<SportsDataBloc>().state.stricker.pid,
+        playerIdWhoIsOut:
+            context.bloc<SportsDataBloc>().state.stricker.playerId,
         dotBall: 1,
-        bowlerId: context.bloc<SportsDataBloc>().state.bowler.pid,
-        playerIdWhoFaced: context.bloc<SportsDataBloc>().state.stricker.pid,
+        bowlerId: context.bloc<SportsDataBloc>().state.bowler.playerId,
+        playerIdWhoFaced:
+            context.bloc<SportsDataBloc>().state.stricker.playerId,
         facedBall: 1,
         run: 0,
         // helpingPlayerId: context.bloc<SportsDataBloc>().state.bowler.pid,
@@ -506,10 +516,12 @@ class _OutScreenState extends State<OutScreen> {
 
   hitWicket() {
     Bowl bowl = Bowl(
-        playerIdWhoIsOut: context.bloc<SportsDataBloc>().state.stricker.pid,
+        playerIdWhoIsOut:
+            context.bloc<SportsDataBloc>().state.stricker.playerId,
         dotBall: 1,
-        bowlerId: context.bloc<SportsDataBloc>().state.bowler.pid,
-        playerIdWhoFaced: context.bloc<SportsDataBloc>().state.stricker.pid,
+        bowlerId: context.bloc<SportsDataBloc>().state.bowler.playerId,
+        playerIdWhoFaced:
+            context.bloc<SportsDataBloc>().state.stricker.playerId,
         facedBall: 1,
         run: 0,
         typeOfOut: "hit-wicket",
@@ -538,10 +550,12 @@ class _OutScreenState extends State<OutScreen> {
 
   hitTheBallTwice() {
     Bowl bowl = Bowl(
-        playerIdWhoIsOut: context.bloc<SportsDataBloc>().state.stricker.pid,
+        playerIdWhoIsOut:
+            context.bloc<SportsDataBloc>().state.stricker.playerId,
         dotBall: 1,
-        bowlerId: context.bloc<SportsDataBloc>().state.bowler.pid,
-        playerIdWhoFaced: context.bloc<SportsDataBloc>().state.stricker.pid,
+        bowlerId: context.bloc<SportsDataBloc>().state.bowler.playerId,
+        playerIdWhoFaced:
+            context.bloc<SportsDataBloc>().state.stricker.playerId,
         facedBall: 1,
         run: 0,
         typeOfOut: "hit the ball twice",
@@ -570,10 +584,12 @@ class _OutScreenState extends State<OutScreen> {
 
   timedOut() {
     Bowl bowl = Bowl(
-        playerIdWhoIsOut: context.bloc<SportsDataBloc>().state.stricker.pid,
+        playerIdWhoIsOut:
+            context.bloc<SportsDataBloc>().state.stricker.playerId,
         dotBall: 0,
-        bowlerId: context.bloc<SportsDataBloc>().state.bowler.pid,
-        playerIdWhoFaced: context.bloc<SportsDataBloc>().state.stricker.pid,
+        bowlerId: context.bloc<SportsDataBloc>().state.bowler.playerId,
+        playerIdWhoFaced:
+            context.bloc<SportsDataBloc>().state.stricker.playerId,
         facedBall: 0,
         run: 0,
         typeOfOut: "timed Out",
@@ -602,13 +618,15 @@ class _OutScreenState extends State<OutScreen> {
 
   obstructingTheField() {
     Bowl bowl = Bowl(
-        playerIdWhoIsOut: context.bloc<SportsDataBloc>().state.stricker.pid,
+        playerIdWhoIsOut:
+            context.bloc<SportsDataBloc>().state.stricker.playerId,
         dotBall: 1,
-        bowlerId: context.bloc<SportsDataBloc>().state.bowler.pid,
-        playerIdWhoFaced: context.bloc<SportsDataBloc>().state.stricker.pid,
+        bowlerId: context.bloc<SportsDataBloc>().state.bowler.playerId,
+        playerIdWhoFaced:
+            context.bloc<SportsDataBloc>().state.stricker.playerId,
         facedBall: 1,
         run: 0,
-        typeOfOut: "Obstructing the field",
+        typeOfOut: "obstructing the field",
         perBallRecord: "W".toString(),
         totalRun: 0,
         single: 0,

@@ -60,7 +60,7 @@ class _StartInningsScreenState extends State<StartInningsScreen> {
     });
   }
 
-  Widget chooseContainer1({String name, String url}) {
+  Widget strikerContainer({String name, String url}) {
     return Container(
       width: MediaQuery.of(context).size.width * 0.4,
       height: MediaQuery.of(context).size.height * 0.3,
@@ -106,7 +106,7 @@ class _StartInningsScreenState extends State<StartInningsScreen> {
     );
   }
 
-  Widget chooseContainer2({String name, String url}) {
+  Widget runnerContainer({String name, String url}) {
     return Container(
       width: MediaQuery.of(context).size.width * 0.4,
       height: MediaQuery.of(context).size.height * 0.3,
@@ -151,7 +151,7 @@ class _StartInningsScreenState extends State<StartInningsScreen> {
     );
   }
 
-  Widget chooseContainer3({String name, String url}) {
+  Widget bowlerContainer({String name, String url}) {
     return Container(
       width: MediaQuery.of(context).size.width * 0.4,
       height: MediaQuery.of(context).size.height * 0.3,
@@ -233,18 +233,11 @@ class _StartInningsScreenState extends State<StartInningsScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-//    for (var value in context
-//        .bloc<SportsDataBloc>()
-//        .state
-//        .teamPlayerScoring[2]
-//        .teamPlayerModelMap
-//        .values) {
-//      print("------ ${value.playerName}");
-//    }
-//    context.bloc<SportsDataBloc>().state.stricker.firstName = null;
-//    context.bloc<SportsDataBloc>().state.runner.firstName = null;
-//    context.bloc<SportsDataBloc>().state.bowler.firstName = null;
-//    context.bloc<SportsDataBloc>().state.keeper.firstName = null;
+
+//    context.bloc<SportsDataBloc>().state.stricker.playerName = null;
+//    context.bloc<SportsDataBloc>().state.runner.playerName = null;
+//    context.bloc<SportsDataBloc>().state.bowler.playerName = null;
+//    context.bloc<SportsDataBloc>().state.keeper.playerName = null;
   }
 
   @override
@@ -277,34 +270,34 @@ class _StartInningsScreenState extends State<StartInningsScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    chooseContainer1(
+                    strikerContainer(
                         name: context
                                     .bloc<SportsDataBloc>()
                                     .state
                                     .stricker
-                                    .firstName ==
+                                    .playerName ==
                                 null
                             ? "Select Striker"
                             : context
                                 .bloc<SportsDataBloc>()
                                 .state
                                 .stricker
-                                .firstName,
+                                .playerName,
                         url:
                             "https://cdn.iconscout.com/icon/premium/png-256-thumb/playing-cricket-1580212-1335319.png"),
-                    chooseContainer2(
+                    runnerContainer(
                         name: context
                                     .bloc<SportsDataBloc>()
                                     .state
                                     .runner
-                                    .firstName ==
+                                    .playerName ==
                                 null
                             ? "Select Runner"
                             : context
                                 .bloc<SportsDataBloc>()
                                 .state
                                 .runner
-                                .firstName,
+                                .playerName,
                         url:
                             "https://cdn.iconscout.com/icon/premium/png-256-thumb/running-batsman-2049546-1729209.png"),
                   ],
@@ -316,19 +309,19 @@ class _StartInningsScreenState extends State<StartInningsScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    chooseContainer3(
+                    bowlerContainer(
                         name: context
                                     .bloc<SportsDataBloc>()
                                     .state
                                     .bowler
-                                    .firstName ==
+                                    .playerName ==
                                 null
                             ? "Select Bowler"
                             : context
                                 .bloc<SportsDataBloc>()
                                 .state
                                 .bowler
-                                .firstName,
+                                .playerName,
                         url:
                             "https://cdn.iconscout.com/icon/premium/png-128-thumb/bowler-6-870764.png"),
                     InkWell(
@@ -349,7 +342,7 @@ class _StartInningsScreenState extends State<StartInningsScreen> {
                                     .bloc<SportsDataBloc>()
                                     .state
                                     .keeper
-                                    .firstName ??
+                                    .playerName ??
                                 "Wicket Keeper",
                             url:
                                 "http://images.clipartpanda.com/keeper-clipart-cricket_wicket_keeper.jpg"),

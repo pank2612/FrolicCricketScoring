@@ -98,7 +98,7 @@ class _CaugthScreenState extends State<CaugthScreen> {
                                         .bloc<SportsDataBloc>()
                                         .state
                                         .stricker
-                                        .firstName ??
+                                        .playerName ??
                                     "Striker",
                             url:
                                 "https://image.flaticon.com/icons/png/128/10/10552.png"),
@@ -130,7 +130,7 @@ class _CaugthScreenState extends State<CaugthScreen> {
                                           .bloc<SportsDataBloc>()
                                           .state
                                           .runner
-                                          .firstName ??
+                                          .playerName ??
                                       "Runner",
                               url:
                                   "https://image.flaticon.com/icons/png/128/10/10552.png"),
@@ -325,7 +325,7 @@ class _CaugthScreenState extends State<CaugthScreen> {
                               .bloc<SportsDataBloc>()
                               .state
                               .stricker
-                              .firstName
+                              .playerName
                               .toString(),
                           url:
                               "https://image.flaticon.com/icons/png/128/10/10552.png"),
@@ -380,7 +380,7 @@ class _CaugthScreenState extends State<CaugthScreen> {
                                 .bloc<SportsDataBloc>()
                                 .state
                                 .selectFielder
-                                .firstName ??
+                                .playerName ??
                             " Select Fielder",
                         url:
                             "https://cdn0.iconfinder.com/data/icons/sports-and-games-3/512/140-128.png"),
@@ -435,12 +435,15 @@ class _CaugthScreenState extends State<CaugthScreen> {
 //    print(
 //        "selected fielder${context.bloc<SportsDataBloc>().state.selectFielder.pid}");
     Bowl bowl = Bowl(
-        playerIdWhoIsOut: context.bloc<SportsDataBloc>().state.stricker.pid,
+        playerIdWhoIsOut:
+            context.bloc<SportsDataBloc>().state.stricker.playerId,
         dotBall: 1,
-        bowlerId: context.bloc<SportsDataBloc>().state.bowler.pid,
-        playerIdWhoFaced: context.bloc<SportsDataBloc>().state.stricker.pid,
+        bowlerId: context.bloc<SportsDataBloc>().state.bowler.playerId,
+        playerIdWhoFaced:
+            context.bloc<SportsDataBloc>().state.stricker.playerId,
         facedBall: 1,
-        helpingPlayerId: context.bloc<SportsDataBloc>().state.selectFielder.pid,
+        helpingPlayerId:
+            context.bloc<SportsDataBloc>().state.selectFielder.playerId,
         run: 0,
         typeOfOut: "caugth",
         perBallRecord: "W".toString(),

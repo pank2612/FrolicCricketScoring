@@ -12,6 +12,9 @@ class ScoreCardScreen extends StatefulWidget {
   MatchDataForApp matchDataForApp;
   String score;
   String wickets;
+  String wicketsOfFirstInnings;
+  String scoreOfFirstInnings;
+  String oversOfFirstInnings;
   int extraRuns;
   String totalOver;
   ScoreCardScreen(
@@ -19,6 +22,9 @@ class ScoreCardScreen extends StatefulWidget {
       this.wickets,
       this.extraRuns,
       this.totalOver,
+      this.oversOfFirstInnings,
+      this.wicketsOfFirstInnings,
+      this.scoreOfFirstInnings,
       this.score});
   @override
   _ScoreCardScreenState createState() => _ScoreCardScreenState();
@@ -29,21 +35,32 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    print("score is ${widget.score + "/" + widget.wickets}");
   }
 
   @override
   Widget build(BuildContext context) {
     List<PlayerDetailsModel> battingPlayerdetailList =
         List<PlayerDetailsModel>();
-    context.bloc<SportsDataBloc>().state.playerDetailList.forEach((element) {
+    context
+        .bloc<SportsDataBloc>()
+        .state
+        .teamPlayerScoring[BATTING_TEAM_ID]
+        .teamPlayerModelMap
+        .values
+        .forEach((element) {
       if (element.teamId == BATTING_TEAM_ID) {
         battingPlayerdetailList.add(element);
       }
     });
     List<PlayerDetailsModel> bowlingPlayerdetailList =
         List<PlayerDetailsModel>();
-    context.bloc<SportsDataBloc>().state.playerDetailList.forEach((element) {
+    context
+        .bloc<SportsDataBloc>()
+        .state
+        .teamPlayerScoring[BOWLING_TEAM_ID]
+        .teamPlayerModelMap
+        .values
+        .forEach((element) {
       if (element.teamId == BOWLING_TEAM_ID) {
         bowlingPlayerdetailList.add(element);
       }
@@ -131,7 +148,7 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
                         Text(
                           BATTING_TEAM_ID == widget.matchDataForApp.firstTeamId
                               ? "(${widget.totalOver ?? "0.0"} ov)"
-                              : "",
+                              : "(${widget.oversOfFirstInnings ?? "0.0"} ov)",
                           style: TextStyle(
                               color: Colors.grey,
                               fontSize: 16,
@@ -141,7 +158,7 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
                         Text(
                           BATTING_TEAM_ID == widget.matchDataForApp.firstTeamId
                               ? "${widget.score + "/" + widget.wickets}"
-                              : "0/0",
+                              : "${widget.scoreOfFirstInnings + "/" + widget.wicketsOfFirstInnings}",
                           style: TextStyle(
                               color: Colors.black,
                               fontSize: 28,
@@ -185,7 +202,7 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
                         Text(
                           BATTING_TEAM_ID == widget.matchDataForApp.secondTeamId
                               ? "(${widget.totalOver ?? "0.0"} ov)"
-                              : "",
+                              : "(${widget.oversOfFirstInnings ?? "0.0"} ov)",
                           style: TextStyle(
                               color: Colors.grey,
                               fontSize: 16,
@@ -198,7 +215,7 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
                             BATTING_TEAM_ID ==
                                     widget.matchDataForApp.secondTeamId
                                 ? "${widget.score + "/" + widget.wickets}"
-                                : "0/0",
+                                : "${widget.scoreOfFirstInnings + "/" + widget.wicketsOfFirstInnings}",
                             style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 28,
@@ -329,7 +346,7 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
                               Container(
                                 child: Text(
                                   battingPlayerdetailList[index]
-                                      .madeRuns
+                                      .runsMadeByBatsman
                                       .toString(),
                                   style: TextStyle(
                                       color: Colors.black,
@@ -657,7 +674,10 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
                             children: [
                               Container(
                                 child: Text(
-                                  "BATSMEN",
+                                  bowlingPlayerdetailList[index]
+                                          .shortName
+                                          .toString() ??
+                                      "BATSMEN",
                                   style: TextStyle(
                                       color: Colors.blue,
                                       fontWeight: FontWeight.w600,
@@ -667,7 +687,10 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
                               ),
                               Container(
                                 child: Text(
-                                  "R",
+                                  bowlingPlayerdetailList[index]
+                                          .runsMadeByBatsman
+                                          .toString() ??
+                                      "0",
                                   style: TextStyle(
                                       color: Colors.black,
                                       fontWeight: FontWeight.w600,
@@ -677,7 +700,10 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
                               ),
                               Container(
                                 child: Text(
-                                  "B",
+                                  bowlingPlayerdetailList[index]
+                                          .facedBall
+                                          .toString() ??
+                                      "0",
                                   style: TextStyle(
                                       color: Colors.black,
                                       fontWeight: FontWeight.w600,
@@ -687,7 +713,10 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
                               ),
                               Container(
                                 child: Text(
-                                  "4s",
+                                  bowlingPlayerdetailList[index]
+                                          .fours
+                                          .toString() ??
+                                      "0",
                                   style: TextStyle(
                                       color: Colors.black,
                                       fontWeight: FontWeight.w600,
@@ -698,7 +727,10 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
                               Expanded(
                                 child: Container(
                                   child: Text(
-                                    "6s",
+                                    bowlingPlayerdetailList[index]
+                                            .sixes
+                                            .toString() ??
+                                        "0",
                                     style: TextStyle(
                                         color: Colors.black,
                                         fontWeight: FontWeight.w600,
@@ -714,7 +746,7 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
                             height: MediaQuery.of(context).size.height * 0.01,
                           ),
                           Text(
-                            bowlingPlayerdetailList[index].typeOfOut.toString(),
+                            "${getOutText(bowlingPlayerdetailList[index])}",
 //                            "lbw b Bumrah",
                             style: TextStyle(
                                 color: Colors.black,
@@ -728,7 +760,7 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
                       ),
                     );
                   },
-                  itemCount: 6,
+                  itemCount: bowlingPlayerdetailList.length,
                   shrinkWrap: true,
                 ),
               ),
@@ -810,7 +842,10 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
                             children: [
                               Container(
                                 child: Text(
-                                  "BOWLER",
+                                  battingPlayerdetailList[index]
+                                          .shortName
+                                          .toString() ??
+                                      "BOWLER",
                                   style: TextStyle(
                                       color: Colors.blue,
                                       fontWeight: FontWeight.w600,
@@ -820,7 +855,10 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
                               ),
                               Container(
                                 child: Text(
-                                  "R",
+                                  getBowlerOverText(
+                                          battingPlayerdetailList[index]
+                                              .overList) ??
+                                      "R",
                                   style: TextStyle(
                                       color: Colors.black,
                                       fontWeight: FontWeight.w600,
@@ -830,7 +868,10 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
                               ),
                               Container(
                                 child: Text(
-                                  "B",
+                                  battingPlayerdetailList[index]
+                                          .maiden
+                                          .toString() ??
+                                      "0",
                                   style: TextStyle(
                                       color: Colors.black,
                                       fontWeight: FontWeight.w600,
@@ -840,7 +881,10 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
                               ),
                               Container(
                                 child: Text(
-                                  "4s",
+                                  battingPlayerdetailList[index]
+                                          .runsByBowler
+                                          .toString() ??
+                                      "0",
                                   style: TextStyle(
                                       color: Colors.black,
                                       fontWeight: FontWeight.w600,
@@ -851,7 +895,10 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
                               Expanded(
                                 child: Container(
                                   child: Text(
-                                    "6s",
+                                    battingPlayerdetailList[index]
+                                            .wickets
+                                            .toString() ??
+                                        "0",
                                     style: TextStyle(
                                         color: Colors.black,
                                         fontWeight: FontWeight.w600,
@@ -863,16 +910,6 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
                               ),
                             ],
                           ),
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.01,
-                          ),
-                          Text(
-                            "lbw b Bumrah",
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 16),
-                          ),
                           Divider(
                             thickness: 1.5,
                           )
@@ -880,7 +917,7 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
                       ),
                     );
                   },
-                  itemCount: 6,
+                  itemCount: battingPlayerdetailList.length,
                   shrinkWrap: true,
                 ),
               )
@@ -995,7 +1032,7 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
         return "hit the ball twice " +
             " b " +
             getBowlerName(playerDetailsModel.batsmanOutThroughBowlerId);
-      case 'timed out':
+      case 'timed Out':
         return "timed out " +
             " b " +
             getBowlerName(playerDetailsModel.batsmanOutThroughBowlerId);
@@ -1014,7 +1051,13 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
 
   String getHelpingFielderName(int pId) {
     String txt = '';
-    context.bloc<SportsDataBloc>().state.playerDetailList.forEach((element) {
+    context
+        .bloc<SportsDataBloc>()
+        .state
+        .teamPlayerScoring[BOWLING_TEAM_ID]
+        .teamPlayerModelMap
+        .values
+        .forEach((element) {
       if (element.playerId == pId) {
         txt = element.shortName;
       }
@@ -1024,7 +1067,13 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
 
   String getBowlerName(int pId) {
     String txt = '';
-    context.bloc<SportsDataBloc>().state.playerDetailList.forEach((element) {
+    context
+        .bloc<SportsDataBloc>()
+        .state
+        .teamPlayerScoring[BOWLING_TEAM_ID]
+        .teamPlayerModelMap
+        .values
+        .forEach((element) {
       if (element.playerId == pId) {
         txt = element.shortName;
       }

@@ -15,6 +15,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:froliccricketscore/modules/start_innings/player_list.dart';
 import 'package:froliccricketscore/modules/start_innings/start_Innings_Screen.dart';
 
+import 'matchCompleteScreen.dart';
+
 class LiveScoreScreen extends StatefulWidget {
   MatchDataForApp matchDataForApp;
   List<Players> allPlayerList = List<Players>();
@@ -108,7 +110,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
-                                    "${getTotalScore(state.overList) + "/" + getTotalWickets(state.overList)}",
+                                    "${getTotalScore() + "/" + getTotalWickets()}",
                                     //   "${getScore(state.overList)}",
                                     style: TextStyle(
                                         fontWeight: FontWeight.w500,
@@ -116,7 +118,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                                         fontSize: 40),
                                   ),
                                   Text(
-                                    "(${getOverText(state.overList)})",
+                                    "(${getOverText(state.teamPlayerScoring[BATTING_TEAM_ID].overList)})",
                                     style: TextStyle(
                                         fontWeight: FontWeight.w300,
                                         color: Colors.white,
@@ -134,10 +136,23 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                                       MaterialPageRoute(
                                           builder: (context) => ScoreCardScreen(
                                                 wickets: totalwickets,
+                                                oversOfFirstInnings:
+                                                    firstInningsOvers(),
+                                                wicketsOfFirstInnings:
+                                                    firstInningsWickets()
+                                                        .toString(),
+                                                scoreOfFirstInnings:
+                                                    firstInningsScore()
+                                                        .toString(),
                                                 matchDataForApp:
                                                     widget.matchDataForApp,
                                                 score: totalScore,
-                                                extraRuns: extraRuns,
+                                                extraRuns: context
+                                                    .bloc<SportsDataBloc>()
+                                                    .state
+                                                    .teamPlayerScoring[
+                                                        BATTING_TEAM_ID]
+                                                    .extraRuns,
                                                 totalOver: totalOver,
                                               )));
                                 },
@@ -185,7 +200,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                                                 0.01,
                                       ),
                                       Text(
-                                        state.stricker.firstName ?? "Striker",
+                                        state.stricker.playerName ?? "Striker",
                                         style: TextStyle(
                                             fontWeight: FontWeight.w500,
                                             color: Colors.white,
@@ -194,7 +209,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                                     ],
                                   ),
                                   Text(
-                                    getStrikerData(state.stricker.pid) ??
+                                    getStrikerData(state.stricker.playerId) ??
                                         "0(0)",
                                     // "${state.stricker.pid}(${state.playerDetailsModel.facedBall.toString() ?? "0"})",
                                     style: TextStyle(
@@ -223,7 +238,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                                                 0.01,
                                       ),
                                       Text(
-                                        state.runner.firstName ?? "Runner",
+                                        state.runner.playerName ?? "Runner",
 //                                "Vivek",
                                         style: TextStyle(
                                             fontWeight: FontWeight.w500,
@@ -233,7 +248,8 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                                     ],
                                   ),
                                   Text(
-                                    getStrikerData(state.runner.pid) ?? "0(0)",
+                                    getStrikerData(state.runner.playerId) ??
+                                        "0(0)",
                                     style: TextStyle(
                                         fontWeight: FontWeight.w300,
                                         color: Colors.white,
@@ -273,7 +289,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                                 width: MediaQuery.of(context).size.width * 0.01,
                               ),
                               Text(
-                                state.bowler.firstName ?? "Bowler",
+                                state.bowler.playerName ?? "Bowler",
 //                        "Avishek",
                                 style: TextStyle(
                                     color: Colors.white, fontSize: 20),
@@ -282,8 +298,8 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                                 width: MediaQuery.of(context).size.width * 0.01,
                               ),
                               Text(
-                                getBowlerData(
-                                        state.bowler.pid, state.overList) ??
+                                getBowlerData(state.bowler.playerId,
+                                        state.overList) ??
                                     "(0-0)",
                                 style: TextStyle(
                                     fontWeight: FontWeight.w400,
@@ -303,7 +319,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                                 width: MediaQuery.of(context).size.width * 0.01,
                               ),
                               Text(
-                                getExtraRuns(state.overList).toString(),
+                                getExtraRuns().toString(),
                                 style: TextStyle(
                                     fontWeight: FontWeight.w400,
                                     color: Colors.white,
@@ -366,7 +382,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                                       child: RaisedButton(
                                           color: Colors.white,
                                           onPressed: () {
-                                            _grid1Navigation(index);
+                                            gridviewOfNineButtons(index);
                                           },
                                           splashColor: Colors.grey,
                                           child: Center(
@@ -397,7 +413,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                                   padding: const EdgeInsets.all(3.0),
                                   child: RaisedButton(
                                       onPressed: () {
-                                        _grid2Navigation(index);
+                                        gridviewOfFourButtons(index);
                                       },
                                       splashColor: Colors.grey,
                                       color: Colors.white,
@@ -423,9 +439,8 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
     );
   }
 
-  Widget _grid1Navigation(int indexValue) {
+  Widget gridviewOfNineButtons(int indexValue) {
     if (indexValue == 0) {
-//      inningComplete();
       zero();
     } else if (indexValue == 1) {
       single();
@@ -446,7 +461,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
     }
   }
 
-  Future _grid2Navigation(int indexValue) async {
+  Future gridviewOfFourButtons(int indexValue) async {
     if (indexValue == 0) {
       _undoDialogBox();
     } else if (indexValue == 1) {
@@ -458,6 +473,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                 allPlayerList: widget.allPlayerList,
               )));
       overFinishedDialogBox();
+      checkForMatchComplete();
     } else if (indexValue == 3) {
       _legByeDialogBox();
     }
@@ -625,7 +641,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                             style: TextStyle(color: Colors.black, fontSize: 20),
                           ),
                           Text(
-                            "${getTotalScore(context.bloc<SportsDataBloc>().state.overList).toString() + "/" + getTotalWickets(context.bloc<SportsDataBloc>().state.overList).toString()}" ??
+                            "${getTotalScore() + "/" + getTotalWickets()}" ??
                                 "0/0",
                             style: TextStyle(color: Colors.black, fontSize: 20),
                           ),
@@ -646,7 +662,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                                 .bloc<SportsDataBloc>()
                                 .state
                                 .stricker
-                                .pid),
+                                .playerId),
                             style: TextStyle(color: Colors.black, fontSize: 20),
                           ),
                         ],
@@ -666,7 +682,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                                 .bloc<SportsDataBloc>()
                                 .state
                                 .runner
-                                .pid),
+                                .playerId),
                             style: TextStyle(color: Colors.black, fontSize: 20),
                           ),
                         ],
@@ -683,7 +699,11 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                           ),
                           Text(
                             getBowlerData(
-                                context.bloc<SportsDataBloc>().state.bowler.pid,
+                                context
+                                    .bloc<SportsDataBloc>()
+                                    .state
+                                    .bowler
+                                    .playerId,
                                 context.bloc<SportsDataBloc>().state.overList),
                             style: TextStyle(color: Colors.black, fontSize: 20),
                           ),
@@ -712,7 +732,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                             builder: (_, state) {
                               return Center(
                                 child: Text(
-                                  state.keeper.firstName ?? "Change Keeper",
+                                  state.keeper.playerName ?? "Change Keeper",
                                   style: TextStyle(
                                       color: Colors.white, fontSize: 20),
                                 ),
@@ -879,7 +899,12 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                         Container(
                           width: MediaQuery.of(context).size.width * 0.18,
                           child: Text(
-                            extraRuns.toString(),
+                            context
+                                .bloc<SportsDataBloc>()
+                                .state
+                                .teamPlayerScoring[BATTING_TEAM_ID]
+                                .extraRuns
+                                .toString(),
                             style: TextStyle(fontSize: 18, color: Colors.black),
                           ),
                         ),
@@ -1250,8 +1275,9 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         dotBall: 1,
         facedBall: 1,
         run: 0,
-        bowlerId: context.bloc<SportsDataBloc>().state.bowler.pid,
-        playerIdWhoFaced: context.bloc<SportsDataBloc>().state.stricker.pid,
+        bowlerId: context.bloc<SportsDataBloc>().state.bowler.playerId,
+        playerIdWhoFaced:
+            context.bloc<SportsDataBloc>().state.stricker.playerId,
         perBallRecord: 0.toString(),
         totalRun: 0,
         single: 0,
@@ -1269,17 +1295,15 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         stump: 0,
         wicket: 0,
         isValid: true);
-    context.bloc<SportsDataBloc>().updateOver(bowl);
-    context.bloc<SportsDataBloc>().updateStriker(bowl, BATTING_TEAM_ID);
-    context.bloc<SportsDataBloc>().updateBowler(bowl, BOWLING_TEAM_ID);
-    overFinishedDialogBox();
+    updatePlayersData(bowl);
   }
 
   single() {
     Bowl bowl = Bowl(
         dotBall: 0,
-        bowlerId: context.bloc<SportsDataBloc>().state.bowler.pid,
-        playerIdWhoFaced: context.bloc<SportsDataBloc>().state.stricker.pid,
+        bowlerId: context.bloc<SportsDataBloc>().state.bowler.playerId,
+        playerIdWhoFaced:
+            context.bloc<SportsDataBloc>().state.stricker.playerId,
         facedBall: 1,
         run: 1,
         perBallRecord: 1.toString(),
@@ -1300,10 +1324,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         wicket: 0,
         isValid: true);
 
-    context.bloc<SportsDataBloc>().updateOver(bowl);
-    context.bloc<SportsDataBloc>().updateStriker(bowl, BATTING_TEAM_ID);
-    context.bloc<SportsDataBloc>().updateBowler(bowl, BOWLING_TEAM_ID);
-    overFinishedDialogBox();
+    updatePlayersData(bowl);
   }
 
   double() {
@@ -1311,8 +1332,9 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         dotBall: 0,
         facedBall: 1,
         run: 2,
-        bowlerId: context.bloc<SportsDataBloc>().state.bowler.pid,
-        playerIdWhoFaced: context.bloc<SportsDataBloc>().state.stricker.pid,
+        bowlerId: context.bloc<SportsDataBloc>().state.bowler.playerId,
+        playerIdWhoFaced:
+            context.bloc<SportsDataBloc>().state.stricker.playerId,
         perBallRecord: 2.toString(),
         totalRun: 2,
         single: 0,
@@ -1330,10 +1352,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         stump: 0,
         wicket: 0,
         isValid: true);
-    context.bloc<SportsDataBloc>().updateOver(bowl);
-    context.bloc<SportsDataBloc>().updateStriker(bowl, BATTING_TEAM_ID);
-    context.bloc<SportsDataBloc>().updateBowler(bowl, BOWLING_TEAM_ID);
-    overFinishedDialogBox();
+    updatePlayersData(bowl);
   }
 
   triple() {
@@ -1343,8 +1362,9 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         run: 3,
         perBallRecord: 3.toString(),
         totalRun: 3,
-        bowlerId: context.bloc<SportsDataBloc>().state.bowler.pid,
-        playerIdWhoFaced: context.bloc<SportsDataBloc>().state.stricker.pid,
+        bowlerId: context.bloc<SportsDataBloc>().state.bowler.playerId,
+        playerIdWhoFaced:
+            context.bloc<SportsDataBloc>().state.stricker.playerId,
         single: 0,
         double: 0,
         tripple: 1,
@@ -1360,17 +1380,15 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         stump: 0,
         wicket: 0,
         isValid: true);
-    context.bloc<SportsDataBloc>().updateOver(bowl);
-    context.bloc<SportsDataBloc>().updateStriker(bowl, BATTING_TEAM_ID);
-    context.bloc<SportsDataBloc>().updateBowler(bowl, BOWLING_TEAM_ID);
-    overFinishedDialogBox();
+    updatePlayersData(bowl);
   }
 
   four() {
     Bowl bowl = Bowl(
         dotBall: 0,
-        bowlerId: context.bloc<SportsDataBloc>().state.bowler.pid,
-        playerIdWhoFaced: context.bloc<SportsDataBloc>().state.stricker.pid,
+        bowlerId: context.bloc<SportsDataBloc>().state.bowler.playerId,
+        playerIdWhoFaced:
+            context.bloc<SportsDataBloc>().state.stricker.playerId,
         facedBall: 1,
         run: 4,
         perBallRecord: 4.toString(),
@@ -1390,18 +1408,16 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         extras: 0,
         wicket: 0,
         isValid: true);
-    context.bloc<SportsDataBloc>().updateOver(bowl);
-    context.bloc<SportsDataBloc>().updateStriker(bowl, BATTING_TEAM_ID);
-    context.bloc<SportsDataBloc>().updateBowler(bowl, BOWLING_TEAM_ID);
-    overFinishedDialogBox();
+    updatePlayersData(bowl);
   }
 
   six() {
     Bowl bowl = Bowl(
         dotBall: 0,
         extras: 0,
-        bowlerId: context.bloc<SportsDataBloc>().state.bowler.pid,
-        playerIdWhoFaced: context.bloc<SportsDataBloc>().state.stricker.pid,
+        bowlerId: context.bloc<SportsDataBloc>().state.bowler.playerId,
+        playerIdWhoFaced:
+            context.bloc<SportsDataBloc>().state.stricker.playerId,
         facedBall: 1,
         run: 6,
         perBallRecord: 6.toString(),
@@ -1420,10 +1436,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         stump: 0,
         wicket: 0,
         isValid: true);
-    context.bloc<SportsDataBloc>().updateOver(bowl);
-    context.bloc<SportsDataBloc>().updateStriker(bowl, BATTING_TEAM_ID);
-    context.bloc<SportsDataBloc>().updateBowler(bowl, BOWLING_TEAM_ID);
-    overFinishedDialogBox();
+    updatePlayersData(bowl);
   }
 
   wide() {
@@ -1431,8 +1444,9 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         dotBall: 0,
         extras: 1,
         facedBall: 0,
-        bowlerId: context.bloc<SportsDataBloc>().state.bowler.pid,
-        playerIdWhoFaced: context.bloc<SportsDataBloc>().state.stricker.pid,
+        bowlerId: context.bloc<SportsDataBloc>().state.bowler.playerId,
+        playerIdWhoFaced:
+            context.bloc<SportsDataBloc>().state.stricker.playerId,
         run: 0,
         perBallRecord: "WD",
         totalRun: 1,
@@ -1450,18 +1464,15 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         stump: 0,
         wicket: 0,
         isValid: false);
-    context.bloc<SportsDataBloc>().updateOver(bowl);
-//    context.bloc<SportsDataBloc>().updateStriker(bowl,widget.allPlayerList);
-    //context.bloc<SportsDataBloc>().updateStriker(bowl, BATTING_TEAM_ID);
-    context.bloc<SportsDataBloc>().updateBowler(bowl, BOWLING_TEAM_ID);
-    overFinishedDialogBox();
+    updatePlayersData(bowl);
   }
 
   legBye() {
     Bowl bowl = Bowl(
         dotBall: 1,
-        bowlerId: context.bloc<SportsDataBloc>().state.bowler.pid,
-        playerIdWhoFaced: context.bloc<SportsDataBloc>().state.stricker.pid,
+        bowlerId: context.bloc<SportsDataBloc>().state.bowler.playerId,
+        playerIdWhoFaced:
+            context.bloc<SportsDataBloc>().state.stricker.playerId,
         extras: int.parse(_legByeController.text) ?? 0,
         facedBall: 1,
         run: 0,
@@ -1481,17 +1492,15 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         stump: 0,
         wicket: 0,
         isValid: true);
-    context.bloc<SportsDataBloc>().updateOver(bowl);
-    context.bloc<SportsDataBloc>().updateStriker(bowl, BATTING_TEAM_ID);
-    context.bloc<SportsDataBloc>().updateBowler(bowl, BOWLING_TEAM_ID);
-    overFinishedDialogBox();
+    updatePlayersData(bowl);
   }
 
   bye() {
     Bowl bowl = Bowl(
         dotBall: 1,
-        bowlerId: context.bloc<SportsDataBloc>().state.bowler.pid,
-        playerIdWhoFaced: context.bloc<SportsDataBloc>().state.stricker.pid,
+        bowlerId: context.bloc<SportsDataBloc>().state.bowler.playerId,
+        playerIdWhoFaced:
+            context.bloc<SportsDataBloc>().state.stricker.playerId,
         extras: int.parse(_byeController.text) ?? 0,
         facedBall: 1,
         run: 0,
@@ -1511,17 +1520,15 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         stump: 0,
         wicket: 0,
         isValid: true);
-    context.bloc<SportsDataBloc>().updateOver(bowl);
-    context.bloc<SportsDataBloc>().updateStriker(bowl, BATTING_TEAM_ID);
-    context.bloc<SportsDataBloc>().updateBowler(bowl, BOWLING_TEAM_ID);
-    overFinishedDialogBox();
+    updatePlayersData(bowl);
   }
 
   fiveSeven() {
     Bowl bowl = Bowl(
         dotBall: 0,
-        bowlerId: context.bloc<SportsDataBloc>().state.bowler.pid,
-        playerIdWhoFaced: context.bloc<SportsDataBloc>().state.stricker.pid,
+        bowlerId: context.bloc<SportsDataBloc>().state.bowler.playerId,
+        playerIdWhoFaced:
+            context.bloc<SportsDataBloc>().state.stricker.playerId,
         extras: int.parse(_fiveSevenController.text) ?? 0,
         facedBall: 0,
         run: int.parse(_fiveSevenController.text) ?? 0,
@@ -1541,11 +1548,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         stump: 0,
         wicket: 0,
         isValid: true);
-    context.bloc<SportsDataBloc>().updateOver(bowl);
-//    context.bloc<SportsDataBloc>().updateStriker(bowl,widget.allPlayerList);
-//    context.bloc<SportsDataBloc>().updateStriker(bowl, BATTING_TEAM_ID);
-    context.bloc<SportsDataBloc>().updateBowler(bowl, BOWLING_TEAM_ID);
-    overFinishedDialogBox();
+    updatePlayersData(bowl);
   }
 
   noBall() {
@@ -1558,8 +1561,9 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
     }
     Bowl bowl = Bowl(
         dotBall: 0,
-        bowlerId: context.bloc<SportsDataBloc>().state.bowler.pid,
-        playerIdWhoFaced: context.bloc<SportsDataBloc>().state.stricker.pid,
+        bowlerId: context.bloc<SportsDataBloc>().state.bowler.playerId,
+        playerIdWhoFaced:
+            context.bloc<SportsDataBloc>().state.stricker.playerId,
         extras: int.parse(_nbController.text) + 1 ?? 0,
         facedBall: 0,
         run: run,
@@ -1580,10 +1584,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         stump: 0,
         wicket: 0,
         isValid: false);
-    context.bloc<SportsDataBloc>().updateOver(bowl);
-    context.bloc<SportsDataBloc>().updateStriker(bowl, BATTING_TEAM_ID);
-    context.bloc<SportsDataBloc>().updateBowler(bowl, BOWLING_TEAM_ID);
-    overFinishedDialogBox();
+    updatePlayersData(bowl);
   }
 
   out() {
@@ -1596,8 +1597,9 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
     }
     Bowl bowl = Bowl(
         dotBall: 0,
-        bowlerId: context.bloc<SportsDataBloc>().state.bowler.pid,
-        playerIdWhoFaced: context.bloc<SportsDataBloc>().state.stricker.pid,
+        bowlerId: context.bloc<SportsDataBloc>().state.bowler.playerId,
+        playerIdWhoFaced:
+            context.bloc<SportsDataBloc>().state.stricker.playerId,
         extras: int.parse(_nbController.text) + 1 ?? 0,
         facedBall: 0,
         run: run,
@@ -1618,10 +1620,49 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         stump: 0,
         wicket: 0,
         isValid: true);
+    updatePlayersData(bowl);
+  }
+
+  updatePlayersData(Bowl bowl) {
     context.bloc<SportsDataBloc>().updateOver(bowl);
     context.bloc<SportsDataBloc>().updateStriker(bowl, BATTING_TEAM_ID);
     context.bloc<SportsDataBloc>().updateBowler(bowl, BOWLING_TEAM_ID);
     overFinishedDialogBox();
+    checkForMatchComplete();
+  }
+
+  navigateToMatchCompleteScreen(String howWonTheMatch) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => MatchCompleteScreen(
+                  scoreOfFirstInnings: firstInningsScore(),
+                  wicketsOfFirstInnings: firstInningsWickets(),
+                  wicketsOfSecondInnings: int.parse(totalwickets),
+                  scoreOfSecondInnings: int.parse(totalScore),
+                  oversOfSecondInnings: totalOver,
+                  howWonTheMatch: howWonTheMatch,
+                  oversOfFirstInnings: firstInningsOvers(),
+                  matchDataForApp: widget.matchDataForApp,
+                )));
+  }
+
+  checkForMatchComplete() {
+    if (context.bloc<SportsDataBloc>().state.inningsFlag == "2nd innings") {
+      if (int.parse(totalScore) > firstInningsScore()) {
+        navigateToMatchCompleteScreen("wonByRuns");
+        return;
+      }
+      if (overLength == widget.matchDataForApp.inningsOver) {
+        navigateToMatchCompleteScreen("overFinished");
+        return;
+      }
+
+      if (int.parse(totalwickets) == 10) {
+        navigateToMatchCompleteScreen("allOut");
+        return;
+      }
+    }
   }
 
   String totalOver = '';
@@ -1631,7 +1672,11 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
       txt = "0.0";
       return txt;
     }
-
+    if (overList[0].over == null) {
+      txt = "0.0";
+      return txt;
+    }
+//context.bloc<SportsDataBloc>().state.teamPlayerScoring[BATTING_TEAM_ID].overList;
     Over over = overList[overList.length - 1];
     int bowlCount = 0;
     over.over.forEach((element) {
@@ -1644,47 +1689,97 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
     } else {
       txt = overList.length.toString() + ".0";
     }
+//    if (context.bloc<SportsDataBloc>().state.inningsFlag == "2nd innings") {
+//      firstInningsOvers();
+//    }
     totalOver = txt;
     return txt;
   }
 
-  String getCurrentBall(List<Over> overList) {
-    String txt = "";
-    if (overList.isEmpty) {
-      txt = "0.0";
-      return txt;
-    }
-
-    Over over = overList[overList.length - 1];
-    int bowlCount = 0;
-    over.over.forEach((element) {
-      if (element.isValid == true) {
-        bowlCount += 1;
+  String oversOfFirstInnings = '';
+  String firstInningsOvers() {
+    String overs = '';
+    context
+        .bloc<SportsDataBloc>()
+        .state
+        .teamPlayerScoring[BOWLING_TEAM_ID]
+        .teamPlayerModelMap
+        .values
+        .forEach((element) {
+      if (element.overList == null) {
+        return;
+      }
+      Over over = element.overList[element.overList.length - 1];
+      int bowlCount = 0;
+      if (over.over == null) {
+        return;
+      }
+      over.over.forEach((element) {
+        if (element.isValid == true) {
+          bowlCount += 1;
+        }
+      });
+      if (bowlCount < 6) {
+        overs = (element.overList.length - 1).toString() +
+            "." +
+            bowlCount.toString();
+      } else {
+        overs = element.overList.length.toString() + ".0";
       }
     });
-    if (bowlCount < 6) {
-      txt = (overList.length - 1).toString() + "." + bowlCount.toString();
-    } else {
-      txt = overList.length.toString() + ".0";
-    }
-    return txt;
+    print("first Innings Overs ${oversOfFirstInnings}");
+    print("Second Innings Overs ${totalOver}");
+    oversOfFirstInnings = overs;
+    return overs;
   }
 
   String totalScore = "";
+  String totalScoreOfFirstInnings = "";
   String totalwickets = "";
-  String getTotalWickets(List<Over> overList) {
+  String totalwicketsOfFirstInnings = "";
+  String getTotalWickets() {
     String totalWicket = '';
-//    print("wicket---- ${totalwickets}");
     int wickets = 0;
-    if (overList.isEmpty) {
-      totalWicket = "0";
-    }
-    overList.forEach((element) {
-      element.over.forEach((element) {
-        wickets += element.wicket;
-        totalWicket = wickets.toString();
-      });
+    context
+        .bloc<SportsDataBloc>()
+        .state
+        .teamPlayerScoring[BOWLING_TEAM_ID]
+        .teamPlayerModelMap
+        .values
+        .forEach((element) {
+      wickets += element.wickets;
     });
+    totalWicket = wickets.toString();
+//    if (context.bloc<SportsDataBloc>().state.inningsFlag == "2nd innings") {
+//      int wickets = 0;
+//      context
+//          .bloc<SportsDataBloc>()
+//          .state
+//          .teamPlayerScoring[BATTING_TEAM_ID]
+//          .teamPlayerModelMap
+//          .values
+//          .forEach((element) {
+//        wickets += element.wickets;
+//      });
+//      totalwicketsOfFirstInnings = wickets.toString();
+//      if (int.parse(totalWicket) == 10) {
+//        //matchComplete();
+//        Navigator.push(
+//            context,
+//            MaterialPageRoute(
+//                builder: (context) => MatchCompleteScreen(
+//                      scoreOfFirstInnings: int.parse(totalScoreOfFirstInnings),
+//                      wicketsOfFirstInnings:
+//                          int.parse(totalwicketsOfFirstInnings),
+//                      howWonTheMatch: "allOut",
+//                      wicketsOfSecondInnings: int.parse(totalwickets),
+//                      scoreOfSecondInnings: int.parse(totalScore),
+//                      oversOfSecondInnings: totalOver,
+//                      oversOfFirstInnings: oversOfFirstInnings,
+//                      matchDataForApp: widget.matchDataForApp,
+//                    )));
+//      }
+//    }
     if (int.parse(totalWicket) == 10) {
       inningComplete();
     }
@@ -1692,30 +1787,128 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
     return totalWicket;
   }
 
-  String getTotalScore(List<Over> overList) {
+  int firstInningsWickets() {
+    int wickets = 0;
+    context
+        .bloc<SportsDataBloc>()
+        .state
+        .teamPlayerScoring[BATTING_TEAM_ID]
+        .teamPlayerModelMap
+        .values
+        .forEach((element) {
+      wickets += element.wickets;
+    });
+    totalwicketsOfFirstInnings = wickets.toString();
+    return wickets;
+  }
+
+  String getTotalScore() {
     String totalscore = '';
     int score = 0;
-    if (overList.isEmpty) {
-      totalscore = "0";
-    }
-    overList.forEach((element) {
-      element.over.forEach((element) {
-        score += element.totalRun;
-        totalscore = score.toString();
-      });
+    context
+        .bloc<SportsDataBloc>()
+        .state
+        .teamPlayerScoring[BATTING_TEAM_ID]
+        .teamPlayerModelMap
+        .values
+        .forEach((element) {
+      score += element.runsMadeByBatsman;
     });
+    score += context
+        .bloc<SportsDataBloc>()
+        .state
+        .teamPlayerScoring[BATTING_TEAM_ID]
+        .extraRuns;
+    totalscore = score.toString();
     totalScore = totalscore;
+//    if (context.bloc<SportsDataBloc>().state.inningsFlag == "2nd innings") {
+//      if (firstInningsScore() < context.bloc<SportsDataBloc>().state.score) {
+//        Navigator.push(
+//            context,
+//            MaterialPageRoute(
+//                builder: (context) => MatchCompleteScreen(
+//                      scoreOfFirstInnings: int.parse(totalScoreOfFirstInnings),
+//                      wicketsOfFirstInnings:
+//                          int.parse(totalwicketsOfFirstInnings),
+//                      wicketsOfSecondInnings: int.parse(totalwickets),
+//                      scoreOfSecondInnings:
+//                          context.bloc<SportsDataBloc>().state.score,
+//                      howWonTheMatch: "wonByRuns",
+//                      oversOfSecondInnings: totalOver,
+//                      oversOfFirstInnings: oversOfFirstInnings,
+//                      matchDataForApp: widget.matchDataForApp,
+//                    )));
+//      } else {
+//        return score.toString();
+//      }
+//      // return totalScore;
+//    } else {
+//      return totalscore;
+//    }
     return totalscore;
   }
 
-  int extraRuns = 0;
-  int getExtraRuns(List<Over> overList) {
-    int extraRunText = 0;
-    overList.forEach((element) {
-      element.over.forEach((element) {
-        extraRunText += element.extras;
-      });
+  int firstInningsScore() {
+    int firstInningsScore = 0;
+    context
+        .bloc<SportsDataBloc>()
+        .state
+        .teamPlayerScoring[BOWLING_TEAM_ID]
+        .teamPlayerModelMap
+        .values
+        .forEach((element) {
+      firstInningsScore += element.runsMadeByBatsman;
     });
+    firstInningsScore += context
+        .bloc<SportsDataBloc>()
+        .state
+        .teamPlayerScoring[BOWLING_TEAM_ID]
+        .extraRuns;
+    totalScoreOfFirstInnings = firstInningsScore.toString();
+    print("1st team runs are ${firstInningsScore}");
+    return firstInningsScore;
+//    if (firstInningsScore < score) {
+//      print("2st team win");
+//      // matchComplete();
+//      Navigator.push(
+//          context,
+//          MaterialPageRoute(
+//              builder: (context) => MatchCompleteScreen(
+//                    scoreOfFirstInnings: int.parse(totalScoreOfFirstInnings),
+//                    wicketsOfFirstInnings:
+//                        int.parse(totalwicketsOfFirstInnings),
+//                    wicketsOfSecondInnings: int.parse(totalwickets),
+//                    scoreOfSecondInnings: int.parse(totalScore),
+//                    howWonTheMatch: "wonByRuns",
+//                    oversOfSecondInnings: totalOver,
+//                    oversOfFirstInnings: oversOfFirstInnings,
+//                    matchDataForApp: widget.matchDataForApp,
+//                  )));
+//      // return null;
+//    } else {
+//      return totalScore;
+//    }
+//      if (firstInningsScore > score) {
+//        print("1st team win");
+//        matchComplete();
+//        // return null;
+//      }
+//      if (firstInningsScore == score) {
+//        print("match tie");
+//        matchComplete();
+//        //return null;
+//      }
+  }
+
+  int extraRuns = 0;
+  int getExtraRuns() {
+    int extraRunText = 0;
+    extraRunText = context
+        .bloc<SportsDataBloc>()
+        .state
+        .teamPlayerScoring[BATTING_TEAM_ID]
+        .extraRuns;
+
     extraRuns = extraRunText;
     return extraRunText;
   }
@@ -1745,10 +1938,16 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
   }
 
   String getStrikerData(int strikerPID) {
-    String text = '';
-    context.bloc<SportsDataBloc>().state.playerDetailList.forEach((element) {
+    String text = '0(0)';
+    context
+        .bloc<SportsDataBloc>()
+        .state
+        .teamPlayerScoring[BATTING_TEAM_ID]
+        .teamPlayerModelMap
+        .values
+        .forEach((element) {
       if (element.playerId == strikerPID) {
-        text = element.madeRuns.toString() +
+        text = element.runsMadeByBatsman.toString() +
             " (" +
             (element.facedBall.toString()) +
             ")";
@@ -1758,10 +1957,16 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
   }
 
   String getRunnerData(int runnerPID) {
-    String text = '';
-    context.bloc<SportsDataBloc>().state.playerDetailList.forEach((element) {
+    String text = '0(0)';
+    context
+        .bloc<SportsDataBloc>()
+        .state
+        .teamPlayerScoring[BATTING_TEAM_ID]
+        .teamPlayerModelMap
+        .values
+        .forEach((element) {
       if (element.playerId == runnerPID) {
-        text = element.madeRuns.toString() +
+        text = element.runsMadeByBatsman.toString() +
             " (" +
             (element.facedBall.toString()) +
             ")";
@@ -1771,8 +1976,15 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
   }
 
   String getBowlerData(int bowlerPID, List<Over> overList) {
-    String text = '';
-    context.bloc<SportsDataBloc>().state.playerDetailList.forEach((element) {
+//    print("$bowlerPID -- ${overList.length}");
+    String text = '0-0';
+    context
+        .bloc<SportsDataBloc>()
+        .state
+        .teamPlayerScoring[BOWLING_TEAM_ID]
+        .teamPlayerModelMap
+        .values
+        .forEach((element) {
       if (element.playerId == bowlerPID) {
         text = "(" +
             element.runsByBowler.toString() +
@@ -1790,16 +2002,17 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
     setState(() {});
   }
 
-  FutureOr goBackKeeper(dynamic value) {
-    setState(() {
-      context.bloc<SportsDataBloc>().state.keeper.firstName;
-    });
-  }
+  FutureOr goBackKeeper(dynamic value) {}
 
   changeInnings() {
     int battingTeamId = BATTING_TEAM_ID;
     int bowlingTeamId = BOWLING_TEAM_ID;
     BATTING_TEAM_ID = bowlingTeamId;
     BOWLING_TEAM_ID = battingTeamId;
+    //context.bloc<SportsDataBloc>().resetScore(0);
+    context.bloc<SportsDataBloc>().resetStriker(null);
+    context.bloc<SportsDataBloc>().resetRunner(null);
+    context.bloc<SportsDataBloc>().resetBowler(null);
+    context.bloc<SportsDataBloc>().resetKeeper(null);
   }
 }

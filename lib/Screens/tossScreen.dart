@@ -184,11 +184,13 @@ class _TossScreenState extends State<TossScreen> {
           .bloc<SportsDataBloc>()
           .getPlayerModel(widget.matchDataForApp.firstTeamId, playerDetail);
     });
-    for (var value in playerDetailsModelMap.values) {
-//      print("player data------ ${value.playerName}");
-    }
-    ScoreModel scoreModel =
-        ScoreModel(extraRuns: 0, teamPlayerModelMap: playerDetailsModelMap);
+    Over over = Over();
+    List<Over> overList = List<Over>();
+    overList.add(over);
+    ScoreModel scoreModel = ScoreModel(
+        extraRuns: 0,
+        teamPlayerModelMap: playerDetailsModelMap,
+        overList: overList);
 
     teamPlayerScoring[widget.matchDataForApp.firstTeamId] = scoreModel;
     context
@@ -202,27 +204,13 @@ class _TossScreenState extends State<TossScreen> {
           .bloc<SportsDataBloc>()
           .getPlayerModel(widget.matchDataForApp.secondTeamId, playerDetail);
     });
-    for (var value in playerDetailsModelMap1.values) {
-//      print("player data ${value.playerName}");
-    }
-
-    scoreModel =
-        ScoreModel(extraRuns: 0, teamPlayerModelMap: playerDetailsModelMap1);
+    scoreModel = ScoreModel(
+        extraRuns: 0,
+        teamPlayerModelMap: playerDetailsModelMap1,
+        overList: overList);
 
     teamPlayerScoring[widget.matchDataForApp.secondTeamId] = scoreModel;
     context.bloc<SportsDataBloc>().setTeamsScoring(teamPlayerScoring);
-//    print("teamID is ${widget.matchDataForApp.firstTeamId}");
-//    for (var value in teamPlayerScoring[widget.matchDataForApp.firstTeamId]
-//        .teamPlayerModelMap
-//        .values) {
-//      print("player data ${value.playerName}");
-//    }
-//    print("teamID is ${widget.matchDataForApp.secondTeamId}");
-//    for (var value in teamPlayerScoring[widget.matchDataForApp.secondTeamId]
-//        .teamPlayerModelMap
-//        .values) {
-//      print("player data ${value.playerName}");
-//    }
   }
 
   @override

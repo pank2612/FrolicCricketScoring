@@ -42,7 +42,7 @@ class PlayerDetailsModel {
       this.helpingPlayerId = 0,
       this.playerName,
       this.totalPlayedBalls = 0,
-      this.madeRuns = 0,
+      this.runsMadeByBatsman = 0,
       this.overList,
       this.fours = 0,
       this.sixes = 0,
@@ -83,7 +83,7 @@ class PlayerDetailsModel {
   String playerName;
   int helpingPlayerId = 0;
   int totalPlayedBalls = 0;
-  int madeRuns = 0;
+  int runsMadeByBatsman = 0;
   int batsmanOutThroughBowlerId = 0;
   int maxOverPerBowler = 0;
   int fours = 0;
@@ -123,7 +123,7 @@ class PlayerDetailsModel {
         playerName: json["playerName"],
         maxOverPerBowler: json['minOverPerBowler'] ?? 0,
         totalPlayedBalls: json["totalPlayedBalls"] ?? 0,
-        madeRuns: json["madeRuns"] ?? 0,
+        runsMadeByBatsman: json["madeRuns"] ?? 0,
         fours: json["fours"] ?? 0,
         batsmanOutThroughBowlerId: json['batsmanOutThroughBowlerId'] ?? 0,
         typeOfOut: json['typeOfOut'] ?? "Not Out",
@@ -157,7 +157,7 @@ class PlayerDetailsModel {
         "batsmanOut": batsmanOut,
         "shortName": shortName,
         "totalPlayedBalls": totalPlayedBalls,
-        "madeRuns": madeRuns,
+        "madeRuns": runsMadeByBatsman,
         "fours": fours,
         "batsmanOutThroughBowlerId": batsmanOutThroughBowlerId,
         "teamId": teamId,
@@ -324,9 +324,14 @@ class Bowl {
 class ScoreModel {
   HashMap<int, PlayerDetailsModel> teamPlayerModelMap;
   int extraRuns;
-  ScoreModel({this.teamPlayerModelMap = null, this.extraRuns = 0});
-  ScoreModel.fromJson(Map<String, dynamic> json) {
-    extraRuns = json['extrasRuns'] ?? 0;
-    teamPlayerModelMap = json['teamPlayerModelMap'] ?? '';
-  }
+  List<Over> overList = List<Over>();
+
+  ScoreModel(
+      {this.teamPlayerModelMap = null,
+      this.extraRuns = 0,
+      this.overList = null});
+  factory ScoreModel.fromJson(Map<String, dynamic> json) => ScoreModel(
+      extraRuns: json['extraRuns'] ?? 0,
+      overList: List<Over>.from(json["overList"].map((x) => Over.fromJson(x))),
+      teamPlayerModelMap: json['teamPlayerModelMap'] ?? '');
 }
