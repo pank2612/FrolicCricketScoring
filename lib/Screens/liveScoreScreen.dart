@@ -30,7 +30,10 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
   TextEditingController _byeController = TextEditingController();
   TextEditingController _legByeController = TextEditingController();
   TextEditingController _fiveSevenController = TextEditingController();
-
+  final _globalKeyNB = GlobalKey<FormState>();
+  final _globalKeyBye = GlobalKey<FormState>();
+  final _globalKey57 = GlobalKey<FormState>();
+  final _globalKeyLegBye = GlobalKey<FormState>();
   List<Map<String, dynamic>> list1 = [
     {"name": "0"},
     {"name": "1"},
@@ -118,7 +121,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                                         fontSize: 40),
                                   ),
                                   Text(
-                                    "(${getOverText(state.teamPlayerScoring[BATTING_TEAM_ID].overList)})",
+                                    "(${getOverText(state.teamPlayerScoring[BATTING_TEAM_ID].overList, BATTING_TEAM_ID)})",
                                     style: TextStyle(
                                         fontWeight: FontWeight.w300,
                                         color: Colors.white,
@@ -135,25 +138,8 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) => ScoreCardScreen(
-                                                wickets: totalwickets,
-                                                oversOfFirstInnings:
-                                                    firstInningsOvers(),
-                                                wicketsOfFirstInnings:
-                                                    firstInningsWickets()
-                                                        .toString(),
-                                                scoreOfFirstInnings:
-                                                    firstInningsScore()
-                                                        .toString(),
                                                 matchDataForApp:
                                                     widget.matchDataForApp,
-                                                score: totalScore,
-                                                extraRuns: context
-                                                    .bloc<SportsDataBloc>()
-                                                    .state
-                                                    .teamPlayerScoring[
-                                                        BATTING_TEAM_ID]
-                                                    .extraRuns,
-                                                totalOver: totalOver,
                                               )));
                                 },
                                 child: Text(
@@ -341,8 +327,9 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                             radius: 40,
                             child: Text(
                               state.overList[state.overList.length - 1]
-                                  .over[index].perBallRecord
-                                  .toString(),
+                                      .over[index].perBallRecord
+                                      .toString() ??
+                                  "",
                               style: TextStyle(
                                   fontSize: 35,
                                   fontWeight: FontWeight.w700,
@@ -515,17 +502,27 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                               fontWeight: FontWeight.w500, fontSize: 17),
                         ),
                         Container(
-                          width: MediaQuery.of(context).size.width * 0.2,
-                          height: MediaQuery.of(context).size.height * 0.05,
-                          child: TextFormField(
-                            controller: _nbController,
-                            decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(6.0),
-                                    borderSide: BorderSide(
-                                        color: Colors.black,
-                                        width: 4,
-                                        style: BorderStyle.solid))),
+                          width: MediaQuery.of(context).size.width * 0.24,
+                          height: MediaQuery.of(context).size.height * 0.08,
+                          child: Form(
+                            key: _globalKeyNB,
+                            child: TextFormField(
+                              validator: (value) {
+                                if (value.isEmpty) {
+                                  return "Can't be empty";
+                                }
+                                return null;
+                              },
+                              controller: _nbController,
+                              decoration: InputDecoration(
+                                  errorStyle: TextStyle(fontSize: 11),
+                                  border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(6.0),
+                                      borderSide: BorderSide(
+                                          color: Colors.black,
+                                          width: 4,
+                                          style: BorderStyle.solid))),
+                            ),
                           ),
                         ),
                         Text(
@@ -573,6 +570,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                           ),
                           onPressed: () {
                             Navigator.of(context).pop();
+                            _selectedNoBall = null;
                           },
                         ),
                         FlatButton(
@@ -582,8 +580,20 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                           ),
                           color: Colors.teal.shade600,
                           onPressed: () {
-                            noBall();
-                            Navigator.of(context).pop();
+                            if (_globalKeyNB.currentState.validate()) {
+                              if (_selectedNoBall == null) {
+                                Fluttertoast.showToast(
+                                    msg: "Please select out from",
+                                    backgroundColor: Colors.black,
+                                    textColor: Colors.white);
+                                return;
+                              } else {
+                                noBall();
+                                Navigator.of(context).pop();
+                                _selectedNoBall = null;
+                                _nbController.clear();
+                              }
+                            }
                           },
                         ),
                       ],
@@ -789,6 +799,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                     color: Colors.teal.shade600,
                     onPressed: () {
                       Navigator.of(context).pop();
+                      context.bloc<SportsDataBloc>().resetOver();
                       Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -923,6 +934,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                   ),
                   FlatButton(
                       onPressed: () {
+                        context.bloc<SportsDataBloc>().resetOver();
                         changeInnings();
                         context
                             .bloc<SportsDataBloc>()
@@ -990,17 +1002,27 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                 Row(
                   children: [
                     Container(
-                      width: MediaQuery.of(context).size.width * 0.2,
-                      height: MediaQuery.of(context).size.height * 0.05,
-                      child: TextFormField(
-                        controller: _byeController,
-                        decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(6.0),
-                                borderSide: BorderSide(
-                                    color: Colors.black,
-                                    width: 4,
-                                    style: BorderStyle.solid))),
+                      width: MediaQuery.of(context).size.width * 0.24,
+                      height: MediaQuery.of(context).size.height * 0.08,
+                      child: Form(
+                        key: _globalKeyBye,
+                        child: TextFormField(
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return "Can't be empty";
+                            }
+                            return null;
+                          },
+                          controller: _byeController,
+                          decoration: InputDecoration(
+                              errorStyle: TextStyle(fontSize: 11),
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(6.0),
+                                  borderSide: BorderSide(
+                                      color: Colors.black,
+                                      width: 4,
+                                      style: BorderStyle.solid))),
+                        ),
                       ),
                     ),
                     Text(
@@ -1035,8 +1057,11 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                       ),
                       color: Colors.teal.shade600,
                       onPressed: () {
-                        bye();
-                        Navigator.of(context).pop();
+                        if (_globalKeyBye.currentState.validate()) {
+                          bye();
+                          Navigator.of(context).pop();
+                          _byeController.clear();
+                        }
                       },
                     ),
                   ],
@@ -1069,17 +1094,27 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                 Row(
                   children: [
                     Container(
-                      width: MediaQuery.of(context).size.width * 0.2,
-                      height: MediaQuery.of(context).size.height * 0.05,
-                      child: TextFormField(
-                        controller: _legByeController,
-                        decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(6.0),
-                                borderSide: BorderSide(
-                                    color: Colors.black,
-                                    width: 4,
-                                    style: BorderStyle.solid))),
+                      width: MediaQuery.of(context).size.width * 0.24,
+                      height: MediaQuery.of(context).size.height * 0.08,
+                      child: Form(
+                        key: _globalKeyLegBye,
+                        child: TextFormField(
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return "Can't be empty";
+                            }
+                            return null;
+                          },
+                          controller: _legByeController,
+                          decoration: InputDecoration(
+                              errorStyle: TextStyle(fontSize: 11),
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(6.0),
+                                  borderSide: BorderSide(
+                                      color: Colors.black,
+                                      width: 4,
+                                      style: BorderStyle.solid))),
+                        ),
                       ),
                     ),
                     Text(
@@ -1110,8 +1145,11 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                       ),
                       color: Colors.teal.shade600,
                       onPressed: () {
-                        legBye();
-                        Navigator.of(context).pop();
+                        if (_globalKeyLegBye.currentState.validate()) {
+                          legBye();
+                          Navigator.of(context).pop();
+                          _legByeController.clear();
+                        }
                       },
                     ),
                   ],
@@ -1144,17 +1182,26 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                 Row(
                   children: [
                     Container(
-                      width: MediaQuery.of(context).size.width * 0.2,
-                      height: MediaQuery.of(context).size.height * 0.05,
-                      child: TextFormField(
-                        controller: _fiveSevenController,
-                        decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(6.0),
-                                borderSide: BorderSide(
-                                    color: Colors.black,
-                                    width: 4,
-                                    style: BorderStyle.solid))),
+                      width: MediaQuery.of(context).size.width * 0.24,
+                      height: MediaQuery.of(context).size.height * 0.08,
+                      child: Form(
+                        key: _globalKey57,
+                        child: TextFormField(
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return "Can't be empty";
+                            }
+                            return null;
+                          },
+                          controller: _fiveSevenController,
+                          decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(6.0),
+                                  borderSide: BorderSide(
+                                      color: Colors.black,
+                                      width: 4,
+                                      style: BorderStyle.solid))),
+                        ),
                       ),
                     ),
                     Text(
@@ -1189,8 +1236,11 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                       ),
                       color: Colors.teal.shade600,
                       onPressed: () {
-                        fiveSeven();
-                        Navigator.of(context).pop();
+                        if (_globalKey57.currentState.validate()) {
+                          fiveSeven();
+                          Navigator.of(context).pop();
+                          _fiveSevenController.clear();
+                        }
                       },
                     ),
                   ],
@@ -1275,6 +1325,8 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         dotBall: 1,
         facedBall: 1,
         run: 0,
+        bowlingPosition: 1,
+        battingPosition: 1,
         bowlerId: context.bloc<SportsDataBloc>().state.bowler.playerId,
         playerIdWhoFaced:
             context.bloc<SportsDataBloc>().state.stricker.playerId,
@@ -1311,6 +1363,8 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         single: 1,
         double: 0,
         tripple: 0,
+        bowlingPosition: 1,
+        battingPosition: 1,
         wide: 0,
         extras: 0,
         bowled: 0,
@@ -1338,6 +1392,8 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         perBallRecord: 2.toString(),
         totalRun: 2,
         single: 0,
+        bowlingPosition: 1,
+        battingPosition: 1,
         double: 1,
         tripple: 0,
         wide: 0,
@@ -1369,6 +1425,8 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         double: 0,
         tripple: 1,
         wide: 0,
+        bowlingPosition: 1,
+        battingPosition: 1,
         bowled: 0,
         caugth: 0,
         four: 0,
@@ -1403,6 +1461,8 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         noBall: 0,
         runOut: 0,
         six: 0,
+        bowlingPosition: 1,
+        battingPosition: 1,
         lbw: 0,
         stump: 0,
         extras: 0,
@@ -1434,6 +1494,8 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         six: 1,
         lbw: 0,
         stump: 0,
+        bowlingPosition: 1,
+        battingPosition: 1,
         wicket: 0,
         isValid: true);
     updatePlayersData(bowl);
@@ -1453,7 +1515,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         single: 0,
         double: 0,
         tripple: 0,
-        wide: 1,
+        wide: 0,
         bowled: 0,
         caugth: 0,
         four: 0,
@@ -1462,8 +1524,11 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         six: 0,
         lbw: 0,
         stump: 0,
+        bowlingPosition: 1,
+        battingPosition: 1,
         wicket: 0,
         isValid: false);
+
     updatePlayersData(bowl);
   }
 
@@ -1486,6 +1551,8 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         caugth: 0,
         four: 0,
         noBall: 0,
+        bowlingPosition: 1,
+        battingPosition: 1,
         runOut: 0,
         six: 0,
         lbw: 0,
@@ -1515,6 +1582,8 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         four: 0,
         noBall: 0,
         runOut: 0,
+        bowlingPosition: 1,
+        battingPosition: 1,
         six: 0,
         lbw: 0,
         stump: 0,
@@ -1543,6 +1612,8 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         four: 0,
         noBall: 0,
         runOut: 0,
+        bowlingPosition: 1,
+        battingPosition: 1,
         six: 0,
         lbw: 0,
         stump: 0,
@@ -1574,6 +1645,8 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         double: 0,
         tripple: 0,
         wide: 0,
+        bowlingPosition: 1,
+        battingPosition: 1,
         bowled: 0,
         caugth: 0,
         four: 0,
@@ -1603,6 +1676,8 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         extras: int.parse(_nbController.text) + 1 ?? 0,
         facedBall: 0,
         run: run,
+        bowlingPosition: 1,
+        battingPosition: 1,
         perBallRecord:
             (int.parse(_nbController.text) + 1).toString() + "NB" ?? 0,
         totalRun: int.parse(_nbController.text) + 1 ?? 0,
@@ -1636,13 +1711,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         context,
         MaterialPageRoute(
             builder: (context) => MatchCompleteScreen(
-                  scoreOfFirstInnings: firstInningsScore(),
-                  wicketsOfFirstInnings: firstInningsWickets(),
-                  wicketsOfSecondInnings: int.parse(totalwickets),
-                  scoreOfSecondInnings: int.parse(totalScore),
-                  oversOfSecondInnings: totalOver,
                   howWonTheMatch: howWonTheMatch,
-                  oversOfFirstInnings: firstInningsOvers(),
                   matchDataForApp: widget.matchDataForApp,
                 )));
   }
@@ -1666,7 +1735,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
   }
 
   String totalOver = '';
-  String getOverText(List<Over> overList) {
+  String getOverText(List<Over> overList, int id) {
     String txt = "";
     if (overList.isEmpty) {
       txt = "0.0";
@@ -1676,7 +1745,6 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
       txt = "0.0";
       return txt;
     }
-//context.bloc<SportsDataBloc>().state.teamPlayerScoring[BATTING_TEAM_ID].overList;
     Over over = overList[overList.length - 1];
     int bowlCount = 0;
     over.over.forEach((element) {
@@ -1689,9 +1757,6 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
     } else {
       txt = overList.length.toString() + ".0";
     }
-//    if (context.bloc<SportsDataBloc>().state.inningsFlag == "2nd innings") {
-//      firstInningsOvers();
-//    }
     totalOver = txt;
     return txt;
   }
@@ -1699,6 +1764,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
   String oversOfFirstInnings = '';
   String firstInningsOvers() {
     String overs = '';
+
     context
         .bloc<SportsDataBloc>()
         .state
@@ -1710,6 +1776,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         return;
       }
       Over over = element.overList[element.overList.length - 1];
+
       int bowlCount = 0;
       if (over.over == null) {
         return;
@@ -1720,17 +1787,14 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         }
       });
       if (bowlCount < 6) {
-        overs = (element.overList.length - 1).toString() +
+        oversOfFirstInnings = (element.overList.length - 1).toString() +
             "." +
             bowlCount.toString();
       } else {
-        overs = element.overList.length.toString() + ".0";
+        oversOfFirstInnings = element.overList.length.toString() + ".0";
       }
     });
-    print("first Innings Overs ${oversOfFirstInnings}");
-    print("Second Innings Overs ${totalOver}");
-    oversOfFirstInnings = overs;
-    return overs;
+    return oversOfFirstInnings;
   }
 
   String totalScore = "";
@@ -1750,36 +1814,6 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
       wickets += element.wickets;
     });
     totalWicket = wickets.toString();
-//    if (context.bloc<SportsDataBloc>().state.inningsFlag == "2nd innings") {
-//      int wickets = 0;
-//      context
-//          .bloc<SportsDataBloc>()
-//          .state
-//          .teamPlayerScoring[BATTING_TEAM_ID]
-//          .teamPlayerModelMap
-//          .values
-//          .forEach((element) {
-//        wickets += element.wickets;
-//      });
-//      totalwicketsOfFirstInnings = wickets.toString();
-//      if (int.parse(totalWicket) == 10) {
-//        //matchComplete();
-//        Navigator.push(
-//            context,
-//            MaterialPageRoute(
-//                builder: (context) => MatchCompleteScreen(
-//                      scoreOfFirstInnings: int.parse(totalScoreOfFirstInnings),
-//                      wicketsOfFirstInnings:
-//                          int.parse(totalwicketsOfFirstInnings),
-//                      howWonTheMatch: "allOut",
-//                      wicketsOfSecondInnings: int.parse(totalwickets),
-//                      scoreOfSecondInnings: int.parse(totalScore),
-//                      oversOfSecondInnings: totalOver,
-//                      oversOfFirstInnings: oversOfFirstInnings,
-//                      matchDataForApp: widget.matchDataForApp,
-//                    )));
-//      }
-//    }
     if (int.parse(totalWicket) == 10) {
       inningComplete();
     }
@@ -1821,30 +1855,6 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         .extraRuns;
     totalscore = score.toString();
     totalScore = totalscore;
-//    if (context.bloc<SportsDataBloc>().state.inningsFlag == "2nd innings") {
-//      if (firstInningsScore() < context.bloc<SportsDataBloc>().state.score) {
-//        Navigator.push(
-//            context,
-//            MaterialPageRoute(
-//                builder: (context) => MatchCompleteScreen(
-//                      scoreOfFirstInnings: int.parse(totalScoreOfFirstInnings),
-//                      wicketsOfFirstInnings:
-//                          int.parse(totalwicketsOfFirstInnings),
-//                      wicketsOfSecondInnings: int.parse(totalwickets),
-//                      scoreOfSecondInnings:
-//                          context.bloc<SportsDataBloc>().state.score,
-//                      howWonTheMatch: "wonByRuns",
-//                      oversOfSecondInnings: totalOver,
-//                      oversOfFirstInnings: oversOfFirstInnings,
-//                      matchDataForApp: widget.matchDataForApp,
-//                    )));
-//      } else {
-//        return score.toString();
-//      }
-//      // return totalScore;
-//    } else {
-//      return totalscore;
-//    }
     return totalscore;
   }
 
@@ -2009,7 +2019,6 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
     int bowlingTeamId = BOWLING_TEAM_ID;
     BATTING_TEAM_ID = bowlingTeamId;
     BOWLING_TEAM_ID = battingTeamId;
-    //context.bloc<SportsDataBloc>().resetScore(0);
     context.bloc<SportsDataBloc>().resetStriker(null);
     context.bloc<SportsDataBloc>().resetRunner(null);
     context.bloc<SportsDataBloc>().resetBowler(null);

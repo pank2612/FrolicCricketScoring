@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:froliccricketscore/Screens/liveScoreScreen.dart';
 import 'package:froliccricketscore/blocs/sportsBloc.dart';
 import 'package:froliccricketscore/constants/config.dart';
@@ -168,6 +169,7 @@ class _CaugthScreenState extends State<CaugthScreen> {
                   onPressed: () {
                     //  legBye();
                     Navigator.of(context).pop();
+                    context.bloc<SportsDataBloc>().resetFielder(null);
                     return true;
                     ;
 //                    Navigator.push(
@@ -339,7 +341,8 @@ class _CaugthScreenState extends State<CaugthScreen> {
 ////                            context.bloc<SportsDataBloc>().state.stricker.pid,
 ////                            widget.playerList);
 //                      },
-//                      child: Padding(
+//                      child:
+//                      Padding(
 //                        padding: const EdgeInsets.all(8),
 //                        child: whoIsOutContainer(
 //                            name: context
@@ -392,15 +395,29 @@ class _CaugthScreenState extends State<CaugthScreen> {
                 Center(
                   child: RaisedButton(
                     onPressed: () {
-                      out();
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => PlayersList(
-                                    select: "Select next batsman",
-                                    teamId: BATTING_TEAM_ID,
-                                    matchDataForApp: widget.matchDataForApp,
-                                  ))).then(onGoBack1);
+                      if (context
+                              .bloc<SportsDataBloc>()
+                              .state
+                              .selectFielder
+                              .playerName ==
+                          null) {
+                        Fluttertoast.showToast(
+                            msg: "Please select fielder",
+                            textColor: Colors.white,
+                            backgroundColor: Colors.black);
+                        return;
+                      } else {
+                        out();
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => PlayersList(
+                                      select: "Select next batsman",
+                                      teamId: BATTING_TEAM_ID,
+                                      matchDataForApp: widget.matchDataForApp,
+                                    ))).then(onGoBack1);
+                      }
+
                       //_whoIsOnStrikeDialogBox();
                     },
                     child: Text(
@@ -432,8 +449,7 @@ class _CaugthScreenState extends State<CaugthScreen> {
   }
 
   out() {
-//    print(
-//        "selected fielder${context.bloc<SportsDataBloc>().state.selectFielder.pid}");
+    context.bloc<SportsDataBloc>().whoIsOut("striker");
     Bowl bowl = Bowl(
         playerIdWhoIsOut:
             context.bloc<SportsDataBloc>().state.stricker.playerId,
@@ -452,6 +468,8 @@ class _CaugthScreenState extends State<CaugthScreen> {
         double: 0,
         tripple: 0,
         wide: 0,
+        bowlingPosition: 1,
+        battingPosition: 1,
         bowled: 0,
         caugth: 1,
         four: 0,

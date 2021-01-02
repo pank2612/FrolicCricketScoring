@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:froliccricketscore/Screens/liveScoreScreen.dart';
 import 'package:froliccricketscore/blocs/sportsBloc.dart';
 import 'package:froliccricketscore/constants/config.dart';
@@ -22,6 +23,7 @@ class RunOutScreen extends StatefulWidget {
 
 class _RunOutScreenState extends State<RunOutScreen> {
   TextEditingController _runController = TextEditingController();
+  final _globalKeyRunScored = GlobalKey<FormState>();
   File _image1;
   File _image2;
   File _image3;
@@ -389,17 +391,26 @@ class _RunOutScreenState extends State<RunOutScreen> {
                           height: MediaQuery.of(context).size.height * 0.02,
                         ),
                         Container(
-                          width: MediaQuery.of(context).size.width * 0.2,
-                          height: MediaQuery.of(context).size.height * 0.05,
-                          child: TextFormField(
-                            controller: _runController,
-                            decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(6.0),
-                                    borderSide: BorderSide(
-                                        color: Colors.black,
-                                        width: 4,
-                                        style: BorderStyle.solid))),
+                          width: MediaQuery.of(context).size.width * 0.24,
+                          height: MediaQuery.of(context).size.height * 0.08,
+                          child: Form(
+                            key: _globalKeyRunScored,
+                            child: TextFormField(
+                              validator: (value) {
+                                if (value.isEmpty) {
+                                  return "Can't be empty";
+                                }
+                                return null;
+                              },
+                              controller: _runController,
+                              decoration: InputDecoration(
+                                  border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(6.0),
+                                      borderSide: BorderSide(
+                                          color: Colors.black,
+                                          width: 4,
+                                          style: BorderStyle.solid))),
+                            ),
                           ),
                         ),
                       ],
@@ -411,14 +422,37 @@ class _RunOutScreenState extends State<RunOutScreen> {
           ),
           RaisedButton(
               onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => PlayersList(
-                              select: "Select next batsman",
-                              teamId: BATTING_TEAM_ID,
-                              matchDataForApp: widget.matchDataForApp,
-                            ))).then(onGoBack1);
+                if (_globalKeyRunScored.currentState.validate()) {
+                  if (playerIdWhoIsOut == null) {
+                    Fluttertoast.showToast(
+                        msg: "Please select Who is out",
+                        textColor: Colors.white,
+                        backgroundColor: Colors.black);
+                    return;
+                  }
+                  if (context
+                          .bloc<SportsDataBloc>()
+                          .state
+                          .selectFielder
+                          .playerName ==
+                      null) {
+                    Fluttertoast.showToast(
+                        msg: "Please select fielder",
+                        textColor: Colors.white,
+                        backgroundColor: Colors.black);
+                    return;
+                  } else {
+                    runOut();
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => PlayersList(
+                                  select: "Select next batsman",
+                                  teamId: BATTING_TEAM_ID,
+                                  matchDataForApp: widget.matchDataForApp,
+                                ))).then(onGoBack1);
+                  }
+                }
               },
               color: Colors.red,
               child: Text(
@@ -533,8 +567,8 @@ class _RunOutScreenState extends State<RunOutScreen> {
                   ),
                   color: Colors.teal.shade600,
                   onPressed: () {
-                    runOut();
                     Navigator.of(context).pop();
+                    context.bloc<SportsDataBloc>().resetFielder(null);
                     return true;
 //                    Navigator.push(
 //                        context,
@@ -564,14 +598,14 @@ class _RunOutScreenState extends State<RunOutScreen> {
     setState(() {});
   }
 
-  int playerIdWhoIsOut = 0;
+  int playerIdWhoIsOut;
   String deliveryType = '';
   runOut() {
     int totalRun = 0;
     int run = 0;
     if (deliveryType == "WD") {
       totalRun = int.parse(_runController.text) + 1;
-      run = 0;
+      run = int.parse(_runController.text);
     } else if (deliveryType == "NB") {
       totalRun = int.parse(_runController.text) + 1;
       run = int.parse(_runController.text);
@@ -600,21 +634,25 @@ class _RunOutScreenState extends State<RunOutScreen> {
         single: 0,
         double: 0,
         tripple: 0,
-        wide: deliveryType == "WD" ? 1 : 0,
+        wide: 0,
+//        wide: deliveryType == "WD" ? 1 : 0,
         bowled: 0,
         caugth: 0,
         four: 0,
         noBall: deliveryType == "NB" ? 1 : 0,
         runOut: 1,
         six: 0,
+        bowlingPosition: 1,
+        battingPosition: 1,
         lbw: 0,
         typeOfOut: "runout",
         stump: 0,
         extras: (deliveryType == "WD" || deliveryType == "NB") ? 1 : 0,
         wicket: 1,
-        isValid: true);
+        isValid: deliveryType == "NB" ? false : true);
     context.bloc<SportsDataBloc>().updateOver(bowl);
     context.bloc<SportsDataBloc>().updateStriker(bowl, BATTING_TEAM_ID);
+    context.bloc<SportsDataBloc>().updateRunner(bowl, BATTING_TEAM_ID);
     context.bloc<SportsDataBloc>().updateBowler(bowl, BOWLING_TEAM_ID);
     // overFinishedDialogBox();
   }

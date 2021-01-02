@@ -138,134 +138,7 @@ class _PlayersListState extends State<PlayersList> {
         }
       }
     });
-//    print('----- ${playerDetailModelList.length}');
   }
-//  Future<List<Players>> _getMatchPlayers() async {
-//    List<Players> playerList = List<Players>();
-//    HashMap<int, Team> teamMap = context
-//        .bloc<SportsDataBloc>()
-//        .getTournamentData(widget.matchDataForApp.tournamentName)
-//        .teamMap;
-//    for (PlayerDetails playerDetails
-//        in teamMap[widget.teamId].playerMap.values) {
-//      getPlayerData() {
-//        Players players = Players();
-//        players.country = playerDetails.country;
-//        players.point =
-//            num.tryParse(playerDetails.credits.toString())?.toDouble();
-//        players.firstName = playerDetails.name;
-//        players.shortName = playerDetails.shortName;
-//        players.picture = playerDetails.pictures;
-//        players.pid = num.tryParse(playerDetails.playerId.toString())?.toInt();
-//        players.fantasyPlayerRating =
-//            num.tryParse(playerDetails.points.toString())?.toInt();
-//        players.playingRole = playerDetails.skills;
-//        players.teamId = teamMap[widget.matchDataForApp.firstTeamId].teamId;
-//        players.teamName =
-//            teamMap[widget.matchDataForApp.firstTeamId].shortName;
-//        players.playing11 = playerDetails.isPlaying.toString();
-//        players.battingStyle = 'RHB';
-//        players.bowlingStyle = 'RHB';
-//        players.nationality = playerDetails.country;
-//        playerList.add(players);
-//      }
-//
-//      if (widget.select == 'Striker') {
-//        // isPlaying check
-//        if (playerDetails.isPlaying == 1) {
-//          if (context.bloc<SportsDataBloc>().state.stricker != null) {
-//            if (playerDetails.playerId !=
-//                context.bloc<SportsDataBloc>().state.runner.pid) {
-//              getPlayerData();
-//            }
-//          } else {
-//            getPlayerData();
-//          }
-//        }
-//      }
-//      if (widget.select == 'Runner') {
-//        if (playerDetails.isPlaying == 1) {
-//          if (context.bloc<SportsDataBloc>().state.runner != null) {
-//            if (playerDetails.playerId !=
-//                context.bloc<SportsDataBloc>().state.stricker.pid) {
-//              getPlayerData();
-//            }
-//          } else {
-//            getPlayerData();
-//          }
-//        }
-//      }
-//      if (widget.select == 'Bowler') {
-//        if (playerDetails.isPlaying == 1) {
-//          if (context.bloc<SportsDataBloc>().state.bowler != null) {
-//            if (playerDetails.playerId !=
-//                context.bloc<SportsDataBloc>().state.keeper.pid) {
-//              context
-//                  .bloc<SportsDataBloc>()
-//                  .state
-//                  .playerDetailList
-//                  .forEach((element) {
-//                if (element.playerId == playerDetails.playerId) {
-//                  if (element.maxOverPerBowler <
-//                      widget.matchDataForApp.maxOverPerPlayer) {
-//                    getPlayerData();
-//                  }
-//                }
-//              });
-//            }
-//          } else {
-//            getPlayerData();
-//          }
-//        }
-//      }
-//      if (widget.select == 'Keeper') {
-//        if (playerDetails.isPlaying == 1) {
-//          if (context.bloc<SportsDataBloc>().state.keeper != null) {
-//            if (playerDetails.playerId !=
-//                context.bloc<SportsDataBloc>().state.bowler.pid) {
-//              getPlayerData();
-//            }
-//          } else {
-//            getPlayerData();
-//          }
-//        }
-//      }
-//      if (widget.select == 'Select Fielder') {
-//        if (context.bloc<SportsDataBloc>().state.keeper.pid !=
-//            playerDetails.playerId) {
-//          getPlayerData();
-//        }
-//      }
-//      if (widget.select == 'Select next batsman') {
-//        // isPlaying check
-//        if (playerDetails.isPlaying == 1) {
-//          if (context.bloc<SportsDataBloc>().state.stricker != null) {
-//            if (playerDetails.playerId !=
-//                    context.bloc<SportsDataBloc>().state.stricker.pid &&
-//                playerDetails.playerId !=
-//                    context.bloc<SportsDataBloc>().state.runner.pid) {
-//              PlayerDetailsModel playerDetailsModel = PlayerDetailsModel();
-//              context
-//                  .bloc<SportsDataBloc>()
-//                  .state
-//                  .playerDetailList
-//                  .forEach((element) {
-//                if (playerDetails.playerId == element.playerId) {
-//                  playerDetailsModel = element;
-//                }
-//              });
-//              if (playerDetailsModel.batsmanOut == 0) {
-//                getPlayerData();
-//              }
-//            }
-//          } else {
-//            getPlayerData();
-//          }
-//        }
-//      }
-//    }
-//    return playerList;
-//  }
 
   @override
   Widget build(BuildContext context) {
@@ -287,13 +160,6 @@ class _PlayersListState extends State<PlayersList> {
           padding: EdgeInsets.all(12),
           child: ListView.builder(
             itemBuilder: (context, index) {
-//              PlayerDetailsModel key = context
-//                  .bloc<SportsDataBloc>()
-//                  .state
-//                  .teamPlayerScoring[widget.teamId]
-//                  .teamPlayerModelMap
-//                  .values
-//                  .elementAt(index);
               return InkWell(
                 onTap: () {
                   Navigator.of(context).pop();
@@ -387,11 +253,12 @@ class _PlayersListState extends State<PlayersList> {
                       context.bloc<SportsDataBloc>().setRunner(
                           playerDetailModelList[index].playerId,
                           playerDetailModelList);
-                    } else {
-                      context.bloc<SportsDataBloc>().setStricker(
-                          playerDetailModelList[index].playerId,
-                          playerDetailModelList);
                     }
+//                    else {
+//                      context.bloc<SportsDataBloc>().setStricker(
+//                          playerDetailModelList[index].playerId,
+//                          playerDetailModelList);
+//                    }
 
                     return;
                   }

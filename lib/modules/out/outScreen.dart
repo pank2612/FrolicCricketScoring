@@ -341,6 +341,7 @@ class _OutScreenState extends State<OutScreen> {
     {"name": "Tried"},
   ];
   bowled() {
+    context.bloc<SportsDataBloc>().whoIsOut("striker");
     Bowl bowl = Bowl(
         playerIdWhoIsOut:
             context.bloc<SportsDataBloc>().state.stricker.playerId,
@@ -350,6 +351,8 @@ class _OutScreenState extends State<OutScreen> {
             context.bloc<SportsDataBloc>().state.stricker.playerId,
         facedBall: 1,
         run: 0,
+        bowlingPosition: 1,
+        battingPosition: 1,
         perBallRecord: "W".toString(),
         totalRun: 0,
         single: 0,
@@ -375,6 +378,7 @@ class _OutScreenState extends State<OutScreen> {
   }
 
   caugthBehind() {
+    context.bloc<SportsDataBloc>().whoIsOut("striker");
     Bowl bowl = Bowl(
         playerIdWhoIsOut:
             context.bloc<SportsDataBloc>().state.stricker.playerId,
@@ -387,6 +391,8 @@ class _OutScreenState extends State<OutScreen> {
         helpingPlayerId: context.bloc<SportsDataBloc>().state.keeper.playerId,
         perBallRecord: "W".toString(),
         totalRun: 0,
+        bowlingPosition: 1,
+        battingPosition: 1,
         single: 0,
         typeOfOut: "caugth behind",
         double: 0,
@@ -410,6 +416,7 @@ class _OutScreenState extends State<OutScreen> {
   }
 
   stump() {
+    context.bloc<SportsDataBloc>().whoIsOut("striker");
     Bowl bowl = Bowl(
         playerIdWhoIsOut:
             context.bloc<SportsDataBloc>().state.stricker.playerId,
@@ -427,6 +434,8 @@ class _OutScreenState extends State<OutScreen> {
         double: 0,
         tripple: 0,
         wide: 0,
+        bowlingPosition: 1,
+        battingPosition: 1,
         bowled: 1,
         caugth: 0,
         four: 0,
@@ -445,6 +454,7 @@ class _OutScreenState extends State<OutScreen> {
   }
 
   caugthNbowled() {
+    context.bloc<SportsDataBloc>().whoIsOut("striker");
     Bowl bowl = Bowl(
         playerIdWhoIsOut:
             context.bloc<SportsDataBloc>().state.stricker.playerId,
@@ -466,6 +476,8 @@ class _OutScreenState extends State<OutScreen> {
         caugth: 0,
         four: 0,
         noBall: 0,
+        bowlingPosition: 1,
+        battingPosition: 1,
         runOut: 0,
         six: 0,
         lbw: 0,
@@ -480,6 +492,7 @@ class _OutScreenState extends State<OutScreen> {
   }
 
   lbw() {
+    context.bloc<SportsDataBloc>().whoIsOut("striker");
     Bowl bowl = Bowl(
         playerIdWhoIsOut:
             context.bloc<SportsDataBloc>().state.stricker.playerId,
@@ -497,6 +510,8 @@ class _OutScreenState extends State<OutScreen> {
         double: 0,
         tripple: 0,
         wide: 0,
+        bowlingPosition: 1,
+        battingPosition: 1,
         bowled: 0,
         caugth: 0,
         four: 0,
@@ -515,6 +530,7 @@ class _OutScreenState extends State<OutScreen> {
   }
 
   hitWicket() {
+    context.bloc<SportsDataBloc>().whoIsOut("striker");
     Bowl bowl = Bowl(
         playerIdWhoIsOut:
             context.bloc<SportsDataBloc>().state.stricker.playerId,
@@ -531,6 +547,8 @@ class _OutScreenState extends State<OutScreen> {
         double: 0,
         tripple: 0,
         wide: 0,
+        bowlingPosition: 1,
+        battingPosition: 1,
         bowled: 0,
         caugth: 0,
         four: 0,
@@ -549,6 +567,7 @@ class _OutScreenState extends State<OutScreen> {
   }
 
   hitTheBallTwice() {
+    context.bloc<SportsDataBloc>().whoIsOut("striker");
     Bowl bowl = Bowl(
         playerIdWhoIsOut:
             context.bloc<SportsDataBloc>().state.stricker.playerId,
@@ -568,6 +587,8 @@ class _OutScreenState extends State<OutScreen> {
         bowled: 0,
         caugth: 0,
         four: 0,
+        bowlingPosition: 1,
+        battingPosition: 1,
         noBall: 0,
         runOut: 0,
         six: 0,
@@ -583,6 +604,7 @@ class _OutScreenState extends State<OutScreen> {
   }
 
   timedOut() {
+    context.bloc<SportsDataBloc>().whoIsOut("striker");
     Bowl bowl = Bowl(
         playerIdWhoIsOut:
             context.bloc<SportsDataBloc>().state.stricker.playerId,
@@ -601,6 +623,8 @@ class _OutScreenState extends State<OutScreen> {
         wide: 0,
         bowled: 0,
         caugth: 0,
+        bowlingPosition: 1,
+        battingPosition: 1,
         four: 0,
         noBall: 0,
         runOut: 0,
@@ -617,6 +641,7 @@ class _OutScreenState extends State<OutScreen> {
   }
 
   obstructingTheField() {
+    context.bloc<SportsDataBloc>().whoIsOut("striker");
     Bowl bowl = Bowl(
         playerIdWhoIsOut:
             context.bloc<SportsDataBloc>().state.stricker.playerId,
@@ -629,6 +654,8 @@ class _OutScreenState extends State<OutScreen> {
         typeOfOut: "obstructing the field",
         perBallRecord: "W".toString(),
         totalRun: 0,
+        bowlingPosition: 1,
+        battingPosition: 1,
         single: 0,
         double: 0,
         tripple: 0,

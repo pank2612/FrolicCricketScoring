@@ -358,18 +358,26 @@ class _StartInningsScreenState extends State<StartInningsScreen> {
           ),
           InkWell(
             onTap: () {
-//              if (global.striker == null) {
-//                _showDialog("Please select Striker");
-//                return;
-//              }
-//              if (global.runner == null) {
-//                _showDialog("Please select Non-Striker");
-//                return;
-//              }
-//              if (global.bowler == null) {
-//                _showDialog("Please select bowler");
-//                return;
-//              }
+              if (context.bloc<SportsDataBloc>().state.stricker.playerName ==
+                  null) {
+                _showDialog("Please select Striker");
+                return;
+              }
+              if (context.bloc<SportsDataBloc>().state.runner.playerName ==
+                  null) {
+                _showDialog("Please select Non-Striker");
+                return;
+              }
+              if (context.bloc<SportsDataBloc>().state.bowler.playerName ==
+                  null) {
+                _showDialog("Please select bowler");
+                return;
+              }
+              if (context.bloc<SportsDataBloc>().state.keeper.playerName ==
+                  null) {
+                _showDialog("Please select Wicket-Keeper");
+                return;
+              }
               Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => LiveScoreScreen(
                         matchDataForApp: widget.matchDataForApp,

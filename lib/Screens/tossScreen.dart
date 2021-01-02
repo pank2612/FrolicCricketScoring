@@ -180,10 +180,15 @@ class _TossScreenState extends State<TossScreen> {
         .teamMap[widget.matchDataForApp.firstTeamId]
         .playerMap
         .forEach((playerID, playerDetail) {
+//      print(
+//          "batting index------- ${context.bloc<SportsDataBloc>().state.battingCounter}");
+      //print("batting--- ${context.bloc<SportsDataBloc>().batting()}");
+      context.bloc<SportsDataBloc>().batting();
       playerDetailsModelMap[playerID] = context
           .bloc<SportsDataBloc>()
           .getPlayerModel(widget.matchDataForApp.firstTeamId, playerDetail);
     });
+    context.bloc<SportsDataBloc>().setBattingCounter(0);
     Over over = Over();
     List<Over> overList = List<Over>();
     overList.add(over);
@@ -200,10 +205,13 @@ class _TossScreenState extends State<TossScreen> {
         .teamMap[widget.matchDataForApp.secondTeamId]
         .playerMap
         .forEach((playerID, playerDetail) {
+      //context.bloc<SportsDataBloc>().setBattingCounter();
+      context.bloc<SportsDataBloc>().batting();
       playerDetailsModelMap1[playerID] = context
           .bloc<SportsDataBloc>()
           .getPlayerModel(widget.matchDataForApp.secondTeamId, playerDetail);
     });
+    context.bloc<SportsDataBloc>().setBattingCounter(0);
     scoreModel = ScoreModel(
         extraRuns: 0,
         teamPlayerModelMap: playerDetailsModelMap1,

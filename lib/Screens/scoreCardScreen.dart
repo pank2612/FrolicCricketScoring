@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 
 import 'package:flutter/material.dart';
 import 'package:froliccricketscore/blocs/sportsBloc.dart';
@@ -10,22 +11,7 @@ import 'package:froliccricketscore/modules/start_innings/player_list.dart';
 
 class ScoreCardScreen extends StatefulWidget {
   MatchDataForApp matchDataForApp;
-  String score;
-  String wickets;
-  String wicketsOfFirstInnings;
-  String scoreOfFirstInnings;
-  String oversOfFirstInnings;
-  int extraRuns;
-  String totalOver;
-  ScoreCardScreen(
-      {this.matchDataForApp,
-      this.wickets,
-      this.extraRuns,
-      this.totalOver,
-      this.oversOfFirstInnings,
-      this.wicketsOfFirstInnings,
-      this.scoreOfFirstInnings,
-      this.score});
+  ScoreCardScreen({this.matchDataForApp});
   @override
   _ScoreCardScreenState createState() => _ScoreCardScreenState();
 }
@@ -37,10 +23,67 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
     super.initState();
   }
 
+  int getWickets(HashMap<int, PlayerDetailsModel> teamPlayerModelMap) {
+    int wickets = 0;
+//    context
+//        .bloc<SportsDataBloc>()
+//        .state
+//        .teamPlayerScoring[BOWLING_TEAM_ID]
+//        .
+    teamPlayerModelMap.values.forEach((element) {
+      wickets += element.wickets;
+    });
+    return wickets;
+  }
+
+  String getOvers(List<Over> overList) {
+    String overs = "0";
+    Over over = overList[overList.length - 1];
+
+    int bowlCount = 0;
+    if (over.over == null) {
+      return "0";
+    }
+    over.over.forEach((element) {
+      if (element.isValid == true) {
+        bowlCount += 1;
+      }
+    });
+    if (bowlCount < 6) {
+      overs = (overList.length - 1).toString() + "." + bowlCount.toString();
+    } else {
+      overs = overList.length.toString() + ".0";
+    }
+    return overs;
+  }
+
+  String getScore(HashMap<int, PlayerDetailsModel> teamPlayerModelMap) {
+    String totalscore = '';
+    int score = 0;
+//    context
+//        .bloc<SportsDataBloc>()
+//        .state
+//        .teamPlayerScoring[BATTING_TEAM_ID]
+//        .
+    teamPlayerModelMap.values.forEach((element) {
+      score += element.runsMadeByBatsman;
+    });
+    score += context
+        .bloc<SportsDataBloc>()
+        .state
+        .teamPlayerScoring[BATTING_TEAM_ID]
+        .extraRuns;
+    totalscore = score.toString();
+    return totalscore;
+  }
+
   @override
   Widget build(BuildContext context) {
     List<PlayerDetailsModel> battingPlayerdetailList =
         List<PlayerDetailsModel>();
+    for (int i = 0; i < 11; i++) {
+      battingPlayerdetailList.add(null);
+    }
     context
         .bloc<SportsDataBloc>()
         .state
@@ -48,12 +91,14 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
         .teamPlayerModelMap
         .values
         .forEach((element) {
-      if (element.teamId == BATTING_TEAM_ID) {
-        battingPlayerdetailList.add(element);
-      }
+      battingPlayerdetailList[element.battingPosition - 1] = element;
     });
+
     List<PlayerDetailsModel> bowlingPlayerdetailList =
         List<PlayerDetailsModel>();
+    for (int i = 0; i < 11; i++) {
+      bowlingPlayerdetailList.add(null);
+    }
     context
         .bloc<SportsDataBloc>()
         .state
@@ -61,9 +106,10 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
         .teamPlayerModelMap
         .values
         .forEach((element) {
-      if (element.teamId == BOWLING_TEAM_ID) {
-        bowlingPlayerdetailList.add(element);
-      }
+      // if (element.teamId == BOWLING_TEAM_ID) {
+      bowlingPlayerdetailList[element.battingPosition - 1] = element;
+//      bowlingPlayerdetailList.add(element);
+      //}
     });
     return Scaffold(
       appBar: AppBar(
@@ -86,7 +132,7 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
               color: Colors.white,
             ),
             width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height * 0.25,
+            height: MediaQuery.of(context).size.height * 0.28,
             padding: EdgeInsets.all(7),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -146,9 +192,7 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
                     Row(
                       children: [
                         Text(
-                          BATTING_TEAM_ID == widget.matchDataForApp.firstTeamId
-                              ? "(${widget.totalOver ?? "0.0"} ov)"
-                              : "(${widget.oversOfFirstInnings ?? "0.0"} ov)",
+                          "(${getOvers(context.bloc<SportsDataBloc>().state.teamPlayerScoring[widget.matchDataForApp.firstTeamId].overList)} ov)",
                           style: TextStyle(
                               color: Colors.grey,
                               fontSize: 16,
@@ -156,9 +200,10 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
                           textAlign: TextAlign.left,
                         ),
                         Text(
-                          BATTING_TEAM_ID == widget.matchDataForApp.firstTeamId
-                              ? "${widget.score + "/" + widget.wickets}"
-                              : "${widget.scoreOfFirstInnings + "/" + widget.wicketsOfFirstInnings}",
+                          "${getScore(context.bloc<SportsDataBloc>().state.teamPlayerScoring[widget.matchDataForApp.firstTeamId].teamPlayerModelMap) + "/" + getWickets(context.bloc<SportsDataBloc>().state.teamPlayerScoring[widget.matchDataForApp.firstTeamId].teamPlayerModelMap).toString()}",
+//                          BATTING_TEAM_ID == widget.matchDataForApp.firstTeamId
+//                              ? "${getScore(context.bloc<SportsDataBloc>().state.teamPlayerScoring[widget.matchDataForApp.firstTeamId].teamPlayerModelMap) + "/" + getWickets(context.bloc<SportsDataBloc>().state.teamPlayerScoring[widget.matchDataForApp.firstTeamId].teamPlayerModelMap) .toString()}"
+//                              : "${firstInningsScore().toString() + "/" + firstInningsWickets().toString()}",
                           style: TextStyle(
                               color: Colors.black,
                               fontSize: 28,
@@ -168,6 +213,17 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
                       ],
                     ),
                   ],
+                ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Text(
+                    "Extras : ${context.bloc<SportsDataBloc>().state.teamPlayerScoring[widget.matchDataForApp.firstTeamId].extraRuns ?? "0"}",
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w400),
+//                        textAlign: TextAlign.left,
+                  ),
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -200,9 +256,7 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
                     Row(
                       children: [
                         Text(
-                          BATTING_TEAM_ID == widget.matchDataForApp.secondTeamId
-                              ? "(${widget.totalOver ?? "0.0"} ov)"
-                              : "(${widget.oversOfFirstInnings ?? "0.0"} ov)",
+                          "(${getOvers(context.bloc<SportsDataBloc>().state.teamPlayerScoring[widget.matchDataForApp.secondTeamId].overList)} ov)",
                           style: TextStyle(
                               color: Colors.grey,
                               fontSize: 16,
@@ -212,15 +266,16 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
                         Padding(
                           padding: const EdgeInsets.only(left: 8),
                           child: Text(
-                            BATTING_TEAM_ID ==
-                                    widget.matchDataForApp.secondTeamId
-                                ? "${widget.score + "/" + widget.wickets}"
-                                : "${widget.scoreOfFirstInnings + "/" + widget.wicketsOfFirstInnings}",
+                            "${getScore(context.bloc<SportsDataBloc>().state.teamPlayerScoring[widget.matchDataForApp.secondTeamId].teamPlayerModelMap) + "/" + getWickets(context.bloc<SportsDataBloc>().state.teamPlayerScoring[widget.matchDataForApp.secondTeamId].teamPlayerModelMap).toString()}",
+
+//                            BATTING_TEAM_ID ==
+//                                    widget.matchDataForApp.secondTeamId
+//                                ? "${getScore(context.bloc<SportsDataBloc>().state.teamPlayerScoring[widget.matchDataForApp.secondTeamId].teamPlayerModelMap) + "/" + getTotalWickets().toString()}"
+//                                : "${firstInningsScore().toString() + "/" + firstInningsWickets().toString()}",
                             style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 28,
                                 fontWeight: FontWeight.w900),
-//                            textAlign: TextAlign.left,
                           ),
                         ),
                       ],
@@ -230,12 +285,11 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
                 Align(
                   alignment: Alignment.centerRight,
                   child: Text(
-                    "Extras : ${widget.extraRuns ?? "0"}",
+                    "Extras : ${context.bloc<SportsDataBloc>().state.teamPlayerScoring[widget.matchDataForApp.secondTeamId].extraRuns ?? "0"}",
                     style: TextStyle(
                         color: Colors.black,
                         fontSize: 18,
                         fontWeight: FontWeight.w400),
-//                        textAlign: TextAlign.left,
                   ),
                 ),
                 Divider(

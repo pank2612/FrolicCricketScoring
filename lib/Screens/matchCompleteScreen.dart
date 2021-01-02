@@ -1,25 +1,19 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
+import 'package:froliccricketscore/blocs/sportsBloc.dart';
 import 'package:froliccricketscore/constants/config.dart';
 import 'package:froliccricketscore/models/MatchModel.dart';
+import 'package:froliccricketscore/models/playerModel.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class MatchCompleteScreen extends StatefulWidget {
-  int scoreOfFirstInnings;
-  int scoreOfSecondInnings;
-  int wicketsOfFirstInnings;
-  int wicketsOfSecondInnings;
-  String oversOfFirstInnings;
-  String oversOfSecondInnings;
   MatchDataForApp matchDataForApp;
   String howWonTheMatch;
-  MatchCompleteScreen(
-      {this.oversOfFirstInnings,
-      this.oversOfSecondInnings,
-      this.matchDataForApp,
-      this.howWonTheMatch,
-      this.scoreOfFirstInnings,
-      this.scoreOfSecondInnings,
-      this.wicketsOfFirstInnings,
-      this.wicketsOfSecondInnings});
+  MatchCompleteScreen({
+    this.matchDataForApp,
+    this.howWonTheMatch,
+  });
   @override
   _MatchCompleteScreenState createState() => _MatchCompleteScreenState();
 }
@@ -29,7 +23,56 @@ class _MatchCompleteScreenState extends State<MatchCompleteScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    print("how team won the match ${widget.howWonTheMatch} ");
+//    print("how team won the match ${widget.howWonTheMatch} ");
+  }
+
+  int getWickets(HashMap<int, PlayerDetailsModel> teamPlayerModelMap) {
+    int wickets = 0;
+//    context
+//        .bloc<SportsDataBloc>()
+//        .state
+//        .teamPlayerScoring[BOWLING_TEAM_ID]
+//        .
+    teamPlayerModelMap.values.forEach((element) {
+      wickets += element.wickets;
+    });
+    return wickets;
+  }
+
+  String getScore(HashMap<int, PlayerDetailsModel> teamPlayerModelMap) {
+    String totalscore = '';
+    int score = 0;
+    teamPlayerModelMap.values.forEach((element) {
+      score += element.runsMadeByBatsman;
+    });
+    score += context
+        .bloc<SportsDataBloc>()
+        .state
+        .teamPlayerScoring[BATTING_TEAM_ID]
+        .extraRuns;
+    totalscore = score.toString();
+    return totalscore;
+  }
+
+  String getOvers(List<Over> overList) {
+    String overs = "0";
+    Over over = overList[overList.length - 1];
+
+    int bowlCount = 0;
+    if (over.over == null) {
+      return "0";
+    }
+    over.over.forEach((element) {
+      if (element.isValid == true) {
+        bowlCount += 1;
+      }
+    });
+    if (bowlCount < 6) {
+      overs = (overList.length - 1).toString() + "." + bowlCount.toString();
+    } else {
+      overs = overList.length.toString() + ".0";
+    }
+    return overs;
   }
 
   @override
@@ -108,30 +151,50 @@ class _MatchCompleteScreenState extends State<MatchCompleteScreen> {
                       width: MediaQuery.of(context).size.width * 0.25,
                       padding: EdgeInsets.all(5),
                       child: Text(
-                        BOWLING_TEAM_ID == widget.matchDataForApp.firstTeamId
-                            ? widget.matchDataForApp.firstTeamShortName
-                            : widget.matchDataForApp.secondTeamShortName,
+                        widget.matchDataForApp.firstTeamShortName ?? "Team A",
+//                        BOWLING_TEAM_ID == widget.matchDataForApp.firstTeamId
+//                            ? widget.matchDataForApp.firstTeamShortName
+//                            : widget.matchDataForApp.secondTeamShortName,
                         style: TextStyle(fontSize: 18, color: Colors.black),
                       ),
                     ),
                     Container(
                       width: MediaQuery.of(context).size.width * 0.12,
                       child: Text(
-                        widget.scoreOfFirstInnings.toString() ?? "0",
+                        getScore(context
+                                .bloc<SportsDataBloc>()
+                                .state
+                                .teamPlayerScoring[
+                                    widget.matchDataForApp.firstTeamId]
+                                .teamPlayerModelMap)
+                            .toString(),
                         style: TextStyle(fontSize: 18, color: Colors.black),
                       ),
                     ),
                     Container(
                       width: MediaQuery.of(context).size.width * 0.12,
                       child: Text(
-                        widget.wicketsOfFirstInnings.toString() ?? "0",
+                        getWickets(context
+                                    .bloc<SportsDataBloc>()
+                                    .state
+                                    .teamPlayerScoring[
+                                        widget.matchDataForApp.firstTeamId]
+                                    .teamPlayerModelMap)
+                                .toString() ??
+                            "0",
                         style: TextStyle(fontSize: 18, color: Colors.black),
                       ),
                     ),
                     Container(
                       width: MediaQuery.of(context).size.width * 0.12,
                       child: Text(
-                        widget.oversOfFirstInnings.toString() ?? '0',
+                        getOvers(context
+                                .bloc<SportsDataBloc>()
+                                .state
+                                .teamPlayerScoring[
+                                    widget.matchDataForApp.firstTeamId]
+                                .overList) ??
+                            "0",
                         // totalOver == '' ? "0" : totalOver,
                         style: TextStyle(fontSize: 18, color: Colors.black),
                       ),
@@ -149,30 +212,51 @@ class _MatchCompleteScreenState extends State<MatchCompleteScreen> {
                       width: MediaQuery.of(context).size.width * 0.25,
                       padding: EdgeInsets.all(5),
                       child: Text(
-                        BATTING_TEAM_ID == widget.matchDataForApp.secondTeamId
-                            ? widget.matchDataForApp.secondTeamShortName
-                            : widget.matchDataForApp.firstTeamShortName,
+                        widget.matchDataForApp.secondTeamShortName,
+//                        BATTING_TEAM_ID == widget.matchDataForApp.secondTeamId
+//                            ? widget.matchDataForApp.secondTeamShortName
+//                            : widget.matchDataForApp.firstTeamShortName,
                         style: TextStyle(fontSize: 18, color: Colors.black),
                       ),
                     ),
                     Container(
                       width: MediaQuery.of(context).size.width * 0.12,
                       child: Text(
-                        widget.scoreOfSecondInnings.toString() ?? "0",
+                        getScore(context
+                                    .bloc<SportsDataBloc>()
+                                    .state
+                                    .teamPlayerScoring[
+                                        widget.matchDataForApp.secondTeamId]
+                                    .teamPlayerModelMap)
+                                .toString() ??
+                            "0",
                         style: TextStyle(fontSize: 18, color: Colors.black),
                       ),
                     ),
                     Container(
                       width: MediaQuery.of(context).size.width * 0.12,
                       child: Text(
-                        widget.wicketsOfSecondInnings.toString() ?? "0",
+                        getWickets(context
+                                    .bloc<SportsDataBloc>()
+                                    .state
+                                    .teamPlayerScoring[
+                                        widget.matchDataForApp.secondTeamId]
+                                    .teamPlayerModelMap)
+                                .toString() ??
+                            "0",
                         style: TextStyle(fontSize: 18, color: Colors.black),
                       ),
                     ),
                     Container(
                       width: MediaQuery.of(context).size.width * 0.12,
                       child: Text(
-                        widget.oversOfSecondInnings.toString() ?? '0',
+                        getOvers(context
+                                .bloc<SportsDataBloc>()
+                                .state
+                                .teamPlayerScoring[
+                                    widget.matchDataForApp.secondTeamId]
+                                .overList) ??
+                            "0",
                         //  totalOver == '' ? "0" : totalOver,
                         style: TextStyle(fontSize: 18, color: Colors.black),
                       ),

@@ -65,6 +65,8 @@ class PlayerDetailsModel {
       this.dotsBall = 0,
       this.batsmanOutThroughBowlerId = 0,
       this.bowled = 0,
+      this.battingPosition = 0,
+      this.bowlingPosition = 0,
       this.maxOverPerBowler = 0,
       this.ballsByBowler = 0,
       this.facedBall = 0,
@@ -101,6 +103,8 @@ class PlayerDetailsModel {
   int singles = 0;
   int doubles = 0;
   int tripples = 0;
+  int battingPosition = 0;
+  int bowlingPosition = 0;
   int foursByBowler = 0;
   int sixesByBowlers = 0;
   int singleByBowler = 0;
@@ -135,6 +139,8 @@ class PlayerDetailsModel {
         shortName: json["shortName"] ?? "",
         isPlaying: json["isPlaying"] ?? '',
         maiden: json["maiden"] ?? 0,
+        battingPosition: json['battingPosition'] ?? 0,
+        bowlingPosition: json['bowlingPosition'] ?? 0,
         runsByBowler: json["runsByBowler"] ?? 0,
         wickets: json["wickets"] ?? 0,
         caugth: json["caugth"],
@@ -175,6 +181,8 @@ class PlayerDetailsModel {
         "runout": runout,
         "extrasByBowlers": extrasByBowlers,
         "minOverPerBowler": maxOverPerBowler,
+        "bowlingPosition": bowlingPosition,
+        "battingPosition": battingPosition,
         "singles": singles,
         "doubles": doubles,
         "tripples": tripples,
@@ -232,11 +240,15 @@ class Bowl {
       this.dotBall = 0,
       this.caugth,
       this.stump,
+      this.battingPosition = 0,
+      this.bowlingPosition = 0,
       this.extras = 0,
       this.lbw,
       this.isValid});
   bool isValid;
   int run = 0;
+  int battingPosition = 0;
+  int bowlingPosition = 0;
   String typeOfOut = '';
   int bowlerId = 0;
   String perBallRecord = '';
@@ -269,6 +281,8 @@ class Bowl {
         facedBall: json['facedBall'] ?? 0,
         totalRun: json['totalRun'] ?? 0,
         wicket: json["wicket"],
+        battingPosition: json['battingPosition'] ?? 0,
+        bowlingPosition: json['bowlingPosition'] ?? 0,
         wide: json["wide"] ?? 0,
         bowlerId: json['bowlerId'] ?? 0,
         noBall: json["noBall"],
@@ -292,7 +306,6 @@ class Bowl {
         lbw: json["LBW"],
         isValid: json["isValid"],
       );
-
   Map<String, dynamic> toJson() => {
         "run": run = 0,
         "perBallRecord": perBallRecord = '',
@@ -303,6 +316,8 @@ class Bowl {
         "extras": extras = 0,
         "facedBall": facedBall = 0,
         "totalWicket": totalWicket,
+        "bowlingPosition": bowlingPosition,
+        "battingPosition": battingPosition,
         "helpingPlayerId": helpingPlayerId = 0,
         "playerIdWhoFaced": playerIdWhoFaced = 0,
         "runOut": runOut,
