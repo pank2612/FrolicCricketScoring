@@ -19,8 +19,7 @@ import 'matchCompleteScreen.dart';
 
 class LiveScoreScreen extends StatefulWidget {
   MatchDataForApp matchDataForApp;
-  List<Players> allPlayerList = List<Players>();
-  LiveScoreScreen({this.matchDataForApp, this.allPlayerList});
+  LiveScoreScreen({this.matchDataForApp});
   @override
   _LiveScoreScreenState createState() => _LiveScoreScreenState();
 }
@@ -456,8 +455,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
     } else if (indexValue == 2) {
       await Navigator.of(context).push(MaterialPageRoute(
           builder: (context) => OutScreen(
-                matchDataForApp: widget.matchDataForApp,
-                allPlayerList: widget.allPlayerList,
+                matchDataForApp: widget.matchDataForApp
               )));
       overFinishedDialogBox();
       checkForMatchComplete();
@@ -943,8 +941,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) => StartInningsScreen(
-                                      matchDataForApp: widget.matchDataForApp,
-                                      allPlayerList: widget.allPlayerList,
+                                      matchDataForApp: widget.matchDataForApp
                                     )));
                       },
                       color: Colors.teal,

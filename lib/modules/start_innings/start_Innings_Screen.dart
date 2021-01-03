@@ -15,50 +15,13 @@ import 'package:froliccricketscore/constants/global_variables.dart' as global;
 class StartInningsScreen extends StatefulWidget {
   MatchDataForApp matchDataForApp;
 
-  List<Players> allPlayerList;
-  StartInningsScreen({this.matchDataForApp, this.allPlayerList});
+  StartInningsScreen({this.matchDataForApp});
   @override
   _StartInningsScreenState createState() => _StartInningsScreenState();
 }
 
 class _StartInningsScreenState extends State<StartInningsScreen> {
-  File _image1;
-  File _image2;
-  File _image3;
-  final picker = ImagePicker();
   final _scaffoldkey = GlobalKey<ScaffoldState>();
-  Future getImage1() async {
-    var pickedFile = await picker.getImage(source: ImageSource.gallery);
-    setState(() {
-      if (pickedFile != null) {
-        _image1 = File(pickedFile.path);
-      } else {
-        print('No image selected.');
-      }
-    });
-  }
-
-  Future getImage2() async {
-    var pickedFile = await picker.getImage(source: ImageSource.gallery);
-    setState(() {
-      if (pickedFile != null) {
-        _image2 = File(pickedFile.path);
-      } else {
-        print('No image selected.');
-      }
-    });
-  }
-
-  Future getImage3() async {
-    var pickedFile = await picker.getImage(source: ImageSource.gallery);
-    setState(() {
-      if (pickedFile != null) {
-        _image3 = File(pickedFile.path);
-      } else {
-        print('No image selected.');
-      }
-    });
-  }
 
   Widget strikerContainer({String name, String url}) {
     return Container(
@@ -70,11 +33,8 @@ class _StartInningsScreenState extends State<StartInningsScreen> {
         children: [
           Container(
             child:
-//            _image1 == null
-//                ?
                 InkWell(
               onTap: () {
-                // getImage1();
                 Navigator.push(
                     context,
                     CupertinoPageRoute(
@@ -116,11 +76,8 @@ class _StartInningsScreenState extends State<StartInningsScreen> {
         children: [
           Container(
             child:
-//            _image2 == null
-//                ?
                 InkWell(
               onTap: () {
-                // getImage2();
                 Navigator.push(
                     context,
                     CupertinoPageRoute(
@@ -138,7 +95,6 @@ class _StartInningsScreenState extends State<StartInningsScreen> {
                 ),
               ),
             ),
-//                : Image.file(_image2),
             height: MediaQuery.of(context).size.height * 0.2,
             width: MediaQuery.of(context).size.width * 0.3,
           ),
@@ -161,11 +117,8 @@ class _StartInningsScreenState extends State<StartInningsScreen> {
         children: [
           Container(
             child:
-//            _image3 == null
-//                ?
                 InkWell(
               onTap: () {
-                //  getImage3();
                 Navigator.push(
                     context,
                     CupertinoPageRoute(
@@ -183,7 +136,6 @@ class _StartInningsScreenState extends State<StartInningsScreen> {
                 ),
               ),
             ),
-            //  : Image.file(_image3),
             height: MediaQuery.of(context).size.height * 0.2,
             width: MediaQuery.of(context).size.width * 0.3,
           ),
@@ -206,8 +158,6 @@ class _StartInningsScreenState extends State<StartInningsScreen> {
         children: [
           Container(
             child:
-//            _image3 == null
-//                ?
                 CircleAvatar(
               backgroundColor: Colors.white,
               maxRadius: 45,
@@ -216,7 +166,6 @@ class _StartInningsScreenState extends State<StartInningsScreen> {
                 fit: BoxFit.cover,
               ),
             ),
-            //  : Image.file(_image3),
             height: MediaQuery.of(context).size.height * 0.2,
             width: MediaQuery.of(context).size.width * 0.3,
           ),
@@ -234,10 +183,6 @@ class _StartInningsScreenState extends State<StartInningsScreen> {
     // TODO: implement initState
     super.initState();
 
-//    context.bloc<SportsDataBloc>().state.stricker.playerName = null;
-//    context.bloc<SportsDataBloc>().state.runner.playerName = null;
-//    context.bloc<SportsDataBloc>().state.bowler.playerName = null;
-//    context.bloc<SportsDataBloc>().state.keeper.playerName = null;
   }
 
   @override
@@ -380,8 +325,7 @@ class _StartInningsScreenState extends State<StartInningsScreen> {
               }
               Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => LiveScoreScreen(
-                        matchDataForApp: widget.matchDataForApp,
-                        allPlayerList: widget.allPlayerList,
+                        matchDataForApp: widget.matchDataForApp
                       )));
             },
             child: Container(

@@ -158,7 +158,6 @@ class _TossScreenState extends State<TossScreen> {
           "https://www.iconninja.com/files/829/530/352/cricket-ball-sport-cr%C3%ADquete-magento-england-bowling-icon.png"
     },
   ];
-  var allPlayerList = List<Players>();
   bool _isLoading = false;
   @override
   void initState() {
@@ -327,8 +326,7 @@ class _TossScreenState extends State<TossScreen> {
 
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => StartInningsScreen(
-                          matchDataForApp: widget.matchDataForApp,
-                          allPlayerList: allPlayerList,
+                          matchDataForApp: widget.matchDataForApp
                         )));
               },
               child: Container(
