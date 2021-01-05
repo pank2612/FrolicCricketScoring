@@ -642,8 +642,7 @@ class _RunOutScreenState extends State<RunOutScreen> {
         noBall: deliveryType == "NB" ? 1 : 0,
         runOut: 1,
         six: 0,
-        bowlingPosition: 1,
-        battingPosition: 1,
+
         lbw: 0,
         typeOfOut: "runout",
         stump: 0,

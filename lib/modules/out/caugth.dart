@@ -407,7 +407,7 @@ class _CaugthScreenState extends State<CaugthScreen> {
                             backgroundColor: Colors.black);
                         return;
                       } else {
-                        out();
+                        caugthOut();
                         Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -448,7 +448,7 @@ class _CaugthScreenState extends State<CaugthScreen> {
     }
   }
 
-  out() {
+  caugthOut() {
     context.bloc<SportsDataBloc>().whoIsOut("striker");
     Bowl bowl = Bowl(
         playerIdWhoIsOut:
@@ -468,8 +468,6 @@ class _CaugthScreenState extends State<CaugthScreen> {
         double: 0,
         tripple: 0,
         wide: 0,
-        bowlingPosition: 1,
-        battingPosition: 1,
         bowled: 0,
         caugth: 1,
         four: 0,

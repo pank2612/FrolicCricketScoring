@@ -454,9 +454,8 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
       _57DialogBox();
     } else if (indexValue == 2) {
       await Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => OutScreen(
-                matchDataForApp: widget.matchDataForApp
-              )));
+          builder: (context) =>
+              OutScreen(matchDataForApp: widget.matchDataForApp)));
       overFinishedDialogBox();
       checkForMatchComplete();
     } else if (indexValue == 3) {
@@ -941,8 +940,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) => StartInningsScreen(
-                                      matchDataForApp: widget.matchDataForApp
-                                    )));
+                                    matchDataForApp: widget.matchDataForApp)));
                       },
                       color: Colors.teal,
                       child: ListTile(
@@ -1322,8 +1320,6 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         dotBall: 1,
         facedBall: 1,
         run: 0,
-        bowlingPosition: 1,
-        battingPosition: 1,
         bowlerId: context.bloc<SportsDataBloc>().state.bowler.playerId,
         playerIdWhoFaced:
             context.bloc<SportsDataBloc>().state.stricker.playerId,
@@ -1360,8 +1356,6 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         single: 1,
         double: 0,
         tripple: 0,
-        bowlingPosition: 1,
-        battingPosition: 1,
         wide: 0,
         extras: 0,
         bowled: 0,
@@ -1389,8 +1383,6 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         perBallRecord: 2.toString(),
         totalRun: 2,
         single: 0,
-        bowlingPosition: 1,
-        battingPosition: 1,
         double: 1,
         tripple: 0,
         wide: 0,
@@ -1422,8 +1414,6 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         double: 0,
         tripple: 1,
         wide: 0,
-        bowlingPosition: 1,
-        battingPosition: 1,
         bowled: 0,
         caugth: 0,
         four: 0,
@@ -1458,8 +1448,6 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         noBall: 0,
         runOut: 0,
         six: 0,
-        bowlingPosition: 1,
-        battingPosition: 1,
         lbw: 0,
         stump: 0,
         extras: 0,
@@ -1491,8 +1479,6 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         six: 1,
         lbw: 0,
         stump: 0,
-        bowlingPosition: 1,
-        battingPosition: 1,
         wicket: 0,
         isValid: true);
     updatePlayersData(bowl);
@@ -1521,8 +1507,6 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         six: 0,
         lbw: 0,
         stump: 0,
-        bowlingPosition: 1,
-        battingPosition: 1,
         wicket: 0,
         isValid: false);
 
@@ -1548,8 +1532,6 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         caugth: 0,
         four: 0,
         noBall: 0,
-        bowlingPosition: 1,
-        battingPosition: 1,
         runOut: 0,
         six: 0,
         lbw: 0,
@@ -1579,8 +1561,6 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         four: 0,
         noBall: 0,
         runOut: 0,
-        bowlingPosition: 1,
-        battingPosition: 1,
         six: 0,
         lbw: 0,
         stump: 0,
@@ -1609,8 +1589,6 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         four: 0,
         noBall: 0,
         runOut: 0,
-        bowlingPosition: 1,
-        battingPosition: 1,
         six: 0,
         lbw: 0,
         stump: 0,
@@ -1642,8 +1620,6 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         double: 0,
         tripple: 0,
         wide: 0,
-        bowlingPosition: 1,
-        battingPosition: 1,
         bowled: 0,
         caugth: 0,
         four: 0,
@@ -1673,8 +1649,6 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
         extras: int.parse(_nbController.text) + 1 ?? 0,
         facedBall: 0,
         run: run,
-        bowlingPosition: 1,
-        battingPosition: 1,
         perBallRecord:
             (int.parse(_nbController.text) + 1).toString() + "NB" ?? 0,
         totalRun: int.parse(_nbController.text) + 1 ?? 0,

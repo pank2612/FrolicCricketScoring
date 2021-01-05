@@ -77,7 +77,9 @@ class SportsDataBloc extends Bloc<SportsDataBlocEvent, SportsDataBlocState> {
     _teamPlayerScoring[teamId].teamPlayerModelMap[_stricker.playerId] =
         _playerDetailsModel;
     if (bowl.run == 1 || bowl.run == 3 || bowl.run == 5) {
-      rotateStrike();
+      if (bowl.typeOfOut != "runout") {
+        rotateStrike();
+      }
     }
     _teamPlayerScoring[teamId].extraRuns += bowl.extras;
 

@@ -57,7 +57,8 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
     return overs;
   }
 
-  String getScore(HashMap<int, PlayerDetailsModel> teamPlayerModelMap) {
+  String getScore(
+      HashMap<int, PlayerDetailsModel> teamPlayerModelMap, int teamId) {
     String totalscore = '';
     int score = 0;
 //    context
@@ -71,7 +72,7 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
     score += context
         .bloc<SportsDataBloc>()
         .state
-        .teamPlayerScoring[BATTING_TEAM_ID]
+        .teamPlayerScoring[teamId]
         .extraRuns;
     totalscore = score.toString();
     return totalscore;
@@ -200,7 +201,7 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
                           textAlign: TextAlign.left,
                         ),
                         Text(
-                          "${getScore(context.bloc<SportsDataBloc>().state.teamPlayerScoring[widget.matchDataForApp.firstTeamId].teamPlayerModelMap) + "/" + getWickets(context.bloc<SportsDataBloc>().state.teamPlayerScoring[widget.matchDataForApp.firstTeamId].teamPlayerModelMap).toString()}",
+                          "${getScore(context.bloc<SportsDataBloc>().state.teamPlayerScoring[widget.matchDataForApp.firstTeamId].teamPlayerModelMap, widget.matchDataForApp.firstTeamId) + "/" + getWickets(context.bloc<SportsDataBloc>().state.teamPlayerScoring[widget.matchDataForApp.secondTeamId].teamPlayerModelMap).toString()}",
 //                          BATTING_TEAM_ID == widget.matchDataForApp.firstTeamId
 //                              ? "${getScore(context.bloc<SportsDataBloc>().state.teamPlayerScoring[widget.matchDataForApp.firstTeamId].teamPlayerModelMap) + "/" + getWickets(context.bloc<SportsDataBloc>().state.teamPlayerScoring[widget.matchDataForApp.firstTeamId].teamPlayerModelMap) .toString()}"
 //                              : "${firstInningsScore().toString() + "/" + firstInningsWickets().toString()}",
@@ -266,7 +267,7 @@ class _ScoreCardScreenState extends State<ScoreCardScreen> {
                         Padding(
                           padding: const EdgeInsets.only(left: 8),
                           child: Text(
-                            "${getScore(context.bloc<SportsDataBloc>().state.teamPlayerScoring[widget.matchDataForApp.secondTeamId].teamPlayerModelMap) + "/" + getWickets(context.bloc<SportsDataBloc>().state.teamPlayerScoring[widget.matchDataForApp.secondTeamId].teamPlayerModelMap).toString()}",
+                            "${getScore(context.bloc<SportsDataBloc>().state.teamPlayerScoring[widget.matchDataForApp.secondTeamId].teamPlayerModelMap, widget.matchDataForApp.secondTeamId) + "/" + getWickets(context.bloc<SportsDataBloc>().state.teamPlayerScoring[widget.matchDataForApp.firstTeamId].teamPlayerModelMap).toString()}",
 
 //                            BATTING_TEAM_ID ==
 //                                    widget.matchDataForApp.secondTeamId
