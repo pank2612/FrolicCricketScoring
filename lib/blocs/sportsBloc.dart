@@ -168,6 +168,7 @@ class SportsDataBloc extends Bloc<SportsDataBlocEvent, SportsDataBlocState> {
 
     _teamPlayerScoring[teamId].teamPlayerModelMap[_bowler.playerId] =
         _playerDetailsModel;
+
     if (bowl.isValid == true) {
       int validBowl = 0;
       _playerDetailsModel.overList[_playerDetailsModel.overList.length - 1].over
@@ -182,6 +183,7 @@ class SportsDataBloc extends Bloc<SportsDataBlocEvent, SportsDataBlocState> {
         rotateStrike();
       }
     }
+    add(SportsDataBlocEvent.setUpdate);
   }
 
   void whoIsOut(String value) {

@@ -1,7 +1,10 @@
 import 'dart:collection';
+import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:froliccricketscore/blocs/sportsBloc.dart';
 import 'package:froliccricketscore/constants/config.dart';
 import 'package:froliccricketscore/models/MatchModel.dart';
@@ -315,6 +318,7 @@ class _TossScreenState extends State<TossScreen> {
             ),
             InkWell(
               onTap: () {
+//                setNotification();
                 if (winningTossTeamID == null) {
                   _showDialog("Please select toss winning team");
                   return;
@@ -326,8 +330,7 @@ class _TossScreenState extends State<TossScreen> {
 
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => StartInningsScreen(
-                          matchDataForApp: widget.matchDataForApp
-                        )));
+                        matchDataForApp: widget.matchDataForApp)));
               },
               child: Container(
                 width: MediaQuery.of(context).size.width,
@@ -346,6 +349,66 @@ class _TossScreenState extends State<TossScreen> {
             )
           ],
         ));
+  }
+
+  setNotification() {
+    Firestore.instance.collection("users").getDocuments().then((value) {
+      value.documents.forEach((element) {
+        sendNotification(
+          element['tokenId'],
+        );
+      });
+    });
+  }
+
+  static Future<void> sendNotification(receiver) async {
+//    print("tokenId ----$receiver");
+    PlayerDetailsModel playerDetailsModel = PlayerDetailsModel();
+    final postUrl =
+        'https://fcm.googleapis.com/fcm/send'; // this api key get from google
+    final data = {
+      "notification": {"body": "Vishal Here", "title": "Alert"}, // Map type
+      "priority": "high",
+      "data": {
+        "click_action": "FLUTTER_NOTIFICATION_CLICK",
+        "id": "1",
+        "status": "done",
+        "screen": "AlertsScreen",
+        "name": "hhhhh",
+      },
+      "apns": {
+        "payload": {
+          "aps": {"mutable-content": 1}
+        },
+        "fcm_options": {
+          "image":
+              "https://aubergestjacques.com/wp-content/uploads/2017/04/check-out-1.png"
+        }
+      },
+      "to":
+          "dr8-xd06TDCZZgjJzE8zKA:APA91bGVrPwg4q61OuWys2LBllN8xeI0LNWf04DE2sF7Kr7FF7s3F2uDs7V2aK9Dq8eS3Wrkl7oy1HcywRrOmDqJSJCkWIBacJQTV3MPUpADZNzxbhjUdhcxnUtm8SKah9LHZf26sDCd"
+    };
+
+    final headers = {
+      'content-type': 'application/json',
+      'Authorization': NOTIFICATION_KEY
+    };
+    BaseOptions options = new BaseOptions(
+      connectTimeout: 5000,
+      receiveTimeout: 3000,
+      headers: headers,
+    );
+
+    try {
+      final response = await Dio(options).post(postUrl, data: jsonEncode(data));
+      if (response.statusCode == 200) {
+        Fluttertoast.showToast(msg: 'Request Sent To HouseMember');
+      } else {
+        print('notification sending failed');
+      }
+    } catch (e) {
+      print('exception $e');
+    }
   }
 
   _showDialog(String name) {

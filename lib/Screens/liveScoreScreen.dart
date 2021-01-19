@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:froliccricketscore/Screens/scoreCardScreen.dart';
@@ -796,7 +797,7 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
                     color: Colors.teal.shade600,
                     onPressed: () {
                       Navigator.of(context).pop();
-                      context.bloc<SportsDataBloc>().resetOver();
+//                      context.bloc<SportsDataBloc>().resetOver();
                       Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -1669,12 +1670,50 @@ class _LiveScoreScreenState extends State<LiveScoreScreen> {
     updatePlayersData(bowl);
   }
 
-  updatePlayersData(Bowl bowl) {
-    context.bloc<SportsDataBloc>().updateOver(bowl);
-    context.bloc<SportsDataBloc>().updateStriker(bowl, BATTING_TEAM_ID);
-    context.bloc<SportsDataBloc>().updateBowler(bowl, BOWLING_TEAM_ID);
+  Future<void> updatePlayersData(Bowl bowl) async {
+    await context.bloc<SportsDataBloc>().updateOver(bowl);
+    await context.bloc<SportsDataBloc>().updateStriker(bowl, BATTING_TEAM_ID);
+    await context.bloc<SportsDataBloc>().updateBowler(bowl, BOWLING_TEAM_ID);
+    updateDataToFirebase();
     overFinishedDialogBox();
     checkForMatchComplete();
+  }
+
+  updateDataToFirebase() {
+    List<PlayerDetailsModel> playerDetailModelList = List<PlayerDetailsModel>();
+    context
+        .bloc<SportsDataBloc>()
+        .state
+        .teamPlayerScoring[BATTING_TEAM_ID]
+        .teamPlayerModelMap
+        .values
+        .forEach((players) {
+          playerDetailModelList.add(players);
+    });
+    context
+        .bloc<SportsDataBloc>()
+        .state
+        .teamPlayerScoring[BOWLING_TEAM_ID]
+        .teamPlayerModelMap
+        .values
+        .forEach((players) {
+      playerDetailModelList.add(players);
+       });
+    Firestore.instance
+        .collection(SPORTS_DATA)
+        .document(global.defaultSports)
+        .collection(TOURNAMENTS_DATA)
+        .document("IPL2020")
+        .collection(MATCH_DATA)
+        .document("1")
+        .collection("score")
+        .document("1")
+        .setData(
+      {
+        "playersData":
+            FieldValue.arrayUnion(jsonDecode(jsonEncode(playerDetailModelList)))
+      },
+    );
   }
 
   navigateToMatchCompleteScreen(String howWonTheMatch) {

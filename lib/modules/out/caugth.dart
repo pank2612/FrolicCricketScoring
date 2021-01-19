@@ -1,5 +1,7 @@
 import 'dart:async';
-
+import 'dart:convert';
+import 'package:froliccricketscore/constants/global_variables.dart' as global;
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:froliccricketscore/Screens/liveScoreScreen.dart';
@@ -479,9 +481,49 @@ class _CaugthScreenState extends State<CaugthScreen> {
         extras: 0,
         wicket: 1,
         isValid: true);
-    context.bloc<SportsDataBloc>().updateOver(bowl);
-    context.bloc<SportsDataBloc>().updateStriker(bowl, BATTING_TEAM_ID);
-    context.bloc<SportsDataBloc>().updateBowler(bowl, BOWLING_TEAM_ID);
-    // overFinishedDialogBox();
+    updatePlayersData(bowl);
+  }
+
+  Future<void> updatePlayersData(Bowl bowl) async {
+    await context.bloc<SportsDataBloc>().updateOver(bowl);
+    await context.bloc<SportsDataBloc>().updateStriker(bowl, BATTING_TEAM_ID);
+    await context.bloc<SportsDataBloc>().updateBowler(bowl, BOWLING_TEAM_ID);
+    updateDataToFirebase();
+  }
+
+  updateDataToFirebase() {
+    List<PlayerDetailsModel> playerDetailModelList = List<PlayerDetailsModel>();
+    context
+        .bloc<SportsDataBloc>()
+        .state
+        .teamPlayerScoring[BATTING_TEAM_ID]
+        .teamPlayerModelMap
+        .values
+        .forEach((players) {
+      playerDetailModelList.add(players);
+    });
+    context
+        .bloc<SportsDataBloc>()
+        .state
+        .teamPlayerScoring[BOWLING_TEAM_ID]
+        .teamPlayerModelMap
+        .values
+        .forEach((players) {
+      playerDetailModelList.add(players);
+    });
+
+    Firestore.instance
+        .collection(SPORTS_DATA)
+        .document(global.defaultSports)
+        .collection(TOURNAMENTS_DATA)
+        .document("IPL2020")
+        .collection(MATCH_DATA)
+        .document("1")
+        .collection("score")
+        .document("1")
+        .setData({
+      "playersData":
+          FieldValue.arrayUnion(jsonDecode(jsonEncode(playerDetailModelList)))
+    }, merge: true);
   }
 }

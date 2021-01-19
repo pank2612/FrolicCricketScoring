@@ -30,6 +30,10 @@ dependencies:
   intl: ^0.16.0
   flutter_bloc: 6.0.1
   fluttertoast:
+  firebase_messaging: ^6.0.9
+  dio: ^3.0.10
+  http:
+  flutter_local_notifications: ^3.0.3
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.0

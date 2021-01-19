@@ -30,12 +30,6 @@ class PlayerModel {
       };
 }
 
-PlayerDetailsModel playerDetailsModelFromJson(String str) =>
-    PlayerDetailsModel.fromJson(json.decode(str));
-
-String playerDetailsModelToJson(PlayerDetailsModel data) =>
-    json.encode(data.toJson());
-
 class PlayerDetailsModel {
   PlayerDetailsModel(
       {this.playerId,
@@ -127,7 +121,7 @@ class PlayerDetailsModel {
         playerName: json["playerName"],
         maxOverPerBowler: json['minOverPerBowler'] ?? 0,
         totalPlayedBalls: json["totalPlayedBalls"] ?? 0,
-        runsMadeByBatsman: json["madeRuns"] ?? 0,
+        runsMadeByBatsman: json["runsMadeByBatsman"] ?? 0,
         fours: json["fours"] ?? 0,
         batsmanOutThroughBowlerId: json['batsmanOutThroughBowlerId'] ?? 0,
         typeOfOut: json['typeOfOut'] ?? "Not Out",
@@ -163,7 +157,7 @@ class PlayerDetailsModel {
         "batsmanOut": batsmanOut,
         "shortName": shortName,
         "totalPlayedBalls": totalPlayedBalls,
-        "madeRuns": runsMadeByBatsman,
+        "runsMadeByBatsman": runsMadeByBatsman,
         "fours": fours,
         "batsmanOutThroughBowlerId": batsmanOutThroughBowlerId,
         "teamId": teamId,

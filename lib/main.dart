@@ -11,15 +11,7 @@ void main() {
     providers: [BlocProvider<SportsDataBloc>(create: (_) => SportsDataBloc())],
     child: MaterialApp(
       title: "Frolic Cricket Score",
-
-      home:
-          //ScoreCardScreen(),
-          MatchScreen(),
-      //AddPlayers(),
-      // TossScreen(),
-      //StartInningsScreen(),
-      //RunOutScreen(),
-      //LiveScoreScreen(),
+      home: MatchScreen(),
       debugShowCheckedModeBanner: false,
     ),
   ));
